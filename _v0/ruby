@@ -1,0 +1,46 @@
+
+xenv_ruby(){
+    param <<A
+Subcommands:
+    use|activate|act
+    unuse|deactivate|dea
+
+    local
+    global
+    shell
+
+    install
+    uninstall
+
+    rehash
+    version
+
+    exec
+
+    ls|versions
+    ls-remote|lsr
+
+    alias
+    unalias
+
+    which
+    whence
+
+    cache
+A
+
+}
+
+xenv_ruby_install(){
+    :
+}
+
+xenv_ruby_ls(){
+    :
+}
+
+xenv_ruby_ls_remote(){
+    :
+}
+
+

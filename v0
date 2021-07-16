@@ -1,0 +1,11 @@
+#! /usr/bin/env bash
+
+. "$HOME/.x-cmd/boot" 2>/dev/null || eval "$(curl https://get.x-cmd.com/script)"
+
+# Inject the environment.
+xenv() (
+    xrc xenv/_v0/main
+    xrc ${1:+"$@"}
+)
+
+xenv ${1:+"$@"}

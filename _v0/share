@@ -1,0 +1,70 @@
+
+
+xenv_version(){
+    echo "v0"
+}
+
+
+# version file
+xenv_version_filepath_write(){
+    local version_filepath="${1:?"Please provide version_filepath path"}"
+    local version="$2"
+    if [ -z "$version_filepath" ] || [ -z "$version" ]; then
+        cat >&2 <<A
+        xenv_version_filepath "<version_filepath>" "<$version>"
+A
+        exit 1
+    fi
+
+    echo "$version" > "$version_filepath"
+}
+
+
+xenv_version_filepath_read(){
+    local version_filepath="${1:?"Please provide version_filepath path"}"
+
+    if [ ! -f "$version_filepath" ]; then
+        return 1
+    fi
+
+    # local version=
+    # if [ -n "$version" ]
+    # TODO: parse?
+
+    cat "$VERSION_FILE"
+}
+
+# find_local_version_file
+# Notice: x-cmd facility.
+xenv_version_file_find(){
+    local cur="${1:?Provide starting path}"
+    local relative_filepath="${2:?Provide relative filepath}"
+    while [ ! "$cur" = "" ]; do
+        if [ -f "$cur/$relative_filepath" ]; then
+            echo "$cur"
+            return 0
+        fi
+        cur=${cur%/*}
+    done
+    return 1
+}
+
+# TODO: This is for specific language
+xenv_version_show(){
+    local target_dir="${1:-""}"
+    if [ -n "$target_dir" ]; then
+        xenv_version_file_find "$target_dir"
+        return 0
+    fi
+
+    xenv_version_file_find "$RBENV_DIR" && return 0
+
+    [ "$RBENV_DIR" != "$PWD" ]
+
+    echo "${XENV_ROOT}/version"
+}
+
+
+
+
+
