@@ -1,0 +1,46 @@
+
+xenv(){
+    param <<A
+Subcommands:
+    use|activate|act
+    unuse|deactivate|dea
+
+    local
+    global
+    shell
+
+    install
+    uninstall
+
+    rehash
+    version
+
+    exec
+
+    ls|versions
+    lsremote|lsr
+
+    alias
+    unalias
+
+    which
+    whence
+
+    cache
+A
+
+}
+
+xenv_python_install(){
+    :
+}
+
+xenv_python_ls(){
+    :
+}
+
+xenv_python_lsremote(){
+    :
+}
+
+

@@ -18,7 +18,7 @@ Subcommands:
     exec
 
     ls|versions
-    ls-remote|lsr
+    lsremote|lsr
 
     alias
     unalias
@@ -39,7 +39,7 @@ xenv_ruby_ls(){
     :
 }
 
-xenv_ruby_ls_remote(){
+xenv_ruby_lsremote(){
     :
 }
 
