@@ -6,12 +6,13 @@ xrc param
 ___x_cmd_env() {
     param:dsl <<A
 subcommands:
-    install                 "Install environment"
-    uninstall               "Uninstall environment"
-    use                     "Use environment only for current shell session"
-    default                 "Set default environment"
     ls                      "list all installed environments"
-    lsr                     "list all available environments"
+    la                      "list all available environments"
+    get                     "Download environment"
+    rm                      "Remove environment"
+    use                     "Set global default environment"
+    ws                      "Set workspace default environment"
+    try                     "Set default environment in this shell session"
 
     current                 "Show current environment"
     which                   "Display path of environment installed"
