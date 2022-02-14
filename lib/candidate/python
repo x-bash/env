@@ -1,48 +1,45 @@
 
-xenv(){
-    param <<A
-Subcommands:
-    use|activate|act
-    unuse|deactivate|dea
 
-    local
-    global
-    shell
-
-    install
-    uninstall
-
-    rehash
-    version
-
-    exec
-
-    ls|versions
-    lsremote|lsr
-
-    alias
-    unalias
-
-    which
-    whence
-
-    cache
-A
-
-}
-
-# Given version
-___x_cmd_env_python_install(){
+___x_cmd_env_python_la(){
     :
 }
 
-# Given
 ___x_cmd_env_python_ls(){
     :
 }
 
-___x_cmd_env_python_lsremote(){
+___x_cmd_env_python_download(){
     :
 }
 
+___x_cmd_env_python_get(){
+    :
+}
 
+___x_cmd_env_python_rm(){
+    :
+}
+
+___x_cmd_env_python_try(){
+    :
+}
+
+___x_cmd_env_python_use(){
+    :
+}
+
+___x_cmd_env_python_ws(){
+    :
+}
+
+___x_cmd_env_python_current(){
+    :
+}
+
+___x_cmd_env_python_which(){
+    :
+}
+
+___x_cmd_env_python_exec(){
+    :
+}

@@ -2,6 +2,12 @@
 
 xrc param
 
+# TODO:
+# alias
+# unalias
+# rehash
+# whence
+
 # Inject the environment.
 ___x_cmd_env() {
     param:dsl <<A
