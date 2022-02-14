@@ -10,11 +10,12 @@ subcommands:
     uninstall               "Uninstall environment"
     use                     "Use environment only for current shell session"
     default                 "Set default environment"
-    list                    "list all installed environments or list all available environments"
-    
+    ls                      "list all installed environments"
+    lsr                     "list all available environments"
+
     current                 "Show current environment"
     which                   "Display path of environment installed"
-    
+
     exec                    "Run an executable with the selected candidates version"
 A
     param:run
