@@ -1,11 +1,31 @@
-#! /usr/bin/env bash
+# shellcheck    # xrc
 
 . "$HOME/.x-cmd/boot" 2>/dev/null || eval "$(curl https://get.x-cmd.com/script)"
 
+xrc param
+
 # Inject the environment.
-xenv() (
-    xrc xenv/_v0/main
-    xrc ${1:+"$@"}
+___x_cmd_env() (
+    param:dsl <<A
+subcommands:
+    install             "Install environment"
+    uninstall           "Uninstall environment"
+    use                 "Use environment only for current shell session"
+    default             "Set default environment"
+    list                "list all installed environments or list all available environments"
+
+    current             "Show current environment"
+    which               "Display path of environment installed"
+
+    exec                "Run an executable with the selected candidates version"
+A
+    param:run
+
+    
+
+
 )
 
-xenv ${1:+"$@"}
+___x_cmd_env "$@"
+
+xrc setmain ___x_cmd_env
