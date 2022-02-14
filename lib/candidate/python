@@ -12,11 +12,11 @@ ___x_cmd_env_python_download(){
     :
 }
 
-___x_cmd_env_python_get(){
+___x_cmd_env_python_install(){
     :
 }
 
-___x_cmd_env_python_rm(){
+___x_cmd_env_python_uninstall(){
     :
 }
 

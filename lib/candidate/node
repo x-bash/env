@@ -13,11 +13,11 @@ ___x_cmd_env_node_download(){
     :
 }
 
-___x_cmd_env_node_get(){
+___x_cmd_env_node_install(){
     :
 }
 
-___x_cmd_env_node_rm(){
+___x_cmd_env_node_uninstall(){
     :
 }
 

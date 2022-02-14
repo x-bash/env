@@ -14,8 +14,9 @@ ___x_cmd_env() {
 subcommands:
     ls                      "list all installed environments"
     la                      "list all available environments"
-    get                     "Download environment"
-    rm                      "Remove environment"
+    download                "Download environment"
+    install                 "Install environment"
+    uninstall               "Remove environment"
     try                     "Set default environment in this shell session"
     use                     "Set global default environment"
     ws                      "Set workspace default environment"

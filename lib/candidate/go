@@ -11,11 +11,11 @@ ___x_cmd_env_go_download(){
     :
 }
 
-___x_cmd_env_go_get(){
+___x_cmd_env_go_install(){
     :
 }
 
-___x_cmd_env_go_rm(){
+___x_cmd_env_go_uninstall(){
     :
 }
 

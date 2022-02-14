@@ -11,11 +11,11 @@ ___x_cmd_env_ruby_download(){
     :
 }
 
-___x_cmd_env_ruby_get(){
+___x_cmd_env_ruby_install(){
     :
 }
 
-___x_cmd_env_ruby_rm(){
+___x_cmd_env_ruby_uninstall(){
     :
 }
 
