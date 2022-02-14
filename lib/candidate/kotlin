@@ -1,0 +1,44 @@
+
+___x_cmd_env_kotlin_ls(){
+    :
+}
+
+___x_cmd_env_kotlin_la(){
+    :
+}
+
+___x_cmd_env_kotlin_download(){
+    :
+}
+
+___x_cmd_env_kotlin_install(){
+    :
+}
+
+___x_cmd_env_kotlin_uninstall(){
+    :
+}
+
+___x_cmd_env_kotlin_try(){
+    :
+}
+
+___x_cmd_env_kotlin_use(){
+    :
+}
+
+___x_cmd_env_kotlin_ws(){
+    :
+}
+
+___x_cmd_env_kotlin_current(){
+    :
+}
+
+___x_cmd_env_kotlin_which(){
+    :
+}
+
+___x_cmd_env_kotlin_exec(){
+    :
+}
