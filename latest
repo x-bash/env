@@ -1,11 +1,9 @@
 # shellcheck    # xrc
 
-. "$HOME/.x-cmd/boot" 2>/dev/null || eval "$(curl https://get.x-cmd.com/script)"
-
 xrc param
 
 # Inject the environment.
-___x_cmd_env() (
+___x_cmd_env() {
     param:dsl <<A
 subcommands:
     install             "Install environment"
@@ -21,11 +19,12 @@ subcommands:
 A
     param:run
 
-    
+    if [ -z "$PARAM_SUBCMD" ]; then
+        ___x_cmd_env help
+        return 1
+    fi
 
-
-)
-
-___x_cmd_env "$@"
+    "___x_cmd_env_$PARAM_SUBCMD" "$@"
+}
 
 xrc setmain ___x_cmd_env
