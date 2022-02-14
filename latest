@@ -36,18 +36,9 @@ A
         return 1
     fi
 
-    ___x_cmd_env_op_candidate "$PARAM_SUBCMD" "$@"
+    "___x_cmd_env_main_$PARAM_SUBCMD" "$@"
 }
 
-
-
-___x_cmd_env_current(){
-    ___x_cmd_env_op_candidate current "$@"
-}
-
-___x_cmd_env_exec(){
-    ___x_cmd_env_op_candidate exec "$@"
-}
 
 # Section: Candidate API
 
