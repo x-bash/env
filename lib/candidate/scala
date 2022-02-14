@@ -1,0 +1,44 @@
+
+___x_cmd_env_scala_ls(){
+    :
+}
+
+___x_cmd_env_scala_la(){
+    :
+}
+
+___x_cmd_env_scala_download(){
+    :
+}
+
+___x_cmd_env_scala_install(){
+    :
+}
+
+___x_cmd_env_scala_uninstall(){
+    :
+}
+
+___x_cmd_env_scala_try(){
+    :
+}
+
+___x_cmd_env_scala_use(){
+    :
+}
+
+___x_cmd_env_scala_ws(){
+    :
+}
+
+___x_cmd_env_scala_current(){
+    :
+}
+
+___x_cmd_env_scala_which(){
+    :
+}
+
+___x_cmd_env_scala_exec(){
+    :
+}
