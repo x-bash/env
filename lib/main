@@ -28,10 +28,18 @@ ___x_cmd_env_main_use(){
 }
 
 ___x_cmd_env_main_ws(){
+    if [ $# -eq 0 ]; then
+        : TODO: list workspace environment
+    fi
+
     ___x_cmd_env_op_candidate ws "$@"
 }
 
 ___x_cmd_env_main_current(){
+    if [ $# -eq 0 ]; then
+        : TODO: list current environment
+    fi
+
     ___x_cmd_env_op_candidate current "$@"
 }
 
