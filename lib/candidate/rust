@@ -1,0 +1,44 @@
+
+___x_cmd_env_rust_ls(){
+    :
+}
+
+___x_cmd_env_rust_la(){
+    :
+}
+
+___x_cmd_env_rust_download(){
+    :
+}
+
+___x_cmd_env_rust_install(){
+    :
+}
+
+___x_cmd_env_rust_uninstall(){
+    :
+}
+
+___x_cmd_env_rust_try(){
+    :
+}
+
+___x_cmd_env_rust_use(){
+    :
+}
+
+___x_cmd_env_rust_ws(){
+    :
+}
+
+___x_cmd_env_rust_current(){
+    :
+}
+
+___x_cmd_env_rust_which(){
+    :
+}
+
+___x_cmd_env_rust_exec(){
+    :
+}
