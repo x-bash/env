@@ -1,5 +1,5 @@
 
-xenv_ruby(){
+___x_cmd_env_ruby(){
     param <<A
 Subcommands:
     use|activate|act
@@ -31,15 +31,15 @@ A
 
 }
 
-xenv_ruby_install(){
+___x_cmd_env_ruby_install(){
     :
 }
 
-xenv_ruby_ls(){
+___x_cmd_env_ruby_ls(){
     :
 }
 
-xenv_ruby_lsremote(){
+___x_cmd_env_ruby_lsremote(){
     :
 }
 

@@ -19,7 +19,6 @@ A
     echo "$version" > "$version_filepath"
 }
 
-
 ___x_cmd_env_version_filepath_read(){
     local version_filepath="${1:?"Please provide version_filepath path"}"
 

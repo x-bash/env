@@ -31,15 +31,15 @@ A
 
 }
 
-xenv_python_install(){
+___x_cmd_env_python_install(){
     :
 }
 
-xenv_python_ls(){
+___x_cmd_env_python_ls(){
     :
 }
 
-xenv_python_lsremote(){
+___x_cmd_env_python_lsremote(){
     :
 }
 
