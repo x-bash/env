@@ -25,10 +25,26 @@ A
         return 1
     fi
 
-    "___x_cmd_env_$PARAM_SUBCMD" "$@"
+    ___x_cmd_env_op_candidate "$PARAM_SUBCMD" "$@"
 }
 
 # Section: Candidate API
+
+___x_cmd_env_op_candidate(){
+    local op="${1:?Provide op}";  shift
+    local candidate="${1:?Provide candidate}";  shift
+
+    if ! ___x_cmd_env_candidate_has "$candidate"; then
+        printf "Candidate inexisted: %s\n" "$candidate" >&2
+        return 1
+    fi
+
+    xrc "env/lib/candidate/$candidate"
+
+    "___x_cmd_env_${candidate}_${op}" "$@"
+}
+
+
 ___x_cmd_env_candidate_all(){
     printf "%s" "
 python
