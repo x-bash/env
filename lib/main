@@ -1,0 +1,15 @@
+
+
+___x_cmd_env_install(){
+    local candidate="${1:?Provide candidate}";  shift
+
+    if ! ___x_cmd_env_candidate_has "$candidate"; then
+        printf "Candidate inexisted: %s\n" "$candidate" >&2
+        return 1
+    fi
+
+    xrc "env/lib/candidate/$candidate"
+
+    "___x_cmd_env_${candidate}_install" "$@"
+}
+

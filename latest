@@ -30,14 +30,26 @@ A
 
 # Section: Candidate API
 ___x_cmd_env_candidate_all(){
-    cat <<A
+    printf "%s" "
 python
 node
 java
 go
 kotlin
 scala
-A
+"
+
+}
+
+___x_cmd_env_candidate_has(){
+    local target="${1:?Provide target}"
+    local s="$(___x_cmd_env_candidate_all)"
+    if [ "$s" = "${s#
+$target
+}" ]; then
+        return 0
+    fi
+    return 1
 }
 
 # EndSection
