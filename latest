@@ -28,4 +28,15 @@ A
     "___x_cmd_env_$PARAM_SUBCMD" "$@"
 }
 
+___x_cmd_env_candidate_all(){
+    cat <<A
+python
+node
+java
+go
+kotlin
+scala
+A
+}
+
 xrc setmain ___x_cmd_env
