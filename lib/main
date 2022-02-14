@@ -1,0 +1,44 @@
+
+___x_cmd_env_main_ls(){
+    ___x_cmd_env_op_candidate ls "$@"
+}
+
+___x_cmd_env_main_la(){
+    ___x_cmd_env_op_candidate la "$@"
+}
+
+___x_cmd_env_main_download(){
+    ___x_cmd_env_op_candidate download "$@"
+}
+
+___x_cmd_env_main_install(){
+    ___x_cmd_env_op_candidate install "$@"
+}
+
+___x_cmd_env_main_uninstall(){
+    ___x_cmd_env_op_candidate uninstall "$@"
+}
+
+___x_cmd_env_main_try(){
+    ___x_cmd_env_op_candidate try "$@"
+}
+
+___x_cmd_env_main_use(){
+    ___x_cmd_env_op_candidate use "$@"
+}
+
+___x_cmd_env_main_ws(){
+    ___x_cmd_env_op_candidate ws "$@"
+}
+
+___x_cmd_env_main_current(){
+    ___x_cmd_env_op_candidate current "$@"
+}
+
+___x_cmd_env_main_which(){
+    ___x_cmd_env_op_candidate which "$@"
+}
+
+___x_cmd_env_main_exec(){
+    ___x_cmd_env_op_candidate exec "$@"
+}
