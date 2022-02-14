@@ -10,9 +10,9 @@ subcommands:
     la                      "list all available environments"
     get                     "Download environment"
     rm                      "Remove environment"
+    try                     "Set default environment in this shell session"
     use                     "Set global default environment"
     ws                      "Set workspace default environment"
-    try                     "Set default environment in this shell session"
 
     current                 "Show current environment"
     which                   "Display path of environment installed"
