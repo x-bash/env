@@ -1,2 +1,44 @@
-# Maybe just using nvm
 
+___x_cmd_env_node_la(){
+    :
+}
+
+___x_cmd_env_node_ls(){
+    :
+}
+
+___x_cmd_env_node_download(){
+    :
+}
+
+___x_cmd_env_node_get(){
+    :
+}
+
+___x_cmd_env_node_rm(){
+    :
+}
+
+___x_cmd_env_node_try(){
+    :
+}
+
+___x_cmd_env_node_use(){
+    :
+}
+
+___x_cmd_env_node_ws(){
+    :
+}
+
+___x_cmd_env_node_current(){
+    :
+}
+
+___x_cmd_env_node_which(){
+    :
+}
+
+___x_cmd_env_node_exec(){
+    :
+}
