@@ -1,9 +1,9 @@
 
-___x_cmd_env_go_la(){
+___x_cmd_env_go_ls(){
     :
 }
 
-___x_cmd_env_go_ls(){
+___x_cmd_env_go_la(){
     :
 }
 
