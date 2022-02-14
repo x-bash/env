@@ -1,0 +1,11 @@
+
+___x_cmd_env_candidate_all(){
+    cat <<A
+python
+node
+java
+go
+kotlin
+scala
+A
+}
