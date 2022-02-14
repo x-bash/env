@@ -28,6 +28,7 @@ A
     "___x_cmd_env_$PARAM_SUBCMD" "$@"
 }
 
+# Section: Candidate API
 ___x_cmd_env_candidate_all(){
     cat <<A
 python
@@ -38,5 +39,7 @@ kotlin
 scala
 A
 }
+
+# EndSection
 
 xrc setmain ___x_cmd_env
