@@ -1,0 +1,46 @@
+
+___x_cmd_env_deno_ls(){
+    :
+}
+
+
+___x_cmd_env_deno_la(){
+    :
+}
+
+
+___x_cmd_env_deno_download(){
+    :
+}
+
+___x_cmd_env_deno_install(){
+    :
+}
+
+___x_cmd_env_deno_uninstall(){
+    :
+}
+
+___x_cmd_env_deno_try(){
+    :
+}
+
+___x_cmd_env_deno_use(){
+    :
+}
+
+___x_cmd_env_deno_ws(){
+    :
+}
+
+___x_cmd_env_deno_current(){
+    :
+}
+
+___x_cmd_env_deno_which(){
+    :
+}
+
+___x_cmd_env_deno_exec(){
+    :
+}
