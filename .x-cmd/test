@@ -1,0 +1,7 @@
+# shellcheck shell=sh disable=SC1072 #xsh
+
+xws install
+# x wsroot
+___X_CMD_XRC_MODULE_IMPORTED=
+xrc env
+env
