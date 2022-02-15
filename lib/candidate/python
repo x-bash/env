@@ -46,7 +46,7 @@ ___x_cmd_env_python_download(){
     :
 }
 
-# Section: Python install
+# Section: Python install and uninstall
 
 # 1. If no special version and no local python, we will install a default version for you.
 ___x_cmd_env_python_install(){
@@ -82,17 +82,15 @@ ___x_cmd_env_python_install(){
 
         env_log info "Downloading $url/$miniconda_filename"
         if curl --fail --output "$miniconda_filename" "$url/$miniconda_filename"; then
-            env_log info "Install python $version for $system $platform"
+            env_log info "Install python $miniconda_name"
             chmod +x "${miniconda_filename}" &&
                 "./${miniconda_filename}" -b -u -p "./${miniconda_name}" 1>&2
-            # TODO: remove the file: "${miniconda_filename}"
+            rm -rf "./${miniconda_filename}"
         else
             env_log info "Download failure from $url/${miniconda_filename}"
         fi
     )
 }
-
-# EndSection
 
 ___x_cmd_env_python_uninstall(){
     local version="${1:?Provide python version}"
@@ -102,13 +100,14 @@ ___x_cmd_env_python_uninstall(){
 
     local python_path="$___X_CMD_ROOT/.bin/x-cmd/python"
     if [ -d "$python_path/${miniconda_name}" ]; then
-        env_log info "Uninstall python $version"
         rm -rf "${python_path:?Require python path}/${miniconda_name}"
     else
-        env_log info "Python $version is already installed."
+        env_log  warn "Python $version is already installed."
         return
     fi
 }
+
+# EndSection
 
 ___x_cmd_env_python_try(){
     :
@@ -131,5 +130,17 @@ ___x_cmd_env_python_which(){
 }
 
 ___x_cmd_env_python_exec(){
-    :
+    local version="${1:?Provide python version}" ; shift
+    local miniconda_name
+    local miniconda_filename
+    ___x_cmd_env_python_get_miniconda_name_and_filename "$version"
+
+    local python_path="$___X_CMD_ROOT/.bin/x-cmd/python/${miniconda_name}/bin/python"
+
+    if [ ! -f "$python_path" ]; then
+        env_log error "Python $version is not installed."
+        return 1
+    fi
+
+    "$python_path" "$@"
 }

@@ -4,14 +4,15 @@ xws install
 ___X_CMD_XRC_MODULE_IMPORTED=
 advise rm ___x_cmd_env_main
 xrc env
+x log env
 
 case $1 in
     python)
         . "$(x wsroot)/.x-cmd/testcases/python"
         x env install python py38_4.10.1
-        x env uninstall python py38_4.10.1
+        # x env uninstall python py38_4.10.1
         # x env current
-        # x env exec python -V
+        x env exec python py38_4.10.1 -V
         ;;
     node)
         x env install node

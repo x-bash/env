@@ -55,11 +55,25 @@ A
         return 1
     fi
 
-    printf "Installing %s\n" "$1"
+    env_log info "Installing $1 $2"
     ___x_cmd_env_op_candidate install "$@"
 }
 
 ___x_cmd_env_main_uninstall(){
+    param:scope "env"
+    param:dsl <<A
+options:
+    #1        "Environment Candidates" <candidates>:candidates_list
+    #2        "Version"                <version>
+A
+    param:run
+
+    if [ -z "$1" ]; then
+        ___x_cmd_env_main_uninstall help
+        return 1
+    fi
+
+    env_log info "Uninstalling $1 $2"
     ___x_cmd_env_op_candidate uninstall "$@"
 }
 
@@ -92,5 +106,14 @@ ___x_cmd_env_main_which(){
 }
 
 ___x_cmd_env_main_exec(){
+    param:scope "env"
+    param:dsl <<A
+options:
+    #1        "Environment Candidates" <candidates>:candidates_list
+    #2        "Version"                <version>             =~ "*+" "default"
+A
+    param:run
+
+    env_log debug "Exec $1 $2"
     ___x_cmd_env_op_candidate exec "$@"
 }
