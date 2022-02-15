@@ -1,0 +1,44 @@
+
+___x_cmd_env_java_ls(){
+    :
+}
+
+___x_cmd_env_java_la(){
+    :
+}
+
+___x_cmd_env_java_download(){
+    :
+}
+
+___x_cmd_env_java_install(){
+    :
+}
+
+___x_cmd_env_java_uninstall(){
+    :
+}
+
+___x_cmd_env_java_try(){
+    :
+}
+
+___x_cmd_env_java_use(){
+    :
+}
+
+___x_cmd_env_java_ws(){
+    :
+}
+
+___x_cmd_env_java_current(){
+    :
+}
+
+___x_cmd_env_java_which(){
+    :
+}
+
+___x_cmd_env_java_exec(){
+    :
+}
