@@ -1,3 +1,32 @@
+# shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263    # xrc
+
+___x_cmd_env_main() {
+    param:scope     "env"
+    param:dsl <<A
+subcommands:
+    ls                      "list all installed environments"
+    la                      "list all available environments"
+    download                "Download environment"
+    install                 "Install environment"
+    uninstall               "Remove environment"
+    try                     "Set default environment in this shell session"
+    use                     "Set global default environment"
+    ws                      "Set workspace default environment"
+
+    current                 "Show current environment"
+    which                   "Display path of environment installed"
+
+    exec                    "Run an executable with the selected candidates version"
+A
+    param:run
+
+    if [ -z "$PARAM_SUBCMD" ]; then
+        ___x_cmd_env help
+        return 1
+    fi
+
+    "___x_cmd_env_main_$PARAM_SUBCMD" "$@"
+}
 
 ___x_cmd_env_main_ls(){
     ___x_cmd_env_op_candidate ls "$@"
@@ -11,11 +40,40 @@ ___x_cmd_env_main_download(){
     ___x_cmd_env_op_candidate download "$@"
 }
 
-___x_cmd_env_main_install(){
+___x_cmd_env_main_install() {
+    # TODO: You can do more better in #2 advise json
+    param:scope "env"
+    param:dsl <<A
+options:
+    #1        "Environment Candidates" <candidates>:candidates_list
+    #2        "Version"                <version>="default"    =~ "*" "default"
+A
+    param:run
+
+    if [ -z "$1" ]; then
+        ___x_cmd_env_main_install help
+        return 1
+    fi
+
+    env_log info "Installing $1 $2"
     ___x_cmd_env_op_candidate install "$@"
 }
 
 ___x_cmd_env_main_uninstall(){
+    param:scope "env"
+    param:dsl <<A
+options:
+    #1        "Environment Candidates" <candidates>:candidates_list
+    #2        "Version"                <version>
+A
+    param:run
+
+    if [ -z "$1" ]; then
+        ___x_cmd_env_main_uninstall help
+        return 1
+    fi
+
+    env_log info "Uninstalling $1 $2"
     ___x_cmd_env_op_candidate uninstall "$@"
 }
 
@@ -48,5 +106,14 @@ ___x_cmd_env_main_which(){
 }
 
 ___x_cmd_env_main_exec(){
+    param:scope "env"
+    param:dsl <<A
+options:
+    #1        "Environment Candidates" <candidates>:candidates_list
+    #2        "Version"                <version>             =~ "*+" "default"
+A
+    param:run
+
+    env_log debug "Exec $1 $2"
     ___x_cmd_env_op_candidate exec "$@"
 }
