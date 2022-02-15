@@ -3,11 +3,9 @@ ___x_cmd_env_java_ls(){
     :
 }
 
-
 ___x_cmd_env_java_la(){
     :
 }
-
 
 ___x_cmd_env_java_download(){
     :
