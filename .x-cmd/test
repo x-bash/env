@@ -4,11 +4,9 @@ xws install
 ___X_CMD_XRC_MODULE_IMPORTED=
 xrc env
 
-x env
-
 case $1 in
     python)
-        . "$(x wsroot)/.x-cmd/python"
+        . "$(x wsroot)/.x-cmd/testcases/python"
         x env install python
         x env use python
         x env current
@@ -27,6 +25,6 @@ case $1 in
         x env exec java -version
         ;;
     *)
-        echo "Usage: $0 install|uninstall"
+        echo "Usage: x test python|node|java"
         ;;
 esac
