@@ -1,3 +1,4 @@
+# shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263    # xrc
 
 ___x_cmd_env_python_ls(){
     :
@@ -12,9 +13,75 @@ ___x_cmd_env_python_download(){
     :
 }
 
+# Section: Python install
+
+# 1. If no special version and no local python, we will install a default version for you.
 ___x_cmd_env_python_install(){
-    :
+    local version="${1:-default}"
+
+    case $version in
+        default)
+            # TODO: Handle the python3 case
+            if command -v python >/dev/null; then
+                env_log info "python is already installed."
+                return
+            fi
+            ;;
+    esac
+
+    xrc os
+    local platform
+    local system
+    local miniconda_name
+
+    case "$(os name)" in
+        linux)      system=Linux            ;;
+        windows)    system=Windows          ;;
+        darwin)     system=MacOSX           ;;
+        *)          return 1 ;;
+    esac
+
+    case "$(os arch)" in
+        aarch64)    platform=aarch64        ;;
+        x64)        platform=x86_64         ;;
+        arm64)      platform=arm64          ;;
+        *)          return 1 ;;
+    esac
+
+    miniconda_name="Miniconda3-${version}-${system}-${platform}"
+    if [ $system = "Windows" ] ; then
+        miniconda_filename="${miniconda_name}.exe"
+    else
+        miniconda_filename="${miniconda_name}.sh"
+    fi
+
+    local python_path="$___X_CMD_ROOT/.bin/x-cmd/python"
+    if [ -d "$python_path/${miniconda_name}" ]; then
+        env_log info "python $version is already installed."
+        return
+    fi
+
+    (
+        mkdir -p "$python_path"
+        cd "$python_path" || return 1
+        local url="https://repo.anaconda.com/miniconda"
+        if [ "${___X_CMD_IN_CHINA_NET:-0}" -eq 1 ]; then
+            url="https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda"
+        fi
+
+        env_log info "downloading $url/$miniconda_filename"
+        if curl --fail --output "$miniconda_filename" "$url/$miniconda_filename"; then
+            env_log info "install python $version for $system $platform"
+            chmod +x "${miniconda_filename}" &&
+                "./${miniconda_filename}" -b -u -p "./${miniconda_name}" 1>&2
+            # TODO: remove the file: "${MINICONDA_NAME}.sh"
+        else
+            env_log info "Download failure from $url/${MINICONDA_NAME}.sh"
+        fi
+    )
 }
+
+# EndSection
 
 ___x_cmd_env_python_uninstall(){
     :
