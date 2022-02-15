@@ -23,7 +23,7 @@ ___x_cmd_env_python_get_miniconda_name_and_filename(){
         *)          return 1 ;;
     esac
 
-    miniconda_filename="Miniconda3-${version}-${system}-${platform}"
+    miniconda_name="Miniconda3-${version}-${system}-${platform}"
     if [ $system = "Windows" ] ; then
         miniconda_filename="${miniconda_name}.exe"
     else
@@ -95,7 +95,19 @@ ___x_cmd_env_python_install(){
 # EndSection
 
 ___x_cmd_env_python_uninstall(){
-    :
+    local version="${1:?Provide python version}"
+    local miniconda_name
+    local miniconda_filename
+    ___x_cmd_env_python_get_miniconda_name_and_filename "$version"
+
+    local python_path="$___X_CMD_ROOT/.bin/x-cmd/python"
+    if [ -d "$python_path/${miniconda_name}" ]; then
+        env_log info "Uninstall python $version"
+        rm -rf "${python_path:?Require python path}/${miniconda_name}"
+    else
+        env_log info "Python $version is already installed."
+        return
+    fi
 }
 
 ___x_cmd_env_python_try(){
