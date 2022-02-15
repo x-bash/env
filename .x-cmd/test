@@ -2,15 +2,16 @@
 
 xws install
 ___X_CMD_XRC_MODULE_IMPORTED=
+advise rm ___x_cmd_env
 xrc env
 
 case $1 in
     python)
         . "$(x wsroot)/.x-cmd/testcases/python"
         x env install python
-        x env use python
-        x env current
-        x env exec python -V
+        # x env use python
+        # x env current
+        # x env exec python -V
         ;;
     node)
         x env install node
