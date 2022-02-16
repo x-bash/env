@@ -9,7 +9,8 @@ auto_answer_upgrade='true'
 USE="n"
 
 ___x_cmd_env_determine_version(){
-    local version folder
+    local version
+	local folder
 
 	version="$1"
 	folder="$2"
@@ -63,7 +64,8 @@ ___x_cmd_env_determine_version(){
 }
 
 ___x_cmd_env_path_contains(){
-    local candidate exists
+    local candidate
+	local exists
 
 	candidate="$1"
 	exists="$(echo "$PATH" | grep "$candidate")"
@@ -112,7 +114,8 @@ ___x_cmd_env_install_candidate_version(){
 }
 
 ___x_cmd_env_download(){
-    local version archives_folder
+    local version
+	local archives_folder
 	local headers_file
 
 	version="$1"
@@ -306,7 +309,8 @@ ___x_cmd_env_java_download(){
 
 # Section: Java install and uninstall
 ___x_cmd_env_java_install(){
-    local  version folder
+    local version
+	local folder
 
 	version="${1:-default}"
 	folder="${2:?Please provide folder}"
