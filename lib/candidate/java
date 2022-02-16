@@ -161,7 +161,7 @@ ___x_cmd_env_download(){
 		curl --silent --location "https://api.sdkman.io/2/hooks/post/java/${version}/${platform_parameter}" >| "$post_installation_hook"
 		env_log info "Copy remote post-installation hook: ${post_installation_hook}"
 		source "$post_installation_hook"
-		# __sdkman_post_installation_hook || return 1
+		__sdkman_post_installation_hook || return 1
 		env_log info "Processed binary as: $zip_output"
 		env_log info "Completed post-installation hook..."
 
