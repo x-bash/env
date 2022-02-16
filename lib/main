@@ -65,8 +65,16 @@ A
                 return
             fi
             ;;
-        # TODO: You can check the candidate version at here in general way.
+
     esac
+
+    # Check the candidate version in general way.
+    # The path should have no system and platform info.
+    local candidate_path="$___X_CMD_ROOT/.bin/x-cmd/${candidate}"
+    if [ -d "$candidate_path/${version}" ]; then
+        env_log info "$candidate $version is already installed in $candidate_path/${version} ."
+        return
+    fi
 
     env_log info "Installing $1 $2"
     ___x_cmd_env_op_candidate install "$@"

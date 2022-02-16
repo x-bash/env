@@ -16,10 +16,10 @@ case $1 in
         x env exec python py38_4.10.1 -V
         ;;
     node)
-        x env install node
-        x env use node
+        x env install node v14.17.1
+        x env use node v14.17.1
         x env current node
-       x env exec node -v
+        x env exec node v14.17.1 -v
         ;;
     java)
         x env install java
