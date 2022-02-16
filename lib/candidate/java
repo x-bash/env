@@ -8,6 +8,10 @@ sdkman_auto_answer=false
 auto_answer_upgrade='true'
 USE="n"
 
+__sdkman_echo_debug() {
+	env_log debug "$1"
+}
+
 ___x_cmd_env_determine_version(){
     local version
 	local folder
@@ -162,11 +166,12 @@ ___x_cmd_env_download(){
 		env_log info "Copy remote post-installation hook: ${post_installation_hook}"
 		source "$post_installation_hook"
 		__sdkman_post_installation_hook || return 1
+
 		env_log info "Processed binary as: $zip_output"
 		env_log info "Completed post-installation hook..."
 
 		mv -f "$zip_output" "$zip_archive_target"
-		__sdkman_echo_debug "Moved to archive folder: $zip_archive_target"
+		env_log info "Moved to archive folder: $zip_archive_target"
 	else
 		echo ""
 		env_log info "Found a previously downloaded java ${version} archive. Not downloading it again..."
@@ -326,6 +331,9 @@ ___x_cmd_env_java_install(){
 
 	version="${1:-default}"
 	folder="${2}"
+
+	mkdir -p "$___X_CMD_ROOT/.bin/x-cmd/java/tmp"
+	mkdir -p "$___X_CMD_ROOT/.bin/x-cmd/java/archives"
 
     ENV_AVAILABLE="true" #availability set up
     ___x_cmd_env_determine_version "$version" "$folder" || return 1
