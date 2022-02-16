@@ -76,18 +76,7 @@ ___x_cmd_env_python_install(){
 }
 
 ___x_cmd_env_python_uninstall(){
-    local version="${1:?Provide python version}"
-    local miniconda_name
-    local miniconda_filename
-    ___x_cmd_env_python_get_miniconda_name_and_filename "$version"
-
-    local python_path="$___X_CMD_ROOT/.bin/x-cmd/python"
-    if [ -d "$python_path/${miniconda_name}" ]; then
-        rm -rf "${python_path:?Require python path}/${miniconda_name}"
-    else
-        env_log  warn "Python $version is already installed."
-        return
-    fi
+    :
 }
 
 # EndSection
@@ -114,16 +103,7 @@ ___x_cmd_env_python_which(){
 
 ___x_cmd_env_python_exec(){
     local version="${1:?Provide python version}" ; shift
-    local miniconda_name
-    local miniconda_filename
-    ___x_cmd_env_python_get_miniconda_name_and_filename "$version"
-
-    local python_path="$___X_CMD_ROOT/.bin/x-cmd/python/${miniconda_name}/bin/python"
-
-    if [ ! -f "$python_path" ]; then
-        env_log error "Python $version is not installed."
-        return 1
-    fi
+    local python_path="${candidate_path}/${version}/bin/python"
 
     "$python_path" "$@"
 }

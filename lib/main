@@ -94,7 +94,18 @@ A
         return 1
     fi
 
+    local candidate="$1"
+    local version="${2:?Provide the version}"
     env_log info "Uninstalling $1 $2"
+
+    local candidate_path="$___X_CMD_ROOT/.bin/x-cmd/${candidate}"
+    if [ -d "$candidate_path/${version}" ]; then
+        rm -rf "${candidate_path:?Require candidate path}/${version}"
+    else
+        env_log  warn "This ${candidate} $version is no exist."
+        return
+    fi
+
     ___x_cmd_env_op_candidate uninstall "$@"
 }
 
@@ -134,6 +145,31 @@ options:
     #2        "Version"                <version>             =~ "*+" "default"
 A
     param:run
+
+
+    local candidate="$1"
+    local version="${2:-default}"
+    local candidate_path="$___X_CMD_ROOT/.bin/x-cmd/${candidate}"
+    if [ -z "$candidate" ]; then
+        ___x_cmd_env_main_exec help
+        return 1
+    fi
+
+    case $version in
+        default)
+            # TODO: Handle the python3 case.
+            if command -v "${candidate}" >/dev/null; then
+                env_log info "${candidate} is already installed in $(command -v "${candidate}")"
+                return
+            fi
+            ;;
+        *)
+            if [ ! -d "$candidate_path/${version}" ]; then
+                env_log error "$candidate $version is not installed."
+                return
+            fi
+            ;;
+    esac
 
     env_log debug "Exec $1 $2"
     ___x_cmd_env_op_candidate exec "$@"
