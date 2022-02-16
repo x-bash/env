@@ -7,12 +7,12 @@
 # EndSection
 
 ___x_cmd_env_node_ls(){
-    :
+    x nvm ls
 }
 
 
 ___x_cmd_env_node_la(){
-    :
+    x nvm ls-remote
 }
 
 
@@ -21,11 +21,11 @@ ___x_cmd_env_node_download(){
 }
 
 ___x_cmd_env_node_install(){
-    :
+    x nvm install "${1:-default}"
 }
 
 ___x_cmd_env_node_uninstall(){
-    :
+    x nvm uninstall "${1:-default}"
 }
 
 ___x_cmd_env_node_try(){
@@ -49,5 +49,7 @@ ___x_cmd_env_node_which(){
 }
 
 ___x_cmd_env_node_exec(){
-    :
+    local version="${1:-default}" ; shift
+    echo "${version}"
+    x nvm exec "$version" node "${@}"
 }
