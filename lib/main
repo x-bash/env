@@ -50,10 +50,23 @@ options:
 A
     param:run
 
-    if [ -z "$1" ]; then
+    local candidate="$1"
+    local version="${2:-default}"
+    if [ -z "$candidate" ]; then
         ___x_cmd_env_main_install help
         return 1
     fi
+
+    case $version in
+        default)
+            # TODO: Handle the python3 case.
+            if command -v "${candidate}" >/dev/null; then
+                env_log info "${candidate} is already installed in $(command -v "${candidate}")"
+                return
+            fi
+            ;;
+        # TODO: You can check the candidate version at here in general way.
+    esac
 
     env_log info "Installing $1 $2"
     ___x_cmd_env_op_candidate install "$@"

@@ -18,8 +18,8 @@ case $1 in
     node)
         x env install node
         x env use node
-        x env current
-        x env exec node -v
+        x env current node
+       x env exec node -v
         ;;
     java)
         x env install java
