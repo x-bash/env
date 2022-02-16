@@ -323,9 +323,9 @@ ___x_cmd_env_java_install(){
 	local folder
 
 	version="${1:-default}"
-	folder="${2:?Please provide folder}"
+	folder="${2}"
 
-    ENV_AVAILABLE="false" #availability set up
+    ENV_AVAILABLE="true" #availability set up
     ___x_cmd_env_determine_version "$version" "$folder" || return 1
 
     if [[ -d "$___X_CMD_ROOT/.bin/x-cmd/java/${VERSION}" || -L "$___X_CMD_ROOT/.bin/x-cmd/java/${VERSION}" ]]; then
