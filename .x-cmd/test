@@ -9,6 +9,7 @@ x log env
 case $1 in
     python)
         . "$(x wsroot)/.x-cmd/testcases/python"
+        # TODO: Check if this version is available in your system
         x env install python py38_4.10.1
         # x env uninstall python py38_4.10.1
         # x env current
