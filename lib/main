@@ -70,9 +70,9 @@ A
 
     # Check the candidate version in general way.
     # The path should have no system and platform info.
-    local candidate_path="$___X_CMD_ROOT/.bin/x-cmd/${candidate}"
-    if [ -d "$candidate_path/${version}" ]; then
-        env_log info "$candidate $version is already installed in $candidate_path/${version} ."
+    local ___X_CMD_ENV_CANDIDATE_PATH="$___X_CMD_ROOT/.bin/x-cmd/${candidate}"
+    if [ -d "$___X_CMD_ENV_CANDIDATE_PATH/${version}" ]; then
+        env_log info "$candidate $version is already installed in $___X_CMD_ENV_CANDIDATE_PATH/${version} ."
         return
     fi
 
@@ -98,9 +98,9 @@ A
     local version="${2:?Provide the version}"
     env_log info "Uninstalling $1 $2"
 
-    local candidate_path="$___X_CMD_ROOT/.bin/x-cmd/${candidate}"
-    if [ -d "$candidate_path/${version}" ]; then
-        rm -rf "${candidate_path:?Require candidate path}/${version}"
+    local ___X_CMD_ENV_CANDIDATE_PATH="$___X_CMD_ROOT/.bin/x-cmd/${candidate}"
+    if [ -d "$___X_CMD_ENV_CANDIDATE_PATH/${version}" ]; then
+        rm -rf "${___X_CMD_ENV_CANDIDATE_PATH:?Require candidate path}/${version}"
     else
         env_log  warn "This ${candidate} $version is no exist."
         return
@@ -149,7 +149,7 @@ A
 
     local candidate="$1"
     local version="${2:-default}"
-    local candidate_path="$___X_CMD_ROOT/.bin/x-cmd/${candidate}"
+    local ___X_CMD_ENV_CANDIDATE_PATH="$___X_CMD_ROOT/.bin/x-cmd/${candidate}"
     if [ -z "$candidate" ]; then
         ___x_cmd_env_main_exec help
         return 1
@@ -164,7 +164,7 @@ A
             fi
             ;;
         *)
-            if [ ! -d "$candidate_path/${version}" ]; then
+            if [ ! -d "$___X_CMD_ENV_CANDIDATE_PATH/${version}" ]; then
                 env_log error "$candidate $version is not installed."
                 return
             fi

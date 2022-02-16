@@ -56,8 +56,8 @@ ___x_cmd_env_python_install(){
     ___x_cmd_env_python_get_miniconda_name_and_filename "$version"
 
     (
-        mkdir -p "${candidate_path}"
-        cd "${candidate_path}" || return 1
+        mkdir -p "${___X_CMD_ENV_CANDIDATE_PATH}"
+        cd "${___X_CMD_ENV_CANDIDATE_PATH}" || return 1
         local url="https://repo.anaconda.com/miniconda"
         if [ "${___X_CMD_IN_CHINA_NET:-0}" -eq 1 ]; then
             url="https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda"
@@ -103,7 +103,7 @@ ___x_cmd_env_python_which(){
 
 ___x_cmd_env_python_exec(){
     local version="${1:?Provide python version}" ; shift
-    local python_path="${candidate_path}/${version}/bin/python"
+    local python_path="${___X_CMD_ENV_CANDIDATE_PATH}/${version}/bin/python"
 
     "$python_path" "$@"
 }
