@@ -37,8 +37,8 @@ ___x_cmd_env_determine_version(){
 		local validation_url
 		validation_url="https://api.sdkman.io/2/candidates/validate/java/${version}/$(echo $ENV_PLATFORM | tr '[:upper:]' '[:lower:]')"
 		VERSION_VALID=$(curl --silent --location "$validation_url")
-		env_log info "Validate Java $version for $ENV_PLATFORM_TMP: $VERSION_VALID"
-		env_log info "Validation URL: $validation_url"
+		env_log debug "Validate Java $version for $ENV_PLATFORM_TMP: $VERSION_VALID"
+		env_log debug "Validation URL: $validation_url"
 
 		if [[ "$VERSION_VALID" == 'valid' || "$VERSION_VALID" == 'invalid' && -n "$folder" ]]; then
 			VERSION="$version"
@@ -138,13 +138,13 @@ ___x_cmd_env_download(){
 		headers_file="${metadata_folder}/${base_name}.headers"
 
 		local pre_installation_hook="$___X_CMD_ROOT/.bin/x-cmd/java/tmp/hook_pre_java_${version}.sh"
-		env_log info "Get pre-installation hook: https://api.sdkman.io/2/hooks/pre/java/${version}/${platform_parameter}"
+		env_log debug "Get pre-installation hook: https://api.sdkman.io/2/hooks/pre/java/${version}/${platform_parameter}"
 		curl --silent --location "https://api.sdkman.io/2/hooks/pre/java/${version}/${platform_parameter}" >| "$pre_installation_hook"
-		env_log info "Copy remote pre-installation hook: $pre_installation_hook"
+		env_log debug "Copy remote pre-installation hook: $pre_installation_hook"
 		# TODO: you should begin "./" to use relative path
 		source "$pre_installation_hook"
 		# __sdkman_pre_installation_hook || return 1
-		env_log info "Completed pre-installation hook..."
+		env_log debug "Completed pre-installation hook..."
 
 		export local binary_input="$___X_CMD_ROOT/.bin/x-cmd/java/tmp/${base_name}.bin"
 		export local zip_output="$___X_CMD_ROOT/.bin/x-cmd/java/tmp/$base_name.zip"
@@ -158,20 +158,20 @@ ___x_cmd_env_download(){
 
 		# download binary
 		curl --progress-bar --location --retry-max-time 10 --retry 0 "${download_url}" --output "${binary_input}" --dump-header "${headers_file}"
-		env_log info "Downloaded binary to: ${binary_input} (HTTP headers written to: ${headers_file})"
+		env_log debug "Downloaded binary to: ${binary_input} (HTTP headers written to: ${headers_file})"
 
 		local post_installation_hook="$___X_CMD_ROOT/.bin/x-cmd/java/tmp/hook_post_java_${version}.sh"
-		env_log info "Get post-installation hook: https://api.sdkman.io/2/hooks/post/java/${version}/${platform_parameter}"
+		env_log debug "Get post-installation hook: https://api.sdkman.io/2/hooks/post/java/${version}/${platform_parameter}"
 		curl --silent --location "https://api.sdkman.io/2/hooks/post/java/${version}/${platform_parameter}" >| "$post_installation_hook"
-		env_log info "Copy remote post-installation hook: ${post_installation_hook}"
+		env_log debug "Copy remote post-installation hook: ${post_installation_hook}"
 		source "$post_installation_hook"
 		__sdkman_post_installation_hook || return 1
 
-		env_log info "Processed binary as: $zip_output"
-		env_log info "Completed post-installation hook..."
+		env_log debug "Processed binary as: $zip_output"
+		env_log debug "Completed post-installation hook..."
 
 		mv -f "$zip_output" "$zip_archive_target"
-		env_log info "Moved to archive folder: $zip_archive_target"
+		env_log debug "Moved to archive folder: $zip_archive_target"
 	else
 		echo ""
 		env_log info "Found a previously downloaded java ${version} archive. Not downloading it again..."
@@ -192,7 +192,7 @@ ___x_cmd_env_checksum_zip(){
 
 	if [ -z "${headers_file}" ]; then
 		echo ""
-		env_log info "Skipping checksum for cached artifact"
+		env_log debug "Skipping checksum for cached artifact"
 		return
 	elif [ ! -f "${headers_file}" ]; then
 		echo ""
@@ -222,7 +222,7 @@ ___x_cmd_env_checksum_zip(){
 			fi
 
 			if [[ -n $cmd ]]; then
-				env_log info "Checksumming downloaded artifact ${zip_archive} (${algorithm})"
+				env_log debug "Checksumming downloaded artifact ${zip_archive} (${algorithm})"
 
 				if ! eval "$cmd"; then
 					rm -f "$zip_archive"
@@ -284,7 +284,7 @@ ___x_cmd_env_install_local_version(){
 
 	# Validate max length of version
 	version_length=${#version}
-	env_log info "Validating that actual version length ($version_length) does not exceed max ($version_length_max)"
+	env_log debug "Validating that actual version length ($version_length) does not exceed max ($version_length_max)"
 
 	if [[ $version_length -gt $version_length_max ]]; then
 		env_log error "Invalid version! ${version} with length ${version_length} exceeds max of ${version_length_max}!"
