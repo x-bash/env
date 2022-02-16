@@ -17,10 +17,12 @@ case $1 in
         ;;
     node)
         x env ls node
-        x env install node v14.17.1
-        x env use node v14.17.1
-        x env current node
-        x env exec node v14.17.1 -v
+        x env install node v16.14.0
+        x nvm use system
+        x nvm uninstall v16.14.0
+        # x env use node v16.14.0
+        # x env current node
+        # x env exec node v16.14.0 -v
         ;;
     java)
         x env install java
