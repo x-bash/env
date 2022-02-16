@@ -137,17 +137,19 @@ ___x_cmd_env_download(){
 		env_log info "Get pre-installation hook: https://api.sdkman.io/2/hooks/pre/java/${version}/${platform_parameter}"
 		curl --silent --location "https://api.sdkman.io/2/hooks/pre/java/${version}/${platform_parameter}" >| "$pre_installation_hook"
 		env_log info "Copy remote pre-installation hook: $pre_installation_hook"
-		source "$pre_installation_hook"
+		# TODO: you should begin "./" to use relative path
+		. "$pre_installation_hook"
 		env_log info "Completed pre-installation hook..."
 
 		export local binary_input="$___X_CMD_ROOT/.bin/x-cmd/tmp/${base_name}.bin"
 		export local zip_output="$___X_CMD_ROOT/.bin/x-cmd/tmp/$base_name.zip"
 
-		echo ""
+		printf "\n"
 		env_log info "Downloading: Java ${version}"
-		echo ""
+		printf "\n"
 		env_log info "In progress..."
-		echo ""
+		printf "\n"
+
 
 		# download binary
 		curl --progress-bar --location --retry-max-time 10 --retry 0 "${download_url}" --output "${binary_input}" --dump-header "${headers_file}"
