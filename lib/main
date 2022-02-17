@@ -98,6 +98,19 @@ A
 }
 
 ___x_cmd_env_main_ls(){
+    param:scope "env"
+    param:dsl <<A
+options:
+    #1        "Environment Candidates" <candidates>:candidates_list
+A
+    param:run
+
+    if [ -z "$1" ]; then
+        ___x_cmd_env_main_install help
+        return 1
+    fi
+
+    ls "$___X_CMD_ENV_PATH/$1"
     ___x_cmd_env_op_candidate ls "$@"
 }
 
