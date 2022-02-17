@@ -9,7 +9,13 @@ x log env
 case $1 in
     python)
         . "$(x wsroot)/.x-cmd/testcases/python"
+<<<<<<< HEAD
         x env install python py38_4.10.1 #py39_4.10.3
+=======
+        # TODO: Check if this version is available in your system
+        x env install python py38_4.10.1
+        x env ls python
+>>>>>>> origin/main
         # x env uninstall python py38_4.10.1
         # x env current
         x env exec python py38_4.10.1 -V
@@ -17,16 +23,25 @@ case $1 in
     node)
         x env install node v14.17.1
         x env use node v14.17.1
+        x env ls node
         x env current node
         x env exec node v14.17.1 -v
         ;;
     java)
+<<<<<<< HEAD
         . "$(x wsroot)/.x-cmd/testcases/java"
         x env install java 17.0.2.8.1-amzn
         # x env uninstall java 17.0.2.8.1-amzn
         # x env use java
         # x env current
         x env exec java 17.0.2.8.1-amzn -version
+=======
+        x env install java
+        x env use java
+        x env ls java
+        x env current
+        x env exec java -version
+>>>>>>> origin/main
         ;;
     *)
         echo "Usage: x test python|node|java"

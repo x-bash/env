@@ -17,7 +17,7 @@ ___x_cmd_env_main() {
     xrc param
 
     # TODO: candidates list should be automatically generated
-    param_type  env  candidates_list  "=" "python" "java" "node" "null"
+    param_type  env  candidates_list  "=" "python" "java" "node"
     ___x_cmd_env_main "$@"
 }
 
