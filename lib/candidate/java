@@ -287,9 +287,10 @@ ___x_cmd_env_install_local_version(){
 	mkdir -p "$___X_CMD_ENV_PATH/java"
 
 	# handle relative paths
-	if [[ "$folder" != /* ]]; then
-		folder="$(pwd)/$folder"
-	fi
+	case "$folder" in
+		/*) ;;
+		*) folder="$(pwd)/$folder" ;;
+	esac
 
 	if [ -d "$folder" ]; then
 		env_log info "Linking java ${version} to ${folder}"
