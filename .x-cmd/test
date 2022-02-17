@@ -9,7 +9,9 @@ x log env
 case $1 in
     python)
         . "$(x wsroot)/.x-cmd/testcases/python"
-        x env install python py39_4.10.3
+        # TODO: Check if this version is available in your system
+        x env install python py38_4.10.1
+        x env ls python
         # x env uninstall python py38_4.10.1
         # x env current
         x env exec python py39_4.10.3 -V
@@ -17,6 +19,7 @@ case $1 in
     node)
         x env install node v14.17.1
         x env use node v14.17.1
+        x env ls node
         x env current node
         x env exec node v14.17.1 -v
         ;;
