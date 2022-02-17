@@ -46,6 +46,11 @@ ___x_cmd_env_python_download(){
     :
 }
 
+___x_cmd_env_python_try(){
+    local version="${1:?Provide python version}"
+    PATH="${___X_CMD_ENV_PATH}/python/${version}/bin:$PATH"
+}
+
 ___x_cmd_env_python_use(){
     local version="${1:?Provide python version}"
     ___x_cmd_env_python_try "$version"
@@ -91,14 +96,10 @@ ___x_cmd_env_python_install(){
 ___x_cmd_env_python_uninstall(){
     local version="${1:?Provide python version}"
     ___x_cmd_env_common_uninstall python "$version" || return
+    x boot rc del "x-env-python"
 }
 
 # EndSection
-
-___x_cmd_env_python_try(){
-    local version="${1:?Provide python version}"
-    PATH="${___X_CMD_ENV_PATH}/python/${version}/bin:$PATH"
-}
 
 ___x_cmd_env_python_ws(){
     :

@@ -41,18 +41,18 @@ ___x_cmd_env_determine_version(){
     local version="$1"
 	local folder="$1"
 
-    if [[ "$ENV_AVAILABLE" == "false" && -n "$version" && -d "$___X_CMD_ENV_PATH/java/${version}" ]]; then
+    if [ "$ENV_AVAILABLE" = "false" ] && [ -n "$version" ] && [ -d "$___X_CMD_ENV_PATH/java/${version}" ]; then
 		VERSION="$version"
-    elif [[ "$ENV_AVAILABLE" == "false" && -z "$version" && -L "$___X_CMD_ENV_PATH/java/current" ]]; then
+    elif [ "$ENV_AVAILABLE" = "false" ] && [ -z "$version" ] && [ -L "$___X_CMD_ENV_PATH/java/current" ]; then
 		VERSION=$(readlink "$___X_CMD_ENV_PATH/java/current" | sed "s!$___X_CMD_ENV_PATH/java/!!g")
-    elif [[ "$ENV_AVAILABLE" == "false" && -n "$version" ]]; then
+    elif [ "$ENV_AVAILABLE" = "false" ] && [ -n "$version" ]; then
 		env_log error "Stop! Java ${version} is not available while offline."
 		return 1
-    elif [[ "$ENV_AVAILABLE" == "false" && -z "$version" ]]; then
+    elif [ "$ENV_AVAILABLE" = "false" ] && [ -z "$version" ]; then
 		env_log error "This command is not available while offline."
 		return 1
     else
-        if [[ -z "$version" ]]; then
+        if [ -z "$version" ]; then
 			version=$(curl --silent --location "https://api.sdkman.io/2/candidates/default/java")
 		fi
 
@@ -62,17 +62,17 @@ ___x_cmd_env_determine_version(){
 		env_log debug "Validate Java $version for $ENV_PLATFORM_TMP: $VERSION_VALID"
 		env_log debug "Validation URL: $validation_url"
 
-		if [[ "$VERSION_VALID" == 'valid' || "$VERSION_VALID" == 'invalid' && -n "$folder" ]]; then
+		if [ "$VERSION_VALID" = 'valid' ] || [ "$VERSION_VALID" = 'invalid' ] && [ -n "$folder" ]; then
 			VERSION="$version"
 
-		elif [[ "$VERSION_VALID" == 'invalid' && -L "$___X_CMD_ENV_PATH/java/${version}" ]]; then
+		elif [ "$VERSION_VALID" = 'invalid' ] && [ -L "$___X_CMD_ENV_PATH/java/${version}" ]; then
 			VERSION="$version"
 
-		elif [[ "$VERSION_VALID" == 'invalid' && -d "$___X_CMD_ENV_PATH/java/${version}" ]]; then
+		elif [ "$VERSION_VALID" = 'invalid' ] && [ -d "$___X_CMD_ENV_PATH/java/${version}" ]; then
 			VERSION="$version"
 
 		else
-			if [[ -z "$version" ]]; then
+			if [ -z "$version" ]; then
 				version="\b"
 			fi
 
@@ -105,14 +105,14 @@ ___x_cmd_env_determine_current_version(){
 	present=$(___x_cmd_env_path_contains "$___X_CMD_ENV_PATH/java")
 	if [ "$present" = 'true' ]; then
 		if [[ $PATH =~ $___X_CMD_ENV_PATH/java/([^/]+)/bin ]]; then
-			if [[ "$zsh_shell" == "true" ]]; then
+			if [ "$zsh_shell" = "true" ]; then
 				CURRENT=${match[1]}
 			else
 				CURRENT=${BASH_REMATCH[1]}
 			fi
 		fi
 
-		if [[ "$CURRENT" == "current" ]]; then
+		if [ "$CURRENT" = "current" ]; then
 			CURRENT=$(readlink "$___X_CMD_ENV_PATH/java/current" | sed "s!$___X_CMD_ENV_PATH/java/!!g")
 		fi
 	else
@@ -139,7 +139,7 @@ ___x_cmd_env_download(){
 	local headers_file
 
 	metadata_folder="$___X_CMD_ENV_PATH/java/var/metadata"
-	mkdir -p ${metadata_folder}
+	mkdir -p "${metadata_folder}"
 
 	if [ ! -f "${archives_folder}/java-${version}.zip" ]; then
 		local platform_parameter
@@ -255,7 +255,7 @@ ___x_cmd_env_link_candidate_version(){
     local version="$1"
 
 	# Change the 'current' symlink for the candidate, hence affecting all shells.
-	if [[ -L "$___X_CMD_ENV_PATH/java/current" || -d "$___X_CMD_ENV_PATH/java/current" ]]; then
+	if [ -L "$___X_CMD_ENV_PATH/java/current" ] || [ -d "$___X_CMD_ENV_PATH/java/current" ]; then
 		rm -rf "$___X_CMD_ENV_PATH/java/current"
 	fi
 
@@ -279,7 +279,7 @@ ___x_cmd_env_install_local_version(){
 
 	env_log debug "Validating that actual version length ($version_length) does not exceed max ($version_length_max)"
 
-	if [[ $version_length -gt $version_length_max ]]; then
+	if [ "$version_length" -gt $version_length_max ]; then
 		env_log error "Invalid version! ${version} with length ${version_length} exceeds max of ${version_length_max}!"
 		return 1
 	fi
@@ -328,21 +328,23 @@ ___x_cmd_env_java_install(){
     ENV_AVAILABLE="true" #availability set up
     ___x_cmd_env_determine_version "$version" "$folder" || return 1
 
-    if [[ -d "$___X_CMD_ENV_PATH/java/${VERSION}" || -L "$___X_CMD_ENV_PATH/java/${VERSION}" ]]; then
+    if [ -d "$___X_CMD_ENV_PATH/java/${VERSION}" ] || [ -L "$___X_CMD_ENV_PATH/java/${VERSION}" ]; then
         env_log info "Java ${VERSION} is already installed."
 		return 0
 	fi
 
-    if [[ ${VERSION_VALID} == 'valid' ]]; then
+    if [ "${VERSION_VALID}" = 'valid' ]; then
 		___x_cmd_env_determine_current_version
 		___x_cmd_env_install_candidate_version "$VERSION" || return 1
 
         env_log info "Setting java ${VERSION} as default."
-        ___x_cmd_env_link_candidate_version "$VERSION"
-        ___x_cmd_env_add_to_path
+        # TODO: Maybe link will be better?
+        # ___x_cmd_env_link_candidate_version "$VERSION"
+        # ___x_cmd_env_add_to_path
+        ___x_cmd_env_java_use "$VERSION"
 
 		return 0
-	elif [[ "$VERSION_VALID" == 'invalid' && -n "$folder" ]]; then
+	elif [ "$VERSION_VALID" = 'invalid' ] && [ -n "$folder" ]; then
 		___x_cmd_env_install_local_version "$VERSION" "$folder" || return 1
 	else
 		env_log error "Stop! $1 is not a valid java version."
@@ -354,16 +356,20 @@ ___x_cmd_env_java_install(){
 ___x_cmd_env_java_uninstall(){
     local version="${1:?Provide python version}"
     ___x_cmd_env_common_uninstall java "$version" || return
+    x boot rc del "x-env-java"
 }
 
 # EndSection
 
 ___x_cmd_env_java_try(){
-    :
+    local version="${1:?Provide python version}"
+    PATH="${___X_CMD_ENV_PATH}/java/${version}/bin:$PATH"
 }
 
 ___x_cmd_env_java_use(){
-    :
+    local version="${1:?Provide java version}"
+    ___x_cmd_env_java_try "$version"
+    x boot rc add "x-env-java" "x env try java $version"
 }
 
 ___x_cmd_env_java_ws(){
