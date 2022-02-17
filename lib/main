@@ -1,5 +1,74 @@
 # shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263    # xrc
 
+
+# Section: common functions
+
+___X_CMD_ENV_PATH="$___X_CMD_ROOT/.bin/env"
+
+___x_cmd_env_common_pre_install_check(){
+    local candidate="${1:?Provide candidate}"
+    local version="${2:?Provide version}"
+    case $version in
+        default)
+            # TODO: Handle the python3 case.
+            if command -v "${candidate}" >/dev/null; then
+                env_log info "${candidate} is already installed in $(command -v "${candidate}")"
+                return 1
+            fi
+            ;;
+    esac
+
+    # Check the candidate version in general way.
+    # The path should have no system and platform info.
+    local candidate_path="$___X_CMD_ENV_PATH/${candidate}"
+    if [ -d "$candidate_path" ]; then
+        env_log info "$candidate $version is already installed in $candidate_path ."
+        return 1
+    fi
+
+    env_log info "Installing $1 $2"
+}
+
+___x_cmd_env_common_uninstall(){
+    local candidate="${1:?Provide candidate}"
+    local version="${2:?Provide the version}"
+    env_log info "Uninstalling $1 $2"
+
+    local candidate_path="$___X_CMD_ENV_PATH/${candidate}"
+    if [ -d "$candidate_path" ]; then
+        rm -rf "${candidate_path}"
+    else
+        env_log  warn "This ${candidate} ${version} is no exist."
+        return 1
+    fi
+}
+
+___x_cmd_env_common_pre_exec_check() {
+    local candidate="${1:?Provide candidate}"
+    local version="${2:?Provide the version}"
+
+    local candidate_path="$___X_CMD_ENV_PATH/${candidate}"
+    case $version in
+        default)
+            # TODO: Handle the python3 case.
+            if command -v "${candidate}" >/dev/null; then
+                env_log info "${candidate} is already installed in $(command -v "${candidate}")"
+                return 1
+            fi
+            ;;
+        *)
+            if [ ! -d "${candidate_path}/${version}" ]; then
+                env_log error "$candidate $version is not installed."
+                return 1
+            fi
+            ;;
+    esac
+
+    env_log debug "Exec $1 $2"
+}
+
+# EndSection
+
 ___x_cmd_env_main() {
     param:scope     "env"
     param:dsl <<A
@@ -50,33 +119,10 @@ options:
 A
     param:run
 
-    local candidate="$1"
-    local version="${2:-default}"
-    if [ -z "$candidate" ]; then
+    if [ -z "$1" ]; then
         ___x_cmd_env_main_install help
         return 1
     fi
-
-    case $version in
-        default)
-            # TODO: Handle the python3 case.
-            if command -v "${candidate}" >/dev/null; then
-                env_log info "${candidate} is already installed in $(command -v "${candidate}")"
-                return
-            fi
-            ;;
-
-    esac
-
-    # Check the candidate version in general way.
-    # The path should have no system and platform info.
-    local ___X_CMD_ENV_CANDIDATE_PATH="$___X_CMD_ROOT/.bin/x-cmd/${candidate}"
-    if [ -d "$___X_CMD_ENV_CANDIDATE_PATH/${version}" ]; then
-        env_log info "$candidate $version is already installed in $___X_CMD_ENV_CANDIDATE_PATH/${version} ."
-        return
-    fi
-
-    env_log info "Installing $1 $2"
     ___x_cmd_env_op_candidate install "$@"
 }
 
@@ -92,18 +138,6 @@ A
     if [ -z "$1" ]; then
         ___x_cmd_env_main_uninstall help
         return 1
-    fi
-
-    local candidate="$1"
-    local version="${2:?Provide the version}"
-    env_log info "Uninstalling $1 $2"
-
-    local ___X_CMD_ENV_CANDIDATE_PATH="$___X_CMD_ROOT/.bin/x-cmd/${candidate}"
-    if [ -d "$___X_CMD_ENV_CANDIDATE_PATH/${version}" ]; then
-        rm -rf "${___X_CMD_ENV_CANDIDATE_PATH:?Require candidate path}/${version}"
-    else
-        env_log  warn "This ${candidate} $version is no exist."
-        return
     fi
 
     ___x_cmd_env_op_candidate uninstall "$@"
@@ -147,30 +181,10 @@ A
     param:run
 
 
-    local candidate="$1"
-    local version="${2:-default}"
-    local ___X_CMD_ENV_CANDIDATE_PATH="$___X_CMD_ROOT/.bin/x-cmd/${candidate}"
-    if [ -z "$candidate" ]; then
+    if [ -z "$1" ]; then
         ___x_cmd_env_main_exec help
         return 1
     fi
 
-    case $version in
-        default)
-            # TODO: Handle the python3 case.
-            if command -v "${candidate}" >/dev/null; then
-                env_log info "${candidate} is already installed in $(command -v "${candidate}")"
-                return
-            fi
-            ;;
-        *)
-            if [ ! -d "$___X_CMD_ENV_CANDIDATE_PATH/${version}" ]; then
-                env_log error "$candidate $version is not installed."
-                return
-            fi
-            ;;
-    esac
-
-    env_log debug "Exec $1 $2"
     ___x_cmd_env_op_candidate exec "$@"
 }
