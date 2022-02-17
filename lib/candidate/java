@@ -10,11 +10,8 @@ __sdkman_echo_debug() {
 }
 
 ___x_cmd_env_determine_version(){
-    local version
-	local folder
-
-	version="$1"
-	folder="$2"
+    local version="$1"
+	local folder="$1"
 
     if [[ "$ENV_AVAILABLE" == "false" && -n "$version" && -d "$___X_CMD_ROOT/.bin/x-cmd/java/${version}" ]]; then
 		VERSION="$version"
@@ -63,15 +60,14 @@ ___x_cmd_env_determine_version(){
 }
 
 ___x_cmd_env_path_contains(){
-    local candidate
+    local candidate="$1"
 	local exists
 
-	candidate="$1"
 	exists="$(echo "$PATH" | grep "$candidate")"
-	if [[ -n "$exists" ]]; then
-		echo 'true'
+	if [ -n "$exists" ]; then
+		printf "%s\n" "true"
 	else
-		echo 'false'
+		printf "%s\n" "false"
 	fi
 }
 
@@ -79,7 +75,7 @@ ___x_cmd_env_determine_current_version(){
     local present
 
 	present=$(___x_cmd_env_path_contains "$___X_CMD_ROOT/.bin/x-cmd/java")
-	if [[ "$present" == 'true' ]]; then
+	if [ "$present" = 'true' ]; then
 		if [[ $PATH =~ $___X_CMD_ROOT/.bin/x-cmd/java/([^/]+)/bin ]]; then
 			if [[ "$zsh_shell" == "true" ]]; then
 				CURRENT=${match[1]}
@@ -113,13 +109,10 @@ ___x_cmd_env_install_candidate_version(){
 }
 
 ___x_cmd_env_download(){
-    local version
-	local archives_folder
+    local version="$1"
+	local archives_folder="$___X_CMD_ROOT/.bin/x-cmd/java/archives"
 	local headers_file
 
-	version="$1"
-
-	archives_folder="$___X_CMD_ROOT/.bin/x-cmd/java/archives"
 	metadata_folder="$___X_CMD_ROOT/.bin/x-cmd/java/var/metadata"
 	mkdir -p ${metadata_folder}
 
@@ -202,7 +195,7 @@ ___x_cmd_env_checksum_zip(){
 		algorithm=$(echo $line | sed -n 's/^X-Sdkman-Checksum-\(.*\):.*$/\1/p' | tr '[:lower:]' '[:upper:]')
 		checksum=$(echo $line | sed -n 's/^X-Sdkman-Checksum-.*:\(.*\)$/\1/p' | tr -cd '[:alnum:]')
 
-		if [[ -n ${algorithm} && -n ${checksum} ]]; then
+		if [ -n "${algorithm}" ] && [ -n "${checksum}" ]; then
 
 			if [[ "$algorithm" =~ 'SHA' && "$shasum_avail" == 'true' ]]; then
 				cmd="echo \"${checksum} *${zip_archive}\" | shasum --check --quiet"
@@ -211,7 +204,7 @@ ___x_cmd_env_checksum_zip(){
 				cmd="echo \"${checksum} ${zip_archive}\" | md5sum --check --quiet"
 			fi
 
-			if [[ -n $cmd ]]; then
+			if [ -n "$cmd" ]; then
 				env_log debug "Checksumming downloaded artifact ${zip_archive} (${algorithm})"
 
 				if ! eval "$cmd"; then
@@ -221,15 +214,15 @@ ___x_cmd_env_checksum_zip(){
 				fi
 			fi
 		fi
-  	done < ${headers_file}
+  	done < "${headers_file}"
 }
 
 ___x_cmd_env_validate_zip(){
-    local zip_archive
+    local zip_archive="$1"
 	local zip_ok
+    # TODO: To use no unzip command.
+    zip_ok=$(unzip -t "$zip_archive" | grep 'No errors detected in compressed data')
 
-	zip_archive="$1"
-	zip_ok=$(unzip -t "$zip_archive" | grep 'No errors detected in compressed data')
 	if [ -z "$zip_ok" ]; then
 		rm -f "$zip_archive"
 		env_log error "Stop! The archive was corrupt and has been removed! Please try installing again."
@@ -238,9 +231,7 @@ ___x_cmd_env_validate_zip(){
 }
 
 ___x_cmd_env_link_candidate_version(){
-    local version
-
-	version="$1"
+    local version="$1"
 
 	# Change the 'current' symlink for the candidate, hence affecting all shells.
 	if [[ -L "$___X_CMD_ROOT/.bin/x-cmd/java/current" || -d "$___X_CMD_ROOT/.bin/x-cmd/java/current" ]]; then
@@ -254,24 +245,17 @@ ___x_cmd_env_add_to_path(){
     local present
 
 	present=$(___x_cmd_env_path_contains java)
-	if [[ "$present" == 'false' ]]; then
+	if [ "$present" = 'false' ]; then
 		PATH="$___X_CMD_ROOT/.bin/x-cmd/java/current/bin:$PATH"
 	fi
 }
 
 ___x_cmd_env_install_local_version(){
-    local version
-	local folder
-	local version_length
-	local version_length_max
+    local version="$1"
+	local folder="$2"
+	local version_length=${#version} # Validate max length of version
+	local version_length_max=15
 
-	version_length_max=15
-
-	version="$1"
-	folder="$2"
-
-	# Validate max length of version
-	version_length=${#version}
 	env_log debug "Validating that actual version length ($version_length) does not exceed max ($version_length_max)"
 
 	if [[ $version_length -gt $version_length_max ]]; then
@@ -286,7 +270,7 @@ ___x_cmd_env_install_local_version(){
 		folder="$(pwd)/$folder"
 	fi
 
-	if [[ -d "$folder" ]]; then
+	if [ -d "$folder" ]; then
 		env_log info "Linking java ${version} to ${folder}"
 		ln -s "$folder" "$___X_CMD_ROOT/.bin/x-cmd/java/${version}"
 		env_log info "Done installing!"
@@ -313,11 +297,8 @@ ___x_cmd_env_java_download(){
 
 # Section: Java install and uninstall
 ___x_cmd_env_java_install(){
-    local version
-	local folder
-
-	version="${1:-default}"
-	folder="${2}"
+    local version="${1:-default}"
+	local folder="${2}"
 
 	mkdir -p "$___X_CMD_ROOT/.bin/x-cmd/java/tmp"
 	mkdir -p "$___X_CMD_ROOT/.bin/x-cmd/java/archives"
