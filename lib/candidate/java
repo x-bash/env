@@ -57,7 +57,7 @@ ___x_cmd_env_determine_version(){
 		fi
 
 		local validation_url
-		validation_url="https://api.sdkman.io/2/candidates/validate/java/${version}/$(echo $ENV_PLATFORM | tr '[:upper:]' '[:lower:]')"
+		validation_url="https://api.sdkman.io/2/candidates/validate/java/${version}/$(echo "$ENV_PLATFORM" | tr '[:upper:]' '[:lower:]')"
 		VERSION_VALID=$(curl --silent --location "$validation_url")
 		env_log debug "Validate Java $version for $ENV_PLATFORM_TMP: $VERSION_VALID"
 		env_log debug "Validation URL: $validation_url"
@@ -190,8 +190,8 @@ ___x_cmd_env_download(){
 	else
 		env_log info "Found a previously downloaded java ${version} archive. Not downloading it again..."
 	fi
-	# ___x_cmd_env_checksum_zip "${archives_folder}/java-${version}.zip" "${headers_file}" || return 1
-	# ___x_cmd_env_validate_zip "${archives_folder}/java-${version}.zip" || return 1
+	___x_cmd_env_checksum_zip "${archives_folder}/java-${version}.zip" "${headers_file}" || return 1
+	___x_cmd_env_validate_zip "${archives_folder}/java-${version}.zip" || return 1
 }
 
 ___x_cmd_env_checksum_zip(){
@@ -220,8 +220,8 @@ ___x_cmd_env_checksum_zip(){
 	fi
 
 	while IFS= read -r line; do
-		algorithm=$(echo $line | sed -n 's/^X-Sdkman-Checksum-\(.*\):.*$/\1/p' | tr '[:lower:]' '[:upper:]')
-		checksum=$(echo $line | sed -n 's/^X-Sdkman-Checksum-.*:\(.*\)$/\1/p' | tr -cd '[:alnum:]')
+		algorithm=$(echo "$line" | sed -n 's/^X-Sdkman-Checksum-\(.*\):.*$/\1/p' | tr '[:lower:]' '[:upper:]')
+		checksum=$(echo "$line" | sed -n 's/^X-Sdkman-Checksum-.*:\(.*\)$/\1/p' | tr -cd '[:alnum:]')
 
 		if [ -n "${algorithm}" ] && [ -n "${checksum}" ]; then
 
