@@ -43,13 +43,19 @@ ___x_cmd_env_python_la(){
 
 
 ___x_cmd_env_python_download(){
-    # TODO: register in boot
     :
+}
+
+___x_cmd_env_python_use(){
+    local version="${1:?Provide python version}"
+    ___x_cmd_env_python_try "$version"
+    x boot rc add "x-env-python" "x env try python $version"
 }
 
 # Section: Python install and uninstall
 
 # 1. If no special version and no local python, we will install a default version for you.
+# 2. It will download and use the python version.
 ___x_cmd_env_python_install(){
     local version="${1:?Provide python version}"
     ___x_cmd_env_common_pre_install_check python "$version" || return
@@ -90,11 +96,8 @@ ___x_cmd_env_python_uninstall(){
 # EndSection
 
 ___x_cmd_env_python_try(){
-    :
-}
-
-___x_cmd_env_python_use(){
-    :
+    local version="${1:?Provide python version}"
+    PATH="${___X_CMD_ENV_PATH}/python/${version}/bin:$PATH"
 }
 
 ___x_cmd_env_python_ws(){
