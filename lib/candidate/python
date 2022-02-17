@@ -43,6 +43,7 @@ ___x_cmd_env_python_la(){
 
 
 ___x_cmd_env_python_download(){
+    # TODO: register in boot
     :
 }
 
@@ -50,14 +51,18 @@ ___x_cmd_env_python_download(){
 
 # 1. If no special version and no local python, we will install a default version for you.
 ___x_cmd_env_python_install(){
-    local version="${1:-default}"
+    local version="${1:?Provide python version}"
+    ___x_cmd_env_common_pre_install_check python "$version" || return
+
     local miniconda_name
     local miniconda_filename
     ___x_cmd_env_python_get_miniconda_name_and_filename "$version"
 
+    local candidate_path="$___X_CMD_ENV_PATH/python"
+
     (
-        mkdir -p "${___X_CMD_ENV_CANDIDATE_PATH}"
-        cd "${___X_CMD_ENV_CANDIDATE_PATH}" || return 1
+        mkdir -p "${candidate_path}"
+        cd "${candidate_path}" || return 1
         local url="https://repo.anaconda.com/miniconda"
         if [ "${___X_CMD_IN_CHINA_NET:-0}" -eq 1 ]; then
             url="https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda"
@@ -73,10 +78,13 @@ ___x_cmd_env_python_install(){
             env_log info "Download failure from $url/${miniconda_filename}"
         fi
     )
+
+    ___x_cmd_env_python_use "$version"
 }
 
 ___x_cmd_env_python_uninstall(){
-    :
+    local version="${1:?Provide python version}"
+    ___x_cmd_env_common_uninstall python "$version" || return
 }
 
 # EndSection
@@ -103,7 +111,8 @@ ___x_cmd_env_python_which(){
 
 ___x_cmd_env_python_exec(){
     local version="${1:?Provide python version}" ; shift
-    local python_path="${___X_CMD_ENV_CANDIDATE_PATH}/${version}/bin/python"
+    ___x_cmd_env_common_pre_exec_check python "$version" || return
+    local python_path="${___X_CMD_ENV_PATH}/python/${version}/bin/python"
 
     "$python_path" "$@"
 }
