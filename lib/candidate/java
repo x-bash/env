@@ -18,7 +18,7 @@ __sdkman_echo_red() {
 }
 
 __sdkman_echo_no_colour() {
-	echo "$1"
+	printf "%s\n" "$1"
 }
 
 __sdkman_echo_yellow() {
@@ -121,13 +121,10 @@ ___x_cmd_env_determine_current_version(){
 }
 
 ___x_cmd_env_install_candidate_version(){
-    local version
-
-	version="$1"
+    local version="$1"
 
 	___x_cmd_env_download "$version" || return 1
 	env_log info "Installing: Java ${version}"
-
 	mkdir -p "$___X_CMD_ROOT/.bin/x-cmd/java"
 
 	rm -rf "$___X_CMD_ROOT/.bin/x-cmd/java/tmp/out"
@@ -156,19 +153,15 @@ ___x_cmd_env_download(){
 		env_log debug "Get pre-installation hook: https://api.sdkman.io/2/hooks/pre/java/${version}/${platform_parameter}"
 		curl --silent --location "https://api.sdkman.io/2/hooks/pre/java/${version}/${platform_parameter}" >| "$pre_installation_hook"
 		env_log debug "Copy remote pre-installation hook: $pre_installation_hook"
-		# TODO: you should begin "./" to use relative path
-		source "$pre_installation_hook"
+		. "$pre_installation_hook"
 		# __sdkman_pre_installation_hook || return 1
 		env_log debug "Completed pre-installation hook..."
 
 		export local binary_input="$___X_CMD_ROOT/.bin/x-cmd/java/tmp/${base_name}.bin"
 		export local zip_output="$___X_CMD_ROOT/.bin/x-cmd/java/tmp/$base_name.zip"
 
-		printf "\n"
 		env_log info "Downloading: Java ${version}"
-		printf "\n"
 		env_log info "In progress..."
-		printf "\n"
 
 
 		# download binary
@@ -179,7 +172,7 @@ ___x_cmd_env_download(){
 		env_log debug "Get post-installation hook: https://api.sdkman.io/2/hooks/post/java/${version}/${platform_parameter}"
 		curl --silent --location "https://api.sdkman.io/2/hooks/post/java/${version}/${platform_parameter}" >| "$post_installation_hook"
 		env_log debug "Copy remote post-installation hook: ${post_installation_hook}"
-		source "$post_installation_hook"
+		. "$post_installation_hook"
 		__sdkman_post_installation_hook || return 1
 
 		env_log debug "Processed binary as: $zip_output"
