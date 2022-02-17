@@ -4,9 +4,6 @@
 
 ENV_PLATFORM_TMP="$(xrc os && os name && os arch)"
 ENV_PLATFORM="$(cat <<<$ENV_PLATFORM_TMP | tr '[:lower:]' '[:upper:]')"
-sdkman_auto_answer=false
-auto_answer_upgrade='true'
-USE="n"
 
 __sdkman_echo_debug() {
 	env_log debug "$1"
@@ -348,17 +345,10 @@ ___x_cmd_env_java_install(){
 		___x_cmd_env_determine_current_version
 		___x_cmd_env_install_candidate_version "$VERSION" || return 1
 
-		if [[ "$sdkman_auto_answer" != 'true' && "$auto_answer_upgrade" != 'true' && -n "$CURRENT" ]]; then
-			echo -e -n "\033[1;33mDo you want java ${VERSION} to be set as default? (Y/n): \033[0m"
-			read USE
-		fi
-
-		if [[ -z "$USE" || "$USE" == "y" || "$USE" == "Y" ]]; then
-			echo ""
-			env_log info "Setting java ${VERSION} as default."
-			___x_cmd_env_link_candidate_version "$VERSION"
-			___x_cmd_env_add_to_path
-		fi
+        echo ""
+        env_log info "Setting java ${VERSION} as default."
+        ___x_cmd_env_link_candidate_version "$VERSION"
+        ___x_cmd_env_add_to_path
 
 		return 0
 	elif [[ "$VERSION_VALID" == 'invalid' && -n "$folder" ]]; then
