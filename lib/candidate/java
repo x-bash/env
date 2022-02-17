@@ -51,14 +51,11 @@ ___x_cmd_env_determine_version(){
 				version="\b"
 			fi
 
-			echo ""
 			env_log error "Stop! Java $version is not available. Possible causes:"
 			env_log error " * $version is an invalid version"
 			env_log error " * Java binaries are incompatible with your platform"
 			env_log error " * Java has not been released yet"
-			echo ""
 			env_log info "Tip: see all available versions for your platform:"
-			echo ""
 			env_log info "  $ sdk list java"
 			return 1
 		fi
@@ -170,12 +167,10 @@ ___x_cmd_env_download(){
 		mv -f "$zip_output" "$zip_archive_target"
 		env_log debug "Moved to archive folder: $zip_archive_target"
 	else
-		echo ""
 		env_log info "Found a previously downloaded java ${version} archive. Not downloading it again..."
 	fi
 	# ___x_cmd_env_checksum_zip "${archives_folder}/java-${version}.zip" "${headers_file}" || return 1
 	# ___x_cmd_env_validate_zip "${archives_folder}/java-${version}.zip" || return 1
-	echo ""
 }
 
 ___x_cmd_env_checksum_zip(){
@@ -188,11 +183,9 @@ ___x_cmd_env_checksum_zip(){
 	local md5sum_avail=false
 
 	if [ -z "${headers_file}" ]; then
-		echo ""
 		env_log debug "Skipping checksum for cached artifact"
 		return
 	elif [ ! -f "${headers_file}" ]; then
-		echo ""
 		env_log info "Metadata file not found at '${headers_file}', skipping checksum..."
 		return
 	fi
@@ -223,7 +216,6 @@ ___x_cmd_env_checksum_zip(){
 
 				if ! eval "$cmd"; then
 					rm -f "$zip_archive"
-					echo ""
 					env_log error "Stop! An invalid checksum was detected and the archive removed! Please try re-installing."
 					return 1
 				fi
@@ -240,7 +232,6 @@ ___x_cmd_env_validate_zip(){
 	zip_ok=$(unzip -t "$zip_archive" | grep 'No errors detected in compressed data')
 	if [ -z "$zip_ok" ]; then
 		rm -f "$zip_archive"
-		echo ""
 		env_log error "Stop! The archive was corrupt and has been removed! Please try installing again."
 		return 1
 	fi
@@ -304,7 +295,6 @@ ___x_cmd_env_install_local_version(){
 		return 1
 	fi
 
-	echo ""
 }
 
 # EndSection
@@ -336,7 +326,6 @@ ___x_cmd_env_java_install(){
     ___x_cmd_env_determine_version "$version" "$folder" || return 1
 
     if [[ -d "$___X_CMD_ROOT/.bin/x-cmd/java/${VERSION}" || -L "$___X_CMD_ROOT/.bin/x-cmd/java/${VERSION}" ]]; then
-		echo ""
         env_log info "Java ${VERSION} is already installed."
 		return 0
 	fi
@@ -345,7 +334,6 @@ ___x_cmd_env_java_install(){
 		___x_cmd_env_determine_current_version
 		___x_cmd_env_install_candidate_version "$VERSION" || return 1
 
-        echo ""
         env_log info "Setting java ${VERSION} as default."
         ___x_cmd_env_link_candidate_version "$VERSION"
         ___x_cmd_env_add_to_path
@@ -354,7 +342,6 @@ ___x_cmd_env_java_install(){
 	elif [[ "$VERSION_VALID" == 'invalid' && -n "$folder" ]]; then
 		___x_cmd_env_install_local_version "$VERSION" "$folder" || return 1
 	else
-		echo ""
 		env_log error "Stop! $1 is not a valid java version."
 		return 1
 	fi
