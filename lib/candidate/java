@@ -1,6 +1,6 @@
 # shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263    # xrc
 
-# Section: utils
+# Section: sdkman
 
 ENV_PLATFORM_TMP="$(xrc os && os name && os arch)"
 ENV_PLATFORM="$(cat <<<$ENV_PLATFORM_TMP | tr '[:lower:]' '[:upper:]')"
@@ -8,6 +8,34 @@ ENV_PLATFORM="$(cat <<<$ENV_PLATFORM_TMP | tr '[:lower:]' '[:upper:]')"
 __sdkman_echo_debug() {
 	env_log debug "$1"
 }
+
+__sdkman_echo() {
+	printf "\033[1;%s\033[0m\n" "$1$2"
+}
+
+__sdkman_echo_red() {
+	__sdkman_echo "31m" "$1"
+}
+
+__sdkman_echo_no_colour() {
+	echo "$1"
+}
+
+__sdkman_echo_yellow() {
+	__sdkman_echo "33m" "$1"
+}
+
+__sdkman_echo_green() {
+	__sdkman_echo "32m" "$1"
+}
+
+__sdkman_echo_cyan() {
+	__sdkman_echo "36m" "$1"
+}
+
+# EndSection
+
+# Section: utils
 
 ___x_cmd_env_determine_version(){
     local version="$1"
