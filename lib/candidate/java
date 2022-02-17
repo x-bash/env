@@ -127,18 +127,18 @@ ___x_cmd_env_install_candidate_version(){
 	env_log info "Installing: Java ${version}"
 	mkdir -p "$___X_CMD_ENV_PATH/java"
 
-	rm -rf "$___X_CMD_ENV_PATH/java/tmp/out"
-	unzip -oq "$___X_CMD_ENV_PATH/java/archives/java-${version}.zip" -d "$___X_CMD_ENV_PATH/java/tmp/out"
-	mv -f "$___X_CMD_ENV_PATH"/java/tmp/out/* "$___X_CMD_ENV_PATH/java/${version}"
+	rm -rf "$___X_CMD_ENV_TMP_PATH/java/tmp/out"
+	unzip -oq "$___X_CMD_ENV_TMP_PATH/java/archives/java-${version}.zip" -d "$___X_CMD_ENV_TMP_PATH/java/tmp/out"
+	mv -f "$___X_CMD_ENV_TMP_PATH"/java/tmp/out/* "$___X_CMD_ENV_PATH/java/${version}"
 	env_log info "Done installing!"
 }
 
 ___x_cmd_env_download(){
     local version="$1"
-	local archives_folder="$___X_CMD_ENV_PATH/java/archives"
+	local archives_folder="$___X_CMD_ENV_TMP_PATH/java/archives"
 	local headers_file
 
-	metadata_folder="$___X_CMD_ENV_PATH/java/var/metadata"
+	metadata_folder="$___X_CMD_ENV_TMP_PATH/java/var/metadata"
 	mkdir -p "${metadata_folder}"
 
 	if [ ! -f "${archives_folder}/java-${version}.zip" ]; then
@@ -146,10 +146,10 @@ ___x_cmd_env_download(){
 		platform_parameter="$(cat <<<"$ENV_PLATFORM_TMP" | tr '[:upper:]' '[:lower:]')"
 		local download_url="https://api.sdkman.io/2/broker/download/java/${version}/${platform_parameter}"
 		local base_name="java-${version}"
-		local zip_archive_target="$___X_CMD_ENV_PATH/java/archives/${base_name}.zip"
+		local zip_archive_target="$___X_CMD_ENV_TMP_PATH/java/archives/${base_name}.zip"
 		headers_file="${metadata_folder}/${base_name}.headers"
 
-		local pre_installation_hook="$___X_CMD_ENV_PATH/java/tmp/hook_pre_java_${version}.sh"
+		local pre_installation_hook="$___X_CMD_ENV_TMP_PATH/java/tmp/hook_pre_java_${version}.sh"
 		env_log debug "Get pre-installation hook: https://api.sdkman.io/2/hooks/pre/java/${version}/${platform_parameter}"
 		curl --silent --location "https://api.sdkman.io/2/hooks/pre/java/${version}/${platform_parameter}" >| "$pre_installation_hook"
 		env_log debug "Copy remote pre-installation hook: $pre_installation_hook"
@@ -157,8 +157,8 @@ ___x_cmd_env_download(){
 		# __sdkman_pre_installation_hook || return 1
 		env_log debug "Completed pre-installation hook..."
 
-		export local binary_input="$___X_CMD_ENV_PATH/java/tmp/${base_name}.bin"
-		export local zip_output="$___X_CMD_ENV_PATH/java/tmp/$base_name.zip"
+		export local binary_input="$___X_CMD_ENV_TMP_PATH/java/tmp/${base_name}.bin"
+		export local zip_output="$___X_CMD_ENV_TMP_PATH/java/tmp/$base_name.zip"
 
 		env_log info "Downloading: Java ${version}"
 		env_log info "In progress..."
@@ -168,7 +168,7 @@ ___x_cmd_env_download(){
 		curl --progress-bar --location --retry-max-time 10 --retry 0 "${download_url}" --output "${binary_input}" --dump-header "${headers_file}"
 		env_log debug "Downloaded binary to: ${binary_input} (HTTP headers written to: ${headers_file})"
 
-		local post_installation_hook="$___X_CMD_ENV_PATH/java/tmp/hook_post_java_${version}.sh"
+		local post_installation_hook="$___X_CMD_ENV_TMP_PATH/java/tmp/hook_post_java_${version}.sh"
 		env_log debug "Get post-installation hook: https://api.sdkman.io/2/hooks/post/java/${version}/${platform_parameter}"
 		curl --silent --location "https://api.sdkman.io/2/hooks/post/java/${version}/${platform_parameter}" >| "$post_installation_hook"
 		env_log debug "Copy remote post-installation hook: ${post_installation_hook}"
@@ -322,8 +322,8 @@ ___x_cmd_env_java_install(){
     ___x_cmd_env_common_pre_install_check java "${version}" || return
 	local folder="${2}"
 
-	mkdir -p "$___X_CMD_ENV_PATH/java/tmp"
-	mkdir -p "$___X_CMD_ENV_PATH/java/archives"
+	mkdir -p "$___X_CMD_ENV_TMP_PATH/java/tmp"
+	mkdir -p "$___X_CMD_ENV_TMP_PATH/java/archives"
 
     ENV_AVAILABLE="true" #availability set up
     ___x_cmd_env_determine_version "$version" "$folder" || return 1
