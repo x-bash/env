@@ -2,52 +2,1043 @@
 
 # Section: utils
 
+NVM_DIR="$___X_CMD_ENV_PATH/node"
 
+nvm_is_zsh() {
+    [ -n "${ZSH_VERSION-}" ]
+}
+
+nvm_echo() {
+    command printf %s\\n "$*" 2>/dev/null
+}
+
+# nvm_err() {
+#     nvm_echo >&2 "$@"
+# }
+
+nvm_has() {
+    type "${1-}" >/dev/null 2>&1
+}
+
+nvm_grep() {
+  GREP_OPTIONS='' command grep "$@"
+}
+
+# Traverse up in directory tree to find containing folder
+nvm_find_up() {
+    local path_
+    path_="${PWD}"
+    while [ "${path_}" != "" ] && [ ! -f "${path_}/${1-}" ]; do
+        path_=${path_%/*}
+    done
+    nvm_echo "${path_}"
+}
+
+nvm_find_nvmrc() {
+    local dir
+    dir="$(nvm_find_up '.nvmrc')"
+    if [ -e "${dir}/.nvmrc" ]; then
+        nvm_echo "${dir}/.nvmrc"
+    fi
+}
+
+# Obtain nvm version from rc file
+nvm_rc_version() {
+    export NVM_RC_VERSION=''
+    local NVMRC_PATH
+    NVMRC_PATH="$(nvm_find_nvmrc)"
+    if [ ! -e "${NVMRC_PATH}" ]; then
+        if [ "${NVM_SILENT:-0}" -ne 1 ]; then
+            env_log error "No .nvmrc file found"
+        fi
+        return 1
+    fi
+    NVM_RC_VERSION="$(command head -n 1 "${NVMRC_PATH}" | command tr -d '\r')" || command printf ''
+    if [ -z "${NVM_RC_VERSION}" ]; then
+        if [ "${NVM_SILENT:-0}" -ne 1 ]; then
+            env_log error "Warning: empty .nvmrc file found at \"${NVMRC_PATH}\""
+        fi
+        return 2
+    fi
+    if [ "${NVM_SILENT:-0}" -ne 1 ]; then
+        nvm_echo "Found '${NVMRC_PATH}' with version <${NVM_RC_VERSION}>"
+    fi
+}
+
+nvm_node_prefix() {
+    nvm_echo 'node'
+}
+
+nvm_get_mirror() {
+    case "${1}-${2}" in
+    node-std) nvm_echo "${NVM_NODEJS_ORG_MIRROR:-https://nodejs.org/dist}" ;;
+    *)
+        env_log error 'unknown type of node.js release'
+        return 1
+        ;;
+    esac
+}
+
+nvm_ensure_version_prefix() {
+    nvm_echo "kkk$1" >&2
+    local NVM_VERSION
+    NVM_VERSION="$(nvm_echo "${1-}" | command sed -e 's/^\([0-9]\)/v\1/g')"
+    nvm_echo "${NVM_VERSION}"
+}
+
+nvm_curl_libz_support() {
+    curl -V 2>/dev/null | nvm_grep "^Features:" | nvm_grep -q "libz"
+}
+
+nvm_version_greater_than_or_equal_to() {
+    command awk 'BEGIN {
+    if (ARGV[1] == "" || ARGV[2] == "") exit(1)
+    split(ARGV[1], a, /\./);
+    split(ARGV[2], b, /\./);
+    for (i=1; i<=3; i++) {
+      if (a[i] && a[i] !~ /^[0-9]+$/) exit(2);
+      if (a[i] < b[i]) exit(3);
+      else if (a[i] > b[i]) exit(0);
+    }
+    exit(0)
+  }' "${1#v}" "${2#v}"
+}
+
+nvm_curl_version() {
+    curl -V | command awk '{ if ($1 == "curl") print $2 }' | command sed 's/-.*$//g'
+}
+
+nvm_curl_use_compression() {
+    nvm_curl_libz_support && nvm_version_greater_than_or_equal_to "$(nvm_curl_version)" 7.21.0
+}
+
+nvm_download() {
+    local CURL_COMPRESSED_FLAG
+    if nvm_has "curl"; then
+        if nvm_curl_use_compression; then
+            CURL_COMPRESSED_FLAG="--compressed"
+        fi
+        curl --fail ${CURL_COMPRESSED_FLAG:-} -q "$@"
+    elif nvm_has "wget"; then
+        # Emulate curl with wget
+        ARGS=$(nvm_echo "$@" | command sed -e 's/--progress-bar /--progress=bar /' \
+            -e 's/--compressed //' \
+            -e 's/--fail //' \
+            -e 's/-L //' \
+            -e 's/-I /--server-response /' \
+            -e 's/-s /-q /' \
+            -e 's/-sS /-nv /' \
+            -e 's/-o /-O /' \
+            -e 's/-C - /-c /')
+        # shellcheck disable=SC2086
+        eval wget $ARGS
+    fi
+}
+
+nvm_version_dir() {
+  local NVM_WHICH_DIR
+  NVM_WHICH_DIR="${1-}"
+  if [ -z "${NVM_WHICH_DIR}" ] || [ "${NVM_WHICH_DIR}" = "new" ]; then
+    nvm_echo "${NVM_DIR}/versions/node"
+  elif [ "_${NVM_WHICH_DIR}" = "_old" ]; then
+    nvm_echo "${NVM_DIR}"
+  else
+    env_log error 'unknown version dir'
+    return 3
+  fi
+}
+
+nvm_alias_path() {
+  nvm_echo "$(nvm_version_dir old)/alias"
+}
+
+nvm_make_alias() {
+  local ALIAS
+  ALIAS="${1-}"
+  if [ -z "${ALIAS}" ]; then
+    env_log error "an alias name is required"
+    return 1
+  fi
+  local VERSION
+  VERSION="${2-}"
+  if [ -z "${VERSION}" ]; then
+    env_log error "an alias target version is required"
+    return 2
+  fi
+  nvm_echo "${VERSION}" | tee "$(nvm_alias_path)/${ALIAS}" >/dev/null
+}
+
+nvm_ls_remote_index_tab() {
+    local LTS
+    LTS="${NVM_LTS-}"
+    if [ "$#" -lt 3 ]; then
+        env_log error 'not enough arguments'
+        return 5
+    fi
+
+    local FLAVOR
+    FLAVOR="${1-}"
+
+    local TYPE
+    TYPE="${2-}"
+
+    local MIRROR
+    MIRROR="$(nvm_get_mirror "${FLAVOR}" "${TYPE}")"
+    if [ -z "${MIRROR}" ]; then
+        return 3
+    fi
+
+    local PREFIX
+    PREFIX=''
+    case "${FLAVOR}-${TYPE}" in
+    node-std) PREFIX='' ;;
+    *)
+        env_log error 'unknown type of node.js release'
+        return 4
+        ;;
+    esac
+    local SORT_COMMAND
+    SORT_COMMAND='command sort'
+    nvm_echo "qqqq" >&2
+    case "${FLAVOR}" in
+    node) SORT_COMMAND="command sort -t. -u -k 1.2,1n -k 2,2n -k 3,3n" ;;
+    esac
+
+    local PATTERN
+    PATTERN="${3-}"
+
+    if [ "${PATTERN#"${PATTERN%?}"}" = '.' ]; then
+        PATTERN="${PATTERN%.}"
+    fi
+
+    local VERSIONS
+    if [ -n "${PATTERN}" ] && [ "${PATTERN}" != '*' ]; then
+        PATTERN="$(nvm_ensure_version_prefix "${PATTERN}")"
+    else
+        unset PATTERN
+    fi
+
+    nvm_is_zsh && setopt local_options shwordsplit
+    local VERSION_LIST
+    VERSION_LIST="$(nvm_download -L -s "${MIRROR}/index.tab" -o - \
+        | command sed "
+            1d;
+            s/^/${PREFIX}/;
+        " \
+    )"
+    local LTS_ALIAS
+    local LTS_VERSION
+    command mkdir -p "$(nvm_alias_path)/lts"
+    { command awk '{
+        if ($10 ~ /^\-?$/) { next }
+        if ($10 && !a[tolower($10)]++) {
+          if (alias) { print alias, version }
+          alias_name = "lts/" tolower($10)
+          if (!alias) { print "lts/*", alias_name }
+          alias = alias_name
+          version = $1
+        }
+      }
+      END {
+        if (alias) {
+          print alias, version
+        }
+      }' |
+        while read -r LTS_ALIAS_LINE; do
+            LTS_ALIAS="${LTS_ALIAS_LINE%% *}"
+            LTS_VERSION="${LTS_ALIAS_LINE#* }"
+            nvm_make_alias "${LTS_ALIAS}" "${LTS_VERSION}" >/dev/null 2>&1
+        done; } <<EOF
+$VERSION_LIST
+EOF
+
+    if [ -n "${LTS-}" ]; then
+        LTS="$(nvm_normalize_lts "lts/${LTS}")"
+        LTS="${LTS#lts/}"
+    fi
+
+    VERSIONS="$({ command awk -v lts="${LTS-}" '{
+        if (!$1) { next }
+        if (lts && $10 ~ /^\-?$/) { next }
+        if (lts && lts != "*" && tolower($10) !~ tolower(lts)) { next }
+        if ($10 !~ /^\-?$/) {
+          if ($10 && $10 != prev) {
+            print $1, $10, "*"
+          } else {
+            print $1, $10
+          }
+        } else {
+          print $1
+        }
+        prev=$10;
+      }' \
+    | nvm_grep -w "${PATTERN:-.*}" \
+    | command sort -t. -u -k 1.2,1n -k 2,2n -k 3,3n; } << EOF
+$VERSION_LIST
+EOF
+)"
+    nvm_echo "www2" >&2
+    if [ -z "${VERSIONS}" ]; then
+        nvm_echo 'N/A'
+        return 3
+    fi
+    nvm_echo "${VERSIONS}"
+}
+
+nvm_validate_implicit_alias() {
+    local NVM_NODE_PREFIX
+    NVM_NODE_PREFIX="$(nvm_node_prefix)"
+
+    case "$1" in
+    "stable" | "unstable" | "${NVM_NODE_PREFIX}")
+        return
+        ;;
+    *)
+        env_log error "Only implicit aliases 'stable', 'unstable' and '${NVM_NODE_PREFIX}' are supported."
+        return 1
+        ;;
+    esac
+}
+
+nvm_normalize_version() {
+  command awk 'BEGIN {
+    split(ARGV[1], a, /\./);
+    printf "%d%06d%06d\n", a[1], a[2], a[3];
+    exit;
+  }' "${1#v}"
+}
+
+nvm_print_implicit_alias() {
+  if [ "_$1" != "_local" ] && [ "_$1" != "_remote" ]; then
+    env_log error "nvm_print_implicit_alias must be specified with local or remote as the first argument."
+    return 1
+  fi
+
+  local NVM_IMPLICIT
+  NVM_IMPLICIT="$2"
+  if ! nvm_validate_implicit_alias "${NVM_IMPLICIT}"; then
+    return 2
+  fi
+
+  local NVM_NODE_PREFIX
+  NVM_NODE_PREFIX="$(nvm_node_prefix)"
+  local NVM_COMMAND
+  local LAST_TWO
+  case "${NVM_IMPLICIT}" in
+    "${NVM_NODE_PREFIX}")
+      nvm_echo 'stable'
+      return
+    ;;
+    *)
+      NVM_COMMAND="nvm_ls_remote"
+      if [ "_$1" = "_local" ]; then
+        NVM_COMMAND="nvm_ls node"
+      fi
+
+      nvm_is_zsh && setopt local_options shwordsplit
+
+      LAST_TWO=$($NVM_COMMAND | nvm_grep -e '^v' | command cut -c2- | command cut -d . -f 1,2 | uniq)
+    ;;
+  esac
+  local MINOR
+  local STABLE
+  local UNSTABLE
+  local MOD
+  local NORMALIZED_VERSION
+
+  nvm_is_zsh && setopt local_options shwordsplit
+  for MINOR in $LAST_TWO; do
+    NORMALIZED_VERSION="$(nvm_normalize_version "$MINOR")"
+    if [ "_0${NORMALIZED_VERSION#?}" != "_$NORMALIZED_VERSION" ]; then
+      STABLE="$MINOR"
+    else
+      MOD="$(awk 'BEGIN { print int(ARGV[1] / 1000000) % 2 ; exit(0) }' "${NORMALIZED_VERSION}")"
+      if [ "${MOD}" -eq 0 ]; then
+        STABLE="${MINOR}"
+      elif [ "${MOD}" -eq 1 ]; then
+        UNSTABLE="${MINOR}"
+      fi
+    fi
+  done
+
+  if [ "_$2" = '_stable' ]; then
+    nvm_echo "${STABLE}"
+  elif [ "_$2" = '_unstable' ]; then
+    nvm_echo "${UNSTABLE:-"N/A"}"
+  fi
+}
+
+nvm_tree_contains_path() {
+  local tree
+  tree="${1-}"
+  local node_path
+  node_path="${2-}"
+
+  if [ "@${tree}@" = "@@" ] || [ "@${node_path}@" = "@@" ]; then
+    env_log error "both the tree and the node path are required"
+    return 2
+  fi
+
+  local previous_pathdir
+  previous_pathdir="${node_path}"
+  local pathdir
+  pathdir=$(dirname "${previous_pathdir}")
+  while [ "${pathdir}" != '' ] && [ "${pathdir}" != '.' ] && [ "${pathdir}" != '/' ] &&
+      [ "${pathdir}" != "${tree}" ] && [ "${pathdir}" != "${previous_pathdir}" ]; do
+    previous_pathdir="${pathdir}"
+    pathdir=$(dirname "${previous_pathdir}")
+  done
+  [ "${pathdir}" = "${tree}" ]
+}
+
+nvm_normalize_lts() {
+  local LTS
+  LTS="${1-}"
+
+  if [ "$(expr "${LTS}" : '^lts/-[1-9][0-9]*$')" -gt 0 ]; then
+    local N
+    N="$(echo "${LTS}" | cut -d '-' -f 2)"
+    N=$((N+1))
+    local NVM_ALIAS_DIR
+    NVM_ALIAS_DIR="$(nvm_alias_path)"
+    local RESULT
+    RESULT="$(command ls "${NVM_ALIAS_DIR}/lts" | command tail -n "${N}" | command head -n 1)"
+    if [ "${RESULT}" != '*' ]; then
+      nvm_echo "lts/${RESULT}"
+    else
+      env_log error 'That many LTS releases do not exist yet.'
+      return 2
+    fi
+  else
+    nvm_echo "${LTS}"
+  fi
+}
+
+nvm_alias() {
+  local ALIAS
+  ALIAS="${1-}"
+  if [ -z "${ALIAS}" ]; then
+    env_log error 'An alias is required.'
+    return 1
+  fi
+  ALIAS="$(nvm_normalize_lts "${ALIAS}")"
+
+  if [ -z "${ALIAS}" ]; then
+    return 2
+  fi
+
+  local NVM_ALIAS_PATH
+  NVM_ALIAS_PATH="$(nvm_alias_path)/${ALIAS}"
+  if [ ! -f "${NVM_ALIAS_PATH}" ]; then
+    env_log error 'Alias does not exist.'
+    return 2
+  fi
+
+  command cat "${NVM_ALIAS_PATH}"
+}
+
+nvm_ls_current() {
+  local NVM_LS_CURRENT_NODE_PATH
+  if ! NVM_LS_CURRENT_NODE_PATH="$(command which node 2>/dev/null)"; then
+    nvm_echo 'none'
+  elif nvm_tree_contains_path "${NVM_DIR}" "${NVM_LS_CURRENT_NODE_PATH}"; then
+    local VERSION
+    VERSION="$(node --version 2>/dev/null)"
+    if [ "${VERSION}" = "v0.6.21-pre" ]; then
+      nvm_echo 'v0.6.21'
+    else
+      nvm_echo "${VERSION}"
+    fi
+  else
+    nvm_echo 'system'
+  fi
+}
+
+nvm_resolve_alias() {
+  if [ -z "${1-}" ]; then
+    return 1
+  fi
+
+  local PATTERN
+  PATTERN="${1-}"
+
+  local ALIAS
+  ALIAS="${PATTERN}"
+  local ALIAS_TEMP
+
+  local SEEN_ALIASES
+  SEEN_ALIASES="${ALIAS}"
+  while true; do
+    ALIAS_TEMP="$(nvm_alias "${ALIAS}" 2>/dev/null || nvm_echo)"
+
+    if [ -z "${ALIAS_TEMP}" ]; then
+      break
+    fi
+
+    if command printf "${SEEN_ALIASES}" | nvm_grep -q -e "^${ALIAS_TEMP}$"; then
+      ALIAS="∞"
+      break
+    fi
+
+    SEEN_ALIASES="${SEEN_ALIASES}\\n${ALIAS_TEMP}"
+    ALIAS="${ALIAS_TEMP}"
+  done
+
+  if [ -n "${ALIAS}" ] && [ "_${ALIAS}" != "_${PATTERN}" ]; then
+    local NVM_NODE_PREFIX
+    NVM_NODE_PREFIX="$(nvm_node_prefix)"
+    case "${ALIAS}" in
+      '∞' | \
+      "${NVM_NODE_PREFIX}")
+        nvm_echo "${ALIAS}"
+      ;;
+      *)
+        nvm_ensure_version_prefix "${ALIAS}"
+      ;;
+    esac
+    return 0
+  fi
+
+  if nvm_validate_implicit_alias "${PATTERN}" 2>/dev/null; then
+    local IMPLICIT
+    IMPLICIT="$(nvm_print_implicit_alias local "${PATTERN}" 2>/dev/null)"
+    if [ -n "${IMPLICIT}" ]; then
+        nvm_ensure_version_prefix "${IMPLICIT}"
+    fi
+  fi
+
+  return 2
+}
+
+nvm_version() {
+  local PATTERN
+  PATTERN="${1-}"
+  local VERSION
+  # The default version is the current one
+  if [ -z "${PATTERN}" ]; then
+    PATTERN='current'
+  fi
+
+  if [ "${PATTERN}" = "current" ]; then
+    nvm_ls_current
+    return $?
+  fi
+
+  local NVM_NODE_PREFIX
+  NVM_NODE_PREFIX="$(nvm_node_prefix)"
+  case "_${PATTERN}" in
+    "_${NVM_NODE_PREFIX}" | "_${NVM_NODE_PREFIX}-")
+      PATTERN="stable"
+    ;;
+  esac
+  VERSION="$(nvm_ls "${PATTERN}" | command tail -1)"
+  if [ -z "${VERSION}" ] || [ "_${VERSION}" = "_N/A" ]; then
+    nvm_echo "N/A"
+    return 3
+  fi
+  nvm_echo "${VERSION}"
+}
+
+nvm_resolve_local_alias() {
+  if [ -z "${1-}" ]; then
+    return 1
+  fi
+
+  local VERSION
+  local EXIT_CODE
+  VERSION="$(nvm_resolve_alias "${1-}")"
+  EXIT_CODE=$?
+  if [ -z "${VERSION}" ]; then
+    return $EXIT_CODE
+  fi
+  if [ "_${VERSION}" != '_∞' ]; then
+    nvm_version "${VERSION}"
+  else
+    nvm_echo "${VERSION}"
+  fi
+}
+
+nvm_num_version_groups() {
+  local VERSION
+  VERSION="${1-}"
+  VERSION="${VERSION#v}"
+  VERSION="${VERSION%.}"
+  if [ -z "${VERSION}" ]; then
+    nvm_echo "0"
+    return
+  fi
+  local NVM_NUM_DOTS
+  NVM_NUM_DOTS=$(nvm_echo "${VERSION}" | command sed -e 's/[^\.]//g')
+  local NVM_NUM_GROUPS
+  NVM_NUM_GROUPS=".${NVM_NUM_DOTS}" # add extra dot, since it's (n - 1) dots at this point
+  nvm_echo "${#NVM_NUM_GROUPS}"
+}
+
+nvm_version_greater() {
+  command awk 'BEGIN {
+    if (ARGV[1] == "" || ARGV[2] == "") exit(1)
+    split(ARGV[1], a, /\./);
+    split(ARGV[2], b, /\./);
+    for (i=1; i<=3; i++) {
+      if (a[i] && a[i] !~ /^[0-9]+$/) exit(2);
+      if (b[i] && b[i] !~ /^[0-9]+$/) { exit(0); }
+      if (a[i] < b[i]) exit(3);
+      else if (a[i] > b[i]) exit(0);
+    }
+    exit(4)
+  }' "${1#v}" "${2#v}"
+}
+
+nvm_version_path() {
+  local VERSION
+  VERSION="${1-}"
+  if [ -z "${VERSION}" ]; then
+    env_log error 'version is required'
+    return 3
+  elif nvm_version_greater 0.12.0 "${VERSION}"; then
+    nvm_echo "$(nvm_version_dir old)/${VERSION}"
+  else
+    nvm_echo "$(nvm_version_dir new)/${VERSION}"
+  fi
+}
+
+nvm_is_version_installed() {
+  if [ -z "${1-}" ]; then
+    return 1
+  fi
+  local NVM_NODE_BINARY
+  NVM_NODE_BINARY='node'
+  if [ "_$(xrc os && os name)" = '_win' ]; then
+    NVM_NODE_BINARY='node.exe'
+  fi
+  if [ -x "$(nvm_version_path "$1" 2>/dev/null)/bin/${NVM_NODE_BINARY}" ]; then
+    return 0
+  fi
+  return 1
+}
+
+nvm_has_system_node() {
+  [ "$(nvm deactivate >/dev/null 2>&1 && command -v node)" != '' ]
+}
+
+nvm_ls() {
+  local PATTERN
+  PATTERN="${1-}"
+  local VERSIONS
+  VERSIONS=''
+  if [ "${PATTERN}" = 'current' ]; then
+    nvm_ls_current
+    return
+  fi
+
+  local NVM_NODE_PREFIX
+  NVM_NODE_PREFIX="$(nvm_node_prefix)"
+  local NVM_VERSION_DIR_NEW
+  NVM_VERSION_DIR_NEW="$(nvm_version_dir new)"
+  local NVM_VERSION_DIR_OLD
+  NVM_VERSION_DIR_OLD="$(nvm_version_dir old)"
+
+  case "${PATTERN}" in
+    "${NVM_NODE_PREFIX}")
+        PATTERN="${PATTERN}-"
+        ;;
+    *)
+        if nvm_resolve_local_alias "${PATTERN}"; then
+            return
+        fi
+        PATTERN="$(nvm_ensure_version_prefix "${PATTERN}")"
+    ;;
+  esac
+  if [ "${PATTERN}" = 'N/A' ]; then
+    return
+  fi
+  # If it looks like an explicit version, don't do anything funny
+  local NVM_PATTERN_STARTS_WITH_V
+  case $PATTERN in
+    v*) NVM_PATTERN_STARTS_WITH_V=true ;;
+    *) NVM_PATTERN_STARTS_WITH_V=false ;;
+  esac
+  if [ $NVM_PATTERN_STARTS_WITH_V = true ] && [ "_$(nvm_num_version_groups "${PATTERN}")" = "_3" ]; then
+    if nvm_is_version_installed "${PATTERN}"; then
+      VERSIONS="${PATTERN}"
+    fi
+  else
+    case "${PATTERN}" in
+      "${NVM_NODE_PREFIX}-" | "system") ;;
+      *)
+        local NUM_VERSION_GROUPS
+        NUM_VERSION_GROUPS="$(nvm_num_version_groups "${PATTERN}")"
+        if [ "${NUM_VERSION_GROUPS}" = "2" ] || [ "${NUM_VERSION_GROUPS}" = "1" ]; then
+          PATTERN="${PATTERN%.}."
+        fi
+      ;;
+    esac
+
+    nvm_is_zsh && setopt local_options shwordsplit
+    nvm_is_zsh && unsetopt local_options markdirs
+
+    local NVM_DIRS_TO_SEARCH1
+    NVM_DIRS_TO_SEARCH1=''
+    local NVM_DIRS_TO_SEARCH2
+    NVM_DIRS_TO_SEARCH2=''
+    local NVM_ADD_SYSTEM
+    NVM_ADD_SYSTEM=false
+    if [ "${PATTERN}" = "${NVM_NODE_PREFIX}-" ]; then
+      NVM_DIRS_TO_SEARCH1="${NVM_VERSION_DIR_OLD}"
+      NVM_DIRS_TO_SEARCH2="${NVM_VERSION_DIR_NEW}"
+      PATTERN=''
+      if nvm_has_system_node; then
+        NVM_ADD_SYSTEM=true
+      fi
+    fi
+
+    if ! [ -d "${NVM_DIRS_TO_SEARCH1}" ] || ! (command ls -1qA "${NVM_DIRS_TO_SEARCH1}" | nvm_grep -q .); then
+      NVM_DIRS_TO_SEARCH1=''
+    fi
+    if ! [ -d "${NVM_DIRS_TO_SEARCH2}" ] || ! (command ls -1qA "${NVM_DIRS_TO_SEARCH2}" | nvm_grep -q .); then
+      NVM_DIRS_TO_SEARCH2="${NVM_DIRS_TO_SEARCH1}"
+    fi
+
+    local SEARCH_PATTERN
+    if [ -z "${PATTERN}" ]; then
+      PATTERN='v'
+      SEARCH_PATTERN='.*'
+    else
+      SEARCH_PATTERN="$(nvm_echo "${PATTERN}" | command sed 's#\.#\\\.#g;')"
+    fi
+    if [ -n "${NVM_DIRS_TO_SEARCH1}${NVM_DIRS_TO_SEARCH2}" ]; then
+      VERSIONS="$(command find "${NVM_DIRS_TO_SEARCH1}"/* "${NVM_DIRS_TO_SEARCH2}"/*  -name . -o -type d -prune -o -path "${PATTERN}*" \
+        | command sed -e "
+            s#^${NVM_DIR}/##;
+            \\#^[^v]# d;
+            \\#^versions\$# d;
+            s#^versions/##;
+            s#^v#${NVM_NODE_PREFIX}/v#;
+            \\#${SEARCH_PATTERN}# !d;
+          " \
+          -e 's#^\([^/]\{1,\}\)/\(.*\)$#\2.\1#;' \
+        | command sort -t. -u -k 1.2,1n -k 2,2n -k 3,3n \
+        | command sed -e 's#\(.*\)\.\([^\.]\{1,\}\)$#\2-\1#;' \
+                      -e "s#^${NVM_NODE_PREFIX}-##;" \
+      )"
+    fi
+  fi
+
+  if [ "${NVM_ADD_SYSTEM-}" = true ]; then
+    if [ -z "${PATTERN}" ] || [ "${PATTERN}" = 'v' ]; then
+      VERSIONS="${VERSIONS}$(command printf '\n%s' 'system')"
+    elif [ "${PATTERN}" = 'system' ]; then
+      VERSIONS="$(command printf '%s' 'system')"
+    fi
+  fi
+
+  if [ -z "${VERSIONS}" ]; then
+    nvm_echo 'N/A'
+    return 3
+  fi
+
+  nvm_echo "${VERSIONS}"
+}
+
+nvm_ls_remote() {
+    local PATTERN
+    PATTERN="${1-}"
+    if nvm_validate_implicit_alias "${PATTERN}" 2>/dev/null ; then
+        local IMPLICIT
+        IMPLICIT="$(nvm_print_implicit_alias remote "${PATTERN}")"
+        if [ -z "${IMPLICIT-}" ] || [ "${IMPLICIT}" = 'N/A' ]; then
+        nvm_echo "N/A"
+        return 3
+        fi
+        PATTERN="$(NVM_LTS="${NVM_LTS-}" nvm_ls_remote "${IMPLICIT}" | command tail -1 | command awk '{ print $1 }')"
+    elif [ -n "${PATTERN}" ]; then
+        PATTERN="$(nvm_ensure_version_prefix "${PATTERN}")"
+    else
+        PATTERN=".*"
+    fi
+    NVM_LTS="${NVM_LTS-}" nvm_ls_remote_index_tab node std "${PATTERN}"
+}
+
+nvm_remote_versions() {
+    local NVM_NODE_PREFIX
+    NVM_NODE_PREFIX="$(nvm_node_prefix)"
+
+    local PATTERN
+    PATTERN="${1-}"
+
+    local NVM_FLAVOR
+    if [ -n "${NVM_LTS-}" ]; then
+        NVM_FLAVOR="${NVM_NODE_PREFIX}"
+    fi
+
+    case "${PATTERN}" in
+        "${NVM_NODE_PREFIX}")
+        NVM_FLAVOR="${NVM_NODE_PREFIX}"
+        unset PATTERN
+        ;;
+    esac
+
+    if nvm_validate_implicit_alias "${PATTERN-}" 2>/dev/null; then
+        env_log error 'Implicit aliases are not supported in nvm_remote_versions.'
+        return 1
+    fi
+
+    local NVM_LS_REMOTE_EXIT_CODE
+    NVM_LS_REMOTE_EXIT_CODE=0
+    local NVM_LS_REMOTE_PRE_MERGED_OUTPUT
+    NVM_LS_REMOTE_PRE_MERGED_OUTPUT=''
+    local NVM_LS_REMOTE_POST_MERGED_OUTPUT
+    NVM_LS_REMOTE_POST_MERGED_OUTPUT=''
+    if [ -z "${NVM_FLAVOR-}" ] || [ "${NVM_FLAVOR-}" = "${NVM_NODE_PREFIX}" ]; then
+        local NVM_LS_REMOTE_OUTPUT
+        # extra space is needed here to avoid weird behavior when `nvm_ls_remote` ends in a `*`
+        nvm_echo "jjj" >&2
+        NVM_LS_REMOTE_OUTPUT="$(NVM_LTS="${NVM_LTS-}" nvm_ls_remote "${PATTERN-}") " &&:
+        NVM_LS_REMOTE_EXIT_CODE=$?
+        # split output into two
+        NVM_LS_REMOTE_PRE_MERGED_OUTPUT="${NVM_LS_REMOTE_OUTPUT%%v4\.0\.0*}"
+        NVM_LS_REMOTE_POST_MERGED_OUTPUT="${NVM_LS_REMOTE_OUTPUT#"$NVM_LS_REMOTE_PRE_MERGED_OUTPUT"}"
+    fi
+
+    # the `sed` removes both blank lines, and only-whitespace lines (see "weird behavior" ~19 lines up)
+    VERSIONS="$(nvm_echo "${NVM_LS_REMOTE_PRE_MERGED_OUTPUT}
+    ${NVM_LS_REMOTE_POST_MERGED_OUTPUT}" | nvm_grep -v "N/A" | command sed '/^ *$/d')"
+
+    if [ -z "${VERSIONS}" ]; then
+        nvm_echo 'N/A'
+        return 3
+    fi
+    # the `sed` is to remove trailing whitespaces (see "weird behavior" ~25 lines up)
+    nvm_echo "${VERSIONS}" | command sed 's/ *$//g'
+    return $NVM_LS_REMOTE_EXIT_CODE
+}
+
+nvm_remote_version() {
+    local PATTERN
+    PATTERN="${1-}"
+    local VERSION
+    if nvm_validate_implicit_alias "${PATTERN}" 2>/dev/null; then
+        case "${PATTERN}" in
+        *)
+            VERSION="$(NVM_LTS="${NVM_LTS-}" nvm_ls_remote "${PATTERN}")" && :
+            ;;
+        esac
+    else
+        VERSION="$(NVM_LTS="${NVM_LTS-}" nvm_remote_versions "${PATTERN}" | command tail -1)"
+    fi
+    if [ -n "${NVM_VERSION_ONLY-}" ]; then
+        command awk 'BEGIN {
+      n = split(ARGV[1], a);
+      print a[1]
+    }' "${VERSION}"
+    else
+        nvm_echo "${VERSION}"
+    fi
+    if [ "${VERSION}" = 'N/A' ]; then
+        return 3
+    fi
+}
+
+nvm_ensure_default_set() {
+  local VERSION
+  VERSION="$1"
+  if [ -z "${VERSION}" ]; then
+    env_log error 'nvm_ensure_default_set: a version is required'
+    return 1
+  elif nvm_alias default >/dev/null 2>&1; then
+    # default already set
+    return 0
+  fi
+  local EXIT_CODE
+  EXIT_CODE="$?"
+  return $EXIT_CODE
+}
+
+nvm_install_npm_if_needed() {
+  local VERSION
+  VERSION="$(nvm_ls_current)"
+  if ! nvm_has "npm"; then
+    nvm_echo 'Installing npm...'
+    if nvm_version_greater 0.2.0 "${VERSION}"; then
+      env_log error 'npm requires node v0.2.3 or higher'
+    elif nvm_version_greater_than_or_equal_to "${VERSION}" 0.2.0; then
+      if nvm_version_greater 0.2.3 "${VERSION}"; then
+        env_log error 'npm requires node v0.2.3 or higher'
+      else
+        nvm_download -L https://npmjs.org/install.sh -o - | clean=yes npm_install=0.2.19 sh
+      fi
+    else
+      nvm_download -L https://npmjs.org/install.sh -o - | clean=yes sh
+    fi
+  fi
+  return $?
+}
 
 # EndSection
 
-___x_cmd_env_node_ls(){
+___x_cmd_env_node_ls() {
     :
 }
 
-
-___x_cmd_env_node_la(){
+___x_cmd_env_node_la() {
     :
 }
 
-
-___x_cmd_env_node_download(){
+___x_cmd_env_node_download() {
     :
 }
 
-___x_cmd_env_node_install(){
+# Section: node install and uninstall
+
+___x_cmd_env_node_install() {
+    local version_not_provided
+    version_not_provided=0
+
+    if ! nvm_has "curl" && ! nvm_has "wget"; then
+        env_log error 'nvm needs curl or wget to proceed.'
+        return 1
+    fi
+
+    if [ $# -lt 1 ]; then
+        version_not_provided=1
+    fi
+
+    local LTS
+    local ALIAS
+    local NVM_UPGRADE_NPM
+    NVM_UPGRADE_NPM=1
+
+    local provided_version
+    provided_version="${1-}"
+
+    if [ -z "${provided_version}" ]; then
+        if [ "_${LTS-}" = '_*' ]; then
+            nvm_echo 'Installing latest LTS version.'
+            if [ $# -gt 0 ]; then
+                shift
+            fi
+        elif [ "_${LTS-}" != '_' ]; then
+            nvm_echo "Installing with latest version of LTS line: ${LTS}"
+            if [ $# -gt 0 ]; then
+                shift
+            fi
+        else
+            nvm_rc_version
+            if [ $version_not_provided -eq 1 ] && [ -z "${NVM_RC_VERSION}" ]; then
+                unset NVM_RC_VERSION
+                >&2 nvm --help
+                return 127
+            fi
+            provided_version="${NVM_RC_VERSION}"
+            unset NVM_RC_VERSION
+        fi
+    elif [ $# -gt 0 ]; then
+        shift
+    fi
+
+    case "${provided_version}" in
+    'lts/*')
+        LTS='*'
+        provided_version=''
+        ;;
+    lts/*)
+        LTS="${provided_version##lts/}"
+        provided_version=''
+        ;;
+    esac
+    VERSION=$(NVM_VERSION_ONLY=true NVM_LTS="${LTS-}" nvm_remote_version "${provided_version}")
+
+    if [ "${VERSION}" = 'N/A' ]; then
+        local LTS_MSG
+        local REMOTE_CMD
+        if [ "${LTS-}" = '*' ]; then
+            LTS_MSG='(with LTS filter) '
+            REMOTE_CMD='nvm ls-remote --lts'
+        elif [ -n "${LTS-}" ]; then
+            LTS_MSG="(with LTS filter '${LTS}') "
+            REMOTE_CMD="nvm ls-remote --lts=${LTS}"
+        else
+            REMOTE_CMD='nvm ls-remote'
+        fi
+        env_log error "Version '${provided_version}' ${LTS_MSG-}not found - try \`${REMOTE_CMD}\` to browse available versions."
+        return 3
+    fi
+
+    ADDITIONAL_PARAMETERS=''
+
+    while [ $# -ne 0 ]; do
+        case "$1" in
+          *)
+            ADDITIONAL_PARAMETERS="${ADDITIONAL_PARAMETERS} $1"
+          ;;
+        esac
+    shift
+    done
+
+    local FLAVOR
+    FLAVOR="$(nvm_node_prefix)"
+
+    if nvm_is_version_installed "${VERSION}"; then
+        env_log error "${VERSION} is already installed."
+        if [ -n "${LTS-}" ]; then
+          LTS="$(echo "${LTS}" | tr '[:upper:]' '[:lower:]')"
+          nvm_ensure_default_set "lts/${LTS}"
+        else
+          nvm_ensure_default_set "${provided_version}"
+        fi
+
+        return $?
+    fi
+
+    local EXIT_CODE
+    EXIT_CODE=0
+
+    if [ $EXIT_CODE -eq 0 ] && nvm_install_npm_if_needed "${VERSION}"; then
+        if [ -n "${LTS-}" ]; then
+          nvm_ensure_default_set "lts/${LTS}"
+        else
+          nvm_ensure_default_set "${provided_version}"
+        fi
+        if [ "${NVM_UPGRADE_NPM}" = 1 ]; then
+          nvm install-latest-npm
+          EXIT_CODE=$?
+        fi
+    else
+        EXIT_CODE=$?
+    fi
+    return $EXIT_CODE
+}
+
+___x_cmd_env_node_uninstall() {
     :
 }
 
-___x_cmd_env_node_uninstall(){
+# EndSection
+
+___x_cmd_env_node_try() {
     :
 }
 
-___x_cmd_env_node_try(){
+___x_cmd_env_node_use() {
     :
 }
 
-___x_cmd_env_node_use(){
+___x_cmd_env_node_ws() {
     :
 }
 
-___x_cmd_env_node_ws(){
+___x_cmd_env_node_current() {
     :
 }
 
-___x_cmd_env_node_current(){
+___x_cmd_env_node_which() {
     :
 }
 
-___x_cmd_env_node_which(){
-    :
-}
+___x_cmd_env_node_exec() {
+    local version="${1:?Provide node version}" ; shift
+    ___x_cmd_env_common_pre_exec_check node "$version" || return
+    local node_path="${___X_CMD_ENV_PATH}/node/${version}/bin/node"
 
-___x_cmd_env_node_exec(){
-    :
+    "$node_path" "$@"
 }
