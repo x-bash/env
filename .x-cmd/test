@@ -14,7 +14,7 @@ case $1 in
         x env ls python
         # x env uninstall python py38_4.10.1
         # x env current
-        x env exec python py39_4.10.3 -V
+        x env exec python py38_4.10.1 -V
         ;;
     node)
         x env install node v14.17.1
@@ -26,7 +26,8 @@ case $1 in
     java)
         . "$(x wsroot)/.x-cmd/testcases/java"
         x env install java 17.0.2.8.1-amzn
-        # x env use java
+        x env use java 17.0.2.8.1-amzn
+        x env ls java
         # x env current
         x env exec java 17.0.2.8.1-amzn -version
         ;;
