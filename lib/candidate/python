@@ -51,6 +51,7 @@ ___x_cmd_env_python_try(){
     PATH="${___X_CMD_ENV_PATH}/python/${version}/bin:$PATH"
 }
 
+# TODO: ws和全局统一 <ws|$HOME>/.x-cmd/.env/<candidate>/version 来处理
 ___x_cmd_env_python_use(){
     local version="${1:?Provide python version}"
     ___x_cmd_env_python_try "$version"
