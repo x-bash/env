@@ -131,7 +131,7 @@ ___x_cmd_env_main_install() {
     param:dsl <<A
 options:
     #1        "Environment Candidates" <candidates>:candidates_list
-    #2        "Version"                <version>="default"    =~ "*" "default"
+    #2        "Version"                <version>="default"
 A
     param:run
 
@@ -192,7 +192,7 @@ ___x_cmd_env_main_exec(){
     param:dsl <<A
 options:
     #1        "Environment Candidates" <candidates>:candidates_list
-    #2        "Version"                <version>             =~ "*+" "default"
+    #2        "Version"                <version>
 A
     param:run
 
