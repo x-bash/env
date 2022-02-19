@@ -3,7 +3,7 @@
 xws install
 ___X_CMD_XRC_MODULE_IMPORTED=
 # advise rm ___x_cmd_env_main
-# xrc env
+xrc env
 x log env
 
 case $1 in
@@ -18,12 +18,12 @@ case $1 in
         ;;
     node)
         . "$(x wsroot)/.x-cmd/testcases/node"
-        x env install node v14.19.0
+        # x env install node v14.19.0
         # x env install node v17.5.0
         # x env use node v17.5.0
         # x env ls node
         # x env current node
-        # x env exec node v17.5.0
+        # x env exec node v14.19.0
         ;;
     java)
         x env install java

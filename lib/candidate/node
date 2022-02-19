@@ -12,10 +12,6 @@ nvm_echo() {
     command printf %s\\n "$*" 2>/dev/null
 }
 
-# nvm_err() {
-#     nvm_echo >&2 "$@"
-# }
-
 nvm_has() {
     type "${1-}" >/dev/null 2>&1
 }
@@ -138,7 +134,7 @@ nvm_version_dir() {
   local NVM_WHICH_DIR
   NVM_WHICH_DIR="${1-}"
   if [ -z "${NVM_WHICH_DIR}" ] || [ "${NVM_WHICH_DIR}" = "new" ]; then
-    nvm_echo "${NVM_DIR}/versions/node"
+    nvm_echo "${NVM_DIR}/versions"
   elif [ "_${NVM_WHICH_DIR}" = "_old" ]; then
     nvm_echo "${NVM_DIR}"
   else
@@ -389,7 +385,7 @@ nvm_normalize_lts() {
 
   if [ "$(expr "${LTS}" : '^lts/-[1-9][0-9]*$')" -gt 0 ]; then
     local N
-    N="$(echo "${LTS}" | cut -d '-' -f 2)"
+    N="$(print "${LTS}" | cut -d '-' -f 2)"
     N=$((N+1))
     local NVM_ALIAS_DIR
     NVM_ALIAS_DIR="$(nvm_alias_path)"
@@ -867,7 +863,7 @@ nvm_install_npm_if_needed() {
 
 nvm_binary_available() {
   # binaries started with node 0.8.6
-  nvm_version_greater_than_or_equal_to "$(echo "${1-}")" v0.8.6
+  nvm_version_greater_than_or_equal_to "$(print "${1-}")" v0.8.6
 }
 
 nvm_is_merged_node_version() {
@@ -1195,8 +1191,6 @@ nvm_download_artifact() {
     return
   fi
 
-  # printf "&&&&&${FLAVOR}===${KIND}===${TYPE}===${MIRROR}===${VERSION}\n" >&2
-
   local SLUG
   SLUG="$(nvm_get_download_slug "${FLAVOR}" "${KIND}" "${VERSION}")"
 
@@ -1241,9 +1235,7 @@ nvm_download_artifact() {
     command rm -rf "${TARBALL}"
   fi
 
-  env_log error "Downloading ${TARBALL_URL}..."
-  printf "aaaaaa${PROGRESS_BAR}\n" >&2
-  # 这里的download
+  env_log info "Downloading ${TARBALL_URL}..."
   nvm_download -L -C - "${PROGRESS_BAR}" "${TARBALL_URL}" -o "${TARBALL}" || (
     command rm -rf "${TARBALL}" "${tmpdir}"
     env_log error "Binary download from ${TARBALL_URL} failed, trying source."
@@ -1348,7 +1340,7 @@ nvm_install_binary() {
   nosource="${4-}"
 
   local VERSION
-  VERSION="$(echo "${PREFIXED_VERSION}")"
+  VERSION="$(print "${PREFIXED_VERSION}")"
 
   local NVM_OS
   NVM_OS="$(xrc os && os name)"
@@ -1373,7 +1365,6 @@ nvm_install_binary() {
   fi
   env_log info "Downloading and installing ${NODE_OR_IOJS-} ${VERSION}..."
   TARBALL="$(PROGRESS_BAR="${PROGRESS_BAR}" nvm_download_artifact "${FLAVOR}" binary "${TYPE-}" "${VERSION}" | command tail -1)"
-  printf "@@@@@@@@@${TARBALL}\n"
   if [ -f "${TARBALL}" ]; then
     TMPDIR_NVM="$(dirname "${TARBALL}")/files"
   fi
@@ -1479,7 +1470,7 @@ nvm_install_source() {
   fi
 
   local VERSION
-  VERSION="$(echo "${PREFIXED_VERSION}")"
+  VERSION="$(print "${PREFIXED_VERSION}")"
 
   local NVM_MAKE_JOBS
   NVM_MAKE_JOBS="${4-}"
@@ -1577,7 +1568,7 @@ nvm_node_version_has_solaris_binary() {
   NODE_VERSION="$1"
   # Error out if $NODE_VERSION is actually an io.js version
   local STRIPPED_IOJS_VERSION
-  STRIPPED_IOJS_VERSION="$(echo "${NODE_VERSION}")"
+  STRIPPED_IOJS_VERSION="$(print "${NODE_VERSION}")"
   if [ "_${STRIPPED_IOJS_VERSION}" != "_${NODE_VERSION}" ]; then
     return 1
   fi
@@ -1727,7 +1718,7 @@ ___x_cmd_env_node_install() {
     if nvm_is_version_installed "${VERSION}"; then
         env_log error "${VERSION} is already installed."
         if [ -n "${LTS-}" ]; then
-          LTS="$(echo "${LTS}" | tr '[:upper:]' '[:lower:]')"
+          LTS="$(print "${LTS}" | tr '[:upper:]' '[:lower:]')"
           nvm_ensure_default_set "lts/${LTS}"
         else
           nvm_ensure_default_set "${provided_version}"
