@@ -1,10 +1,12 @@
 # shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263    # xrc
 
+# Section: ENV ___X_CMD_ENV_PATH
+
+___X_CMD_ENV_PATH="$___X_CMD_ROOT/.env"
+
+# EndSection
 
 # Section: common functions
-
-___X_CMD_ENV_PATH="$___X_CMD_ROOT/.bin/env"
-___X_CMD_ENV_TMP_PATH="$___X_CMD_ROOT/.tmp/env"
 
 ___x_cmd_env_common_pre_install_check(){
     local candidate="${1:?Provide candidate}"
