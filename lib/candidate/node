@@ -1605,7 +1605,6 @@ ___x_cmd_env_node_ls(){
     ls "$___X_CMD_ENV_PATH/java/versions"
 }
 
-
 ___x_cmd_env_node_la(){
     x nvm ls-remote
 }
