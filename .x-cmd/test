@@ -28,7 +28,7 @@ case $1 in
         ;;
     java)
         x env install java 17.0.2.8.1-amzn
-        x env uninstall java 17.0.2.8.1-amzn
+        # x env uninstall java 17.0.2.8.1-amzn
         # x env use java 17.0.2.8.1-amzn
         x env ls java
         # x env current

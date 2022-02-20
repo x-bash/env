@@ -325,24 +325,26 @@ ___x_cmd_env_java_install(){
 	mkdir -p "$___X_CMD_ENV_PATH/java/tmp"
 	mkdir -p "$___X_CMD_ENV_PATH/java/archives"
 	mkdir -p "$___X_CMD_ENV_PATH/java/versions"
+	mkdir -p "$___X_CMD_ENV_PATH/java/shims"
 
     ENV_AVAILABLE="true" #availability set up
     ___x_cmd_env_determine_version "$version" "$folder" || return 1
 
-    if [ -d "$___X_CMD_ENV_PATH/java/versions/${VERSION}" ] || [ -L "$___X_CMD_ENV_PATH/java/versions/${VERSION}" ]; then
-        env_log info "Java ${VERSION} is already installed."
+    if [ -d "$___X_CMD_ENV_PATH/java/versions/${version}" ] || [ -L "$___X_CMD_ENV_PATH/java/versions/${version}" ]; then
+        env_log info "Java ${version} is already installed."
 		return 0
 	fi
 
     if [ "${VERSION_VALID}" = 'valid' ]; then
 		___x_cmd_env_determine_current_version
-		___x_cmd_env_install_candidate_version "$VERSION" || return 1
+		___x_cmd_env_install_candidate_version "$version" || return 1
 
-        env_log info "Setting java ${VERSION} as default."
+        env_log info "Setting java ${version} as default."
         # TODO: Maybe link will be better?
-        # ___x_cmd_env_link_candidate_version "$VERSION"
+        # ___x_cmd_env_link_candidate_version "$version"
         # ___x_cmd_env_add_to_path
-        ___x_cmd_env_java_use "$VERSION"
+        ___x_cmd_env_java_use "$version"
+		___x_cmd_env_shim_dir java "$version"
 
 		return 0
 	elif [ "$VERSION_VALID" = 'invalid' ] && [ -n "$folder" ]; then
@@ -364,7 +366,7 @@ ___x_cmd_env_java_uninstall(){
 
 ___x_cmd_env_java_try(){
     local version="${1:?Provide python version}"
-    PATH="${___X_CMD_ENV_PATH}/java/${version}/bin:$PATH"
+    PATH="${___X_CMD_ENV_PATH}/java/shims:$PATH"
 }
 
 ___x_cmd_env_java_use(){

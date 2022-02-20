@@ -48,7 +48,7 @@ ___x_cmd_env_python_download(){
 
 ___x_cmd_env_python_try(){
     local version="${1:?Provide python version}"
-    PATH="${___X_CMD_ENV_PATH}/python/versions/${version}/bin:$PATH"
+    PATH="${___X_CMD_ENV_PATH}/python/shims:$PATH"
 }
 
 # TODO: ws和全局统一 <ws|$HOME>/.x-cmd/.env/<candidate>/version 来处理
