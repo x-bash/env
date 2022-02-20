@@ -23,7 +23,7 @@ ___x_cmd_env_common_pre_install_check(){
 
     # Check the candidate version in general way.
     # The path should have no system and platform info.
-    local candidate_path="$___X_CMD_ENV_PATH/${candidate}"
+    local candidate_path="$___X_CMD_ENV_PATH/${candidate}/versions/${version}"
     if [ -d "$candidate_path" ]; then
         env_log info "$candidate $version is already installed in $candidate_path ."
         return 1
@@ -37,7 +37,7 @@ ___x_cmd_env_common_uninstall(){
     local version="${2:?Provide the version}"
     env_log info "Uninstalling $1 $2"
 
-    local candidate_path="$___X_CMD_ENV_PATH/${candidate}"
+    local candidate_path="$___X_CMD_ENV_PATH/${candidate}/versions/${version}"
     if [ -d "$candidate_path" ]; then
         rm -rf "${candidate_path}"
     else
@@ -50,7 +50,7 @@ ___x_cmd_env_common_pre_exec_check() {
     local candidate="${1:?Provide candidate}"
     local version="${2:?Provide the version}"
 
-    local candidate_path="$___X_CMD_ENV_PATH/${candidate}"
+    local candidate_path="$___X_CMD_ENV_PATH/${candidate}/versions/${version}"
     case $version in
         default)
             # TODO: Handle the python3 case.
@@ -60,7 +60,7 @@ ___x_cmd_env_common_pre_exec_check() {
             fi
             ;;
         *)
-            if [ ! -d "${candidate_path}/${version}" ]; then
+            if [ ! -d "${candidate_path}" ]; then
                 env_log error "$candidate $version is not installed."
                 return 1
             fi
@@ -115,7 +115,6 @@ A
 
     # TODO: 增加 本地简写版本对应关系 和 全局简写版本对应关系
     # TODO: V8 -> V8.2   --> (Remote) V8.6
-    ls "$___X_CMD_ENV_PATH/$1"
     ___x_cmd_env_op_candidate ls "$@"
 }
 

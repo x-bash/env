@@ -11,8 +11,8 @@ case $1 in
         . "$(x wsroot)/.x-cmd/testcases/python"
         # TODO: Check if this version is available in your system
         x env install python py38_4.10.1
-        # x env ls python
-        # x env uninstall python py38_4.10.1
+        x env ls python
+        x env uninstall python py38_4.10.1
         # x env current
         x env exec python py38_4.10.1 -V
         ;;
@@ -27,7 +27,8 @@ case $1 in
         ;;
     java)
         x env install java 17.0.2.8.1-amzn
-        x env use java 17.0.2.8.1-amzn
+        x env uninstall java 17.0.2.8.1-amzn
+        # x env use java 17.0.2.8.1-amzn
         x env ls java
         # x env current
         x env exec java 17.0.2.8.1-amzn -version

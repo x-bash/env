@@ -34,7 +34,7 @@ ___x_cmd_env_python_get_miniconda_name_and_filename(){
 # EndSection
 
 ___x_cmd_env_python_ls(){
-    :
+    ls "$___X_CMD_ENV_PATH/python/versions"
 }
 
 ___x_cmd_env_python_la(){

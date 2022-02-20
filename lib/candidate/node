@@ -1602,7 +1602,7 @@ nvm_install_default_packages() {
 # EndSection
 
 ___x_cmd_env_node_ls(){
-    x nvm ls
+    ls "$___X_CMD_ENV_PATH/java/versions"
 }
 
 

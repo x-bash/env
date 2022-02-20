@@ -305,7 +305,7 @@ ___x_cmd_env_install_local_version(){
 # EndSection
 
 ___x_cmd_env_java_ls(){
-    :
+    ls "$___X_CMD_ENV_PATH/java/versions"
 }
 
 ___x_cmd_env_java_la(){
@@ -388,5 +388,5 @@ ___x_cmd_env_java_which(){
 ___x_cmd_env_java_exec(){
 	local version="${1:?Provide java version}" ; shift
     ___x_cmd_env_common_pre_exec_check java "$version" || return
-    "${___X_CMD_ENV_PATH}/java/${version}/bin/java" "$@"
+    "${___X_CMD_ENV_PATH}/java/versions/${version}/bin/java" "$@"
 }
