@@ -20,16 +20,14 @@ ___x_cmd_env_shim_dir(){
 set -e
 
 cur=\$(pwd)
-version=\$(cat "\$cur/$version_path")
 while [ ! "\$cur" = "" ]; do
-    if [ -d "\$cur/$version_path" ]; then
+    if [ -f "\$cur/$version_path" ]; then
         version=\$(cat "\$cur/$version_path")
         exec $versions_path/\$version/bin/${name##*/} "\$@"
         return 0
     fi
     cur=\${cur%/*}
 done
-exec $name "\$@"
 A
 )">"$___X_CMD_ENV_PATH/$candidate/shims/${name##*/}"
         chmod +x "$___X_CMD_ENV_PATH/$candidate/shims/${name##*/}"
