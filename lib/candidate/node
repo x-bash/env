@@ -1842,7 +1842,7 @@ ___x_cmd_env_node_which() {
 ___x_cmd_env_node_exec() {
     local version="${1:?Provide node version}" ; shift
     ___x_cmd_env_common_pre_exec_check node "$version" || return
-    local node_path="${___X_CMD_ENV_PATH}/node/${version}/bin/node"
+    local node_path="${___X_CMD_ENV_PATH}/node/versions/${version}/bin/node"
 
     "$node_path" "$@"
 }

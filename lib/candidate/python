@@ -54,6 +54,8 @@ ___x_cmd_env_python_try(){
 # TODO: ws和全局统一 <ws|$HOME>/.x-cmd/.env/<candidate>/version 来处理
 ___x_cmd_env_python_use(){
     local version="${1:?Provide python version}"
+    printf "%s" "$version" > "$___X_CMD_ENV_PATH/python/version"
+    env_log info "Using python $version . -> $___X_CMD_ENV_PATH/python/version"
     ___x_cmd_env_python_try "$version"
     x boot rc add "x-env-python" "x env try python $version"
 }
@@ -71,9 +73,11 @@ ___x_cmd_env_python_install(){
     ___x_cmd_env_python_get_miniconda_name_and_filename "$version"
 
     local candidate_path="$___X_CMD_ENV_PATH/python/versions"
+    local shim_path="$___X_CMD_ENV_PATH/python/shims"
 
     (
         mkdir -p "${candidate_path}"
+        mkdir -p "${shim_path}"
         cd "${candidate_path}" || return 1
         local url="https://repo.anaconda.com/miniconda"
         if [ "${___X_CMD_IN_CHINA_NET:-0}" -eq 1 ]; then
@@ -91,6 +95,7 @@ ___x_cmd_env_python_install(){
         fi
     )
 
+    ___x_cmd_env_shim_dir python "${version}"
     ___x_cmd_env_python_use "$version"
 }
 
@@ -107,7 +112,7 @@ ___x_cmd_env_python_ws(){
 }
 
 ___x_cmd_env_python_current(){
-    :
+    printf "%s" "$(cat "$___X_CMD_ENV_PATH/python/version")"
 }
 
 ___x_cmd_env_python_which(){

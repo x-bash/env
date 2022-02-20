@@ -12,8 +12,9 @@ case $1 in
         # TODO: Check if this version is available in your system
         x env install python py38_4.10.1
         x env ls python
-        x env uninstall python py38_4.10.1
-        # x env current
+        # x env uninstall python py38_4.10.1
+        x env current python
+        echo ""
         x env exec python py38_4.10.1 -V
         ;;
     node)
@@ -21,9 +22,9 @@ case $1 in
         x env install node v14.19.0
         x env install node v17.5.0
         # x env use node v17.5.0
-        # x env ls node
+        x env ls node
         # x env current node
-        # x env exec node v14.19.0
+        x env exec node v14.19.0
         ;;
     java)
         x env install java 17.0.2.8.1-amzn
