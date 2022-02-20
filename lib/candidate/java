@@ -373,6 +373,8 @@ ___x_cmd_env_java_use(){
     local version="${1:?Provide java version}"
     ___x_cmd_env_java_try "$version"
     x boot rc add "x-env-java" "x env try java $version"
+	printf "%s" "$version" > "$___X_CMD_ENV_PATH/java/version"
+    env_log info "Using java $version . -> $___X_CMD_ENV_PATH/java/version"
 }
 
 ___x_cmd_env_java_ws(){
@@ -380,7 +382,7 @@ ___x_cmd_env_java_ws(){
 }
 
 ___x_cmd_env_java_current(){
-    :
+    printf "%s" "$(cat "$___X_CMD_ENV_PATH/java/version")"
 }
 
 ___x_cmd_env_java_which(){
