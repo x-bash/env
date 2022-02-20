@@ -220,7 +220,6 @@ ___x_cmd_env_checksum_zip(){
 
 			if [[ "$algorithm" =~ 'SHA' && "$shasum_avail" == 'true' ]]; then
 				cmd="echo \"${checksum} *${zip_archive}\" | shasum --check --quiet"
-
 			elif [[ "$algorithm" =~ 'MD5' && "$md5sum_avail" == 'true' ]]; then
 				cmd="echo \"${checksum} ${zip_archive}\" | md5sum --check --quiet"
 			fi
