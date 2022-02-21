@@ -16,6 +16,10 @@ nvm_has() {
     type "${1-}" >/dev/null 2>&1
 }
 
+nvm_echo_with_colors() {
+  command printf %b\\n "$*" 2>/dev/null
+}
+
 nvm_grep() {
   GREP_OPTIONS='' command grep "$@"
 }
@@ -1599,16 +1603,244 @@ nvm_install_default_packages() {
   fi
 }
 
-# EndSection
-
-___x_cmd_env_node_ls(){
-    x nvm ls
+nvm_has_colors() {
+  local NVM_NUM_COLORS
+  if nvm_has tput; then
+    NVM_NUM_COLORS="$(tput -T "${TERM:-vt100}" colors)"
+  fi
+  [ "${NVM_NUM_COLORS:--1}" -ge 8 ]
 }
 
+nvm_set_colors() {
+  if [ "${#1}" -eq 5 ] && nvm_echo "$1" | nvm_grep -E "^[rRgGbBcCyYmMkKeW]{1,}$" 1>/dev/null; then
+    local INSTALLED_COLOR
+    local LTS_AND_SYSTEM_COLOR
+    local CURRENT_COLOR
+    local NOT_INSTALLED_COLOR
+    local DEFAULT_COLOR
+
+    INSTALLED_COLOR="$(echo "$1" | awk '{ print substr($0, 1, 1); }')"
+    LTS_AND_SYSTEM_COLOR="$(echo "$1" | awk '{ print substr($0, 2, 1); }')"
+    CURRENT_COLOR="$(echo "$1" | awk '{ print substr($0, 3, 1); }')"
+    NOT_INSTALLED_COLOR="$(echo "$1" | awk '{ print substr($0, 4, 1); }')"
+    DEFAULT_COLOR="$(echo "$1" | awk '{ print substr($0, 5, 1); }')"
+    if ! nvm_has_colors; then
+      nvm_echo "Setting colors to: ${INSTALLED_COLOR} ${LTS_AND_SYSTEM_COLOR} ${CURRENT_COLOR} ${NOT_INSTALLED_COLOR} ${DEFAULT_COLOR}"
+      nvm_echo "WARNING: Colors may not display because they are not supported in this shell."
+    else
+      nvm_echo_with_colors "Setting colors to: \033[$(nvm_print_color_code "${INSTALLED_COLOR}") ${INSTALLED_COLOR}\033[$(nvm_print_color_code "${LTS_AND_SYSTEM_COLOR}") ${LTS_AND_SYSTEM_COLOR}\033[$(nvm_print_color_code "${CURRENT_COLOR}") ${CURRENT_COLOR}\033[$(nvm_print_color_code "${NOT_INSTALLED_COLOR}") ${NOT_INSTALLED_COLOR}\033[$(nvm_print_color_code "${DEFAULT_COLOR}") ${DEFAULT_COLOR}\033[0m"
+    fi
+    export NVM_COLORS="$1"
+  else
+    return 17
+  fi
+}
+
+nvm_print_color_code() {
+  case "${1-}" in
+    'r') nvm_echo '0;31m';;
+    'R') nvm_echo '1;31m';;
+    'g') nvm_echo '0;32m';;
+    'G') nvm_echo '1;32m';;
+    'b') nvm_echo '0;34m';;
+    'B') nvm_echo '1;34m';;
+    'c') nvm_echo '0;36m';;
+    'C') nvm_echo '1;36m';;
+    'm') nvm_echo '0;35m';;
+    'M') nvm_echo '1;35m';;
+    'y') nvm_echo '0;33m';;
+    'Y') nvm_echo '1;33m';;
+    'k') nvm_echo '0;30m';;
+    'K') nvm_echo '1;30m';;
+    'e') nvm_echo '0;37m';;
+    'W') nvm_echo '1;37m';;
+    *) nvm_err 'Invalid color code';
+        return 1
+    ;;
+  esac
+}
+
+nvm_get_colors() {
+  local COLOR
+  local SYS_COLOR
+  if [ -n "${NVM_COLORS-}" ]; then
+    case $1 in
+      1) COLOR=$(nvm_print_color_code "$(echo "$NVM_COLORS" | awk '{ print substr($0, 1, 1); }')");;
+      2) COLOR=$(nvm_print_color_code "$(echo "$NVM_COLORS" | awk '{ print substr($0, 2, 1); }')");;
+      3) COLOR=$(nvm_print_color_code "$(echo "$NVM_COLORS" | awk '{ print substr($0, 3, 1); }')");;
+      4) COLOR=$(nvm_print_color_code "$(echo "$NVM_COLORS" | awk '{ print substr($0, 4, 1); }')");;
+      5) COLOR=$(nvm_print_color_code "$(echo "$NVM_COLORS" | awk '{ print substr($0, 5, 1); }')");;
+      6)
+        SYS_COLOR=$(nvm_print_color_code "$(echo "$NVM_COLORS" | awk '{ print substr($0, 2, 1); }')")
+        COLOR=$(nvm_echo "$SYS_COLOR" | command tr '0;' '1;')
+        ;;
+      *)
+        env_log error "Invalid color index, ${1-}"
+        return 1
+      ;;
+    esac
+  else
+    case $1 in
+      1) COLOR='0;34m';;
+      2) COLOR='0;33m';;
+      3) COLOR='0;32m';;
+      4) COLOR='0;31m';;
+      5) COLOR='0;37m';;
+      6) COLOR='1;33m';;
+      *)
+        env_log error "Invalid color index, ${1-}"
+        return 1
+      ;;
+    esac
+  fi
+
+  echo "$COLOR"
+}
+
+nvm_print_versions() {
+  local VERSION
+  local LTS
+  local FORMAT
+  local NVM_CURRENT
+  local NVM_LATEST_LTS_COLOR
+  local NVM_OLD_LTS_COLOR
+
+  local INSTALLED_COLOR
+  local SYSTEM_COLOR
+  local CURRENT_COLOR
+  local NOT_INSTALLED_COLOR
+  local DEFAULT_COLOR
+  local LTS_COLOR
+
+  INSTALLED_COLOR=$(nvm_get_colors 1)
+  SYSTEM_COLOR=$(nvm_get_colors 2)
+  CURRENT_COLOR=$(nvm_get_colors 3)
+  NOT_INSTALLED_COLOR=$(nvm_get_colors 4)
+  DEFAULT_COLOR=$(nvm_get_colors 5)
+  LTS_COLOR=$(nvm_get_colors 6)
+
+  NVM_CURRENT=$(nvm_ls_current)
+  NVM_LATEST_LTS_COLOR=$(nvm_echo "${CURRENT_COLOR}" | command tr '0;' '1;')
+  NVM_OLD_LTS_COLOR="${DEFAULT_COLOR}"
+  local NVM_HAS_COLORS
+  if [ -z "${NVM_NO_COLORS-}" ] && nvm_has_colors; then
+    NVM_HAS_COLORS=1
+  fi
+  local LTS_LENGTH
+  local LTS_FORMAT
+  nvm_echo "${1-}" \
+  | command sed '1!G;h;$!d' \
+  | command awk '{ if ($2 && $3 && $3 == "*") { print $1, "(Latest LTS: " $2 ")" } else if ($2) { print $1, "(LTS: " $2 ")" } else { print $1 } }' \
+  | command sed '1!G;h;$!d' \
+  | while read -r VERSION_LINE; do
+    VERSION="${VERSION_LINE%% *}"
+    LTS="${VERSION_LINE#* }"
+    FORMAT='%15s'
+    if [ "_${VERSION}" = "_${NVM_CURRENT}" ]; then
+      if [ "${NVM_HAS_COLORS-}" = '1' ]; then
+        FORMAT="\033[${CURRENT_COLOR}-> %12s\033[0m"
+      else
+        FORMAT='-> %12s *'
+      fi
+    elif [ "${VERSION}" = "system" ]; then
+      if [ "${NVM_HAS_COLORS-}" = '1' ]; then
+        FORMAT="\033[${SYSTEM_COLOR}%15s\033[0m"
+      else
+        FORMAT='%15s *'
+      fi
+    elif nvm_is_version_installed "${VERSION}"; then
+      if [ "${NVM_HAS_COLORS-}" = '1' ]; then
+        FORMAT="\033[${INSTALLED_COLOR}%15s\033[0m"
+      else
+        FORMAT='%15s *'
+      fi
+    fi
+    if [ "${LTS}" != "${VERSION}" ]; then
+      case "${LTS}" in
+        *Latest*)
+          LTS="${LTS##Latest }"
+          LTS_LENGTH="${#LTS}"
+          if [ "${NVM_HAS_COLORS-}" = '1' ]; then
+            LTS_FORMAT="  \\033[${NVM_LATEST_LTS_COLOR}%${LTS_LENGTH}s\\033[0m"
+          else
+            LTS_FORMAT="  %${LTS_LENGTH}s"
+          fi
+        ;;
+        *)
+          LTS_LENGTH="${#LTS}"
+          if [ "${NVM_HAS_COLORS-}" = '1' ]; then
+            LTS_FORMAT="  \\033[${NVM_OLD_LTS_COLOR}%${LTS_LENGTH}s\\033[0m"
+          else
+            LTS_FORMAT="  %${LTS_LENGTH}s"
+          fi
+        ;;
+      esac
+      command printf -- "${FORMAT}${LTS_FORMAT}\\n" "${VERSION}" " ${LTS}"
+    else
+      command printf -- "${FORMAT}\\n" "${VERSION}"
+    fi
+  done
+}
+
+# EndSection
+
+# Section: node ls and la
+___x_cmd_env_node_ls(){
+  env_log info "List all installed Node"
+  local PATTERN
+  local NVM_NO_COLORS
+  local NVM_NO_ALIAS
+
+  while [ $# -gt 0 ]; do
+    case "${1}" in
+      --) ;;
+      --no-colors) NVM_NO_COLORS="${1}" ;;
+      --no-alias) NVM_NO_ALIAS="${1}" ;;
+      --*)
+        env_log error "Unsupported option \"${1}\"."
+        return 55
+      ;;
+      *)
+        PATTERN="node"
+      ;;
+    esac
+    shift
+  done
+  if [ -n "${PATTERN-}" ] && [ -n "${NVM_NO_ALIAS-}" ]; then
+    env_log error '`--no-alias` is not supported when a pattern is provided.'
+    return 55
+  fi
+  local NVM_LS_OUTPUT
+  local NVM_LS_EXIT_CODE
+  NVM_LS_OUTPUT=$(nvm_ls "${PATTERN-}")
+  NVM_LS_EXIT_CODE=$?
+  NVM_NO_COLORS="${NVM_NO_COLORS-}" nvm_print_versions "${NVM_LS_OUTPUT}"
+  if [ -z "${NVM_NO_ALIAS-}" ] && [ -z "${PATTERN-}" ]; then
+    if [ -n "${NVM_NO_COLORS-}" ]; then
+      nvm alias --no-colors
+    else
+      nvm alias
+    fi
+  fi
+  return $NVM_LS_EXIT_CODE
+
+
+  # local versions_csv
+	# versions_csv=""
+	# if [ -d "$___X_CMD_ENV_PATH/node/versions" ]; then
+	# 	for version in $(find "$___X_CMD_ENV_PATH/node/versions" -maxdepth 1 -mindepth 1 \( -type l -o -type d \) -exec basename '{}' \; | sort -r); do
+	# 		versions_csv="${version},${versions_csv}"
+	# 	done
+	# 	versions_csv=${versions_csv%?}
+	# fi
+	# printf "%s\n" "$versions_csv"
+}
 
 ___x_cmd_env_node_la(){
     x nvm ls-remote
 }
+
+# EndSection
 
 ___x_cmd_env_node_download() {
     :

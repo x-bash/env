@@ -110,7 +110,6 @@ A
         return 1
     fi
 
-    ls "$___X_CMD_ENV_PATH/$1"
     ___x_cmd_env_op_candidate ls "$@"
 }
 
