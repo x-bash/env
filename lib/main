@@ -110,10 +110,9 @@ A
         ___x_cmd_env_main_install help
         return 1
     fi
-
     # TODO: 增加 本地简写版本对应关系 和 全局简写版本对应关系
     # TODO: V8 -> V8.2   --> (Remote) V8.6
-    ls "$___X_CMD_ENV_PATH/$1"
+    # ls "$___X_CMD_ENV_PATH/$1"
     ___x_cmd_env_op_candidate ls "$@"
 }
 

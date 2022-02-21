@@ -27,11 +27,13 @@ case $1 in
         ;;
     java)
         . "$(x wsroot)/.x-cmd/testcases/java"
-        x env install java 17.0.2.8.1-amzn
+        # x env install java 17.0.2.8.1-amzn
+        # x env install java 17.0.2-zulu
+        # x env install java 21.3.0.0-mandrel
         # x env use java 17.0.2.8.1-amzn
-        # x env ls java
+        x env ls java
         # x env current
-        x env exec java 17.0.2.8.1-amzn -version
+        # x env exec java 17.0.2.8.1-amzn -version
         ;;
     *)
         echo "Usage: x test python|node|java"
