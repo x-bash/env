@@ -39,11 +39,11 @@ __sdkman_echo_cyan() {
 
 __sdkman_echo_paged() {
 	if [ -n "$PAGER" ]; then
-		printf "%s" "$@" | eval "$PAGER"
+		printf "%s\n" "$@" | eval "$PAGER"
 	elif command -v less >/dev/null; then
-		printf "%s" "$@" | less
+		printf "%s\n" "$@" | less
 	else
-		printf "%s" "$@"
+		printf "%s\n" "$@"
 	fi
 }
 
@@ -372,19 +372,19 @@ ___x_cmd_env_java_ls(){
 
 	env_log info "List all installed Java"
 	___x_cmd_env_build_version_csv
-    # local versions_csv
-	# versions_csv="$(___x_cmd_env_build_version_csv)"
-	# ___x_cmd_env_determine_current_version
 
-	# if [ "$ENV_AVAILABLE" = "false" ]; then
-	# 	___x_cmd_env_offline_list "$versions_csv"
-	# else
-	# 	__sdkman_echo_paged "$(curl --silent --location "https://api.sdkman.io/2/candidates/java/${ENV_PLATFORM_TMP}/versions/list?current=${CURRENT}&installed=${versions_csv}")" | cat
-	# fi
 }
 
 ___x_cmd_env_java_la(){
-    :
+	env_log info "List all installed Java"
+	___x_cmd_env_build_version_csv
+
+    env_log info "List all available Java"
+	# ___x_cmd_env_determine_current_version
+	# __sdkman_echo_paged "$(curl --silent --location "https://api.sdkman.io/2/candidates/java/${ENV_PLATFORM_TMP}/versions/list?current=${CURRENT}&installed=${CURRENT}")" | cat
+
+	local remote_version="$(__sdkman_echo_paged "$(curl --silent "https://api.sdkman.io/2/candidates/java/${ENV_PLATFORM_TMP}/versions/all")")"
+	printf "%s" "" | awk -v remote_version=$remote_version 'BEGIN{gsub(",","\n",remote_version);print remote_version}'
 }
 
 # EndSection
