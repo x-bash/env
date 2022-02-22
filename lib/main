@@ -1,5 +1,145 @@
 # shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263    # xrc
 
+# Section: xenv main
+
+___x_cmd_env_main() {
+    param:scope     "env"
+    param:dsl <<A
+subcommands:
+    ls                      "list all installed environments"
+    la                      "list all available environments"
+    download                "Download environment"
+    install                 "Install environment"
+    uninstall               "Remove environment"
+    try                     "Set default environment in this shell session"
+    use                     "Set global default environment"
+    ws                      "Set workspace default environment"
+
+    current                 "Show current environment"
+    which                   "Display path of environment installed"
+
+    exec                    "Run an executable with the selected candidates version"
+A
+    param:run
+
+    if [ -z "$PARAM_SUBCMD" ]; then
+        ___x_cmd_env_main help
+        return 1
+    fi
+
+    "___x_cmd_env_main_$PARAM_SUBCMD" "$@"
+}
+
+___x_cmd_env_main_ls(){
+    param:scope "env"
+    param:dsl <<A
+options:
+    -r                 "List version including remote"
+    #1|--candidate     "Environment Candidates" <candidates>:candidates_list
+A
+    param:run
+
+    if [ -z "$candidate" ]; then
+        env_log warn "No candidate specified"
+        ___x_cmd_env_main_ls --help
+        return 1
+    fi
+
+    # TODO: 增加 本地简写版本对应关系 和 全局简写版本对应关系
+    # TODO: V8 -> V8.2   --> (Remote) V8.6
+    ___x_cmd_env_run ls "$@"
+}
+
+___x_cmd_env_main_la(){
+    ___x_cmd_env_run la "$@"
+}
+
+___x_cmd_env_main_download(){
+    ___x_cmd_env_run download "$@"
+}
+
+___x_cmd_env_main_install() {
+    # TODO: You can do more better in #2 advise json
+    param:scope "env"
+    param:dsl <<A
+options:
+    #1        "Environment Candidates" <candidates>:candidates_list
+    #2        "Version"                <version>="default"
+A
+    param:run
+
+    if [ -z "$1" ]; then
+        ___x_cmd_env_main_install help
+        return 1
+    fi
+    ___x_cmd_env_run install "$@"
+}
+
+___x_cmd_env_main_uninstall(){
+    param:scope "env"
+    param:dsl <<A
+options:
+    #1        "Environment Candidates" <candidates>:candidates_list
+    #2        "Version"                <version>
+A
+    param:run
+
+    if [ -z "$1" ]; then
+        ___x_cmd_env_main_uninstall help
+        return 1
+    fi
+
+    ___x_cmd_env_run uninstall "$@"
+}
+
+___x_cmd_env_main_try(){
+    ___x_cmd_env_run try "$@"
+}
+
+___x_cmd_env_main_use(){
+    ___x_cmd_env_run use "$@"
+}
+
+___x_cmd_env_main_ws(){
+    if [ $# -eq 0 ]; then
+        : TODO: list workspace environment
+    fi
+
+    ___x_cmd_env_run ws "$@"
+}
+
+___x_cmd_env_main_current(){
+    if [ $# -eq 0 ]; then
+        : TODO: list current environment
+    fi
+
+    ___x_cmd_env_run current "$@"
+}
+
+___x_cmd_env_main_which(){
+    ___x_cmd_env_run which "$@"
+}
+
+___x_cmd_env_main_exec(){
+    param:scope "env"
+    param:dsl <<A
+options:
+    #1        "Environment Candidates" <candidates>:candidates_list
+    #2        "Version"                <version>
+A
+    param:run
+
+
+    if [ -z "$1" ]; then
+        ___x_cmd_env_main_exec help
+        return 1
+    fi
+
+    ___x_cmd_env_run exec "$@"
+}
+
+# EndSection
+
 # Section: ENV ___X_CMD_ENV_PATH
 
 ___X_CMD_ENV_PATH="$___X_CMD_ROOT/.env"
@@ -7,6 +147,36 @@ ___X_CMD_ENV_PATH="$___X_CMD_ROOT/.env"
 # EndSection
 
 # Section: common functions
+
+___x_cmd_env_run(){
+    local op="${1:?Provide op}";  shift
+    local candidate="${1:?Provide candidate}";  shift
+
+    if ! ___x_cmd_env_candidate_has "$candidate"; then
+        env_log error "Candidate inexisted: $candidate"
+        return 1
+    fi
+
+    # TODO: It might be better to have one folder for one language.
+    xrc "env/lib/candidate/$candidate"
+
+    local cmd="___x_cmd_env_${candidate}_${op}"
+    if command -v "$cmd" >/dev/null; then
+        "$cmd" "$@"
+    else
+        env_log warn "Candidate ${candidate} has no op: $op, use common $op function."
+        "___x_cmd_env_common_${op}" "$candidate" "$@"
+    fi
+}
+
+___x_cmd_env_common_ls() {
+    local candidate="${1:?Provide candidate}"
+	if [ -d "$___X_CMD_ENV_PATH/$candidate/versions" ]; then
+		for version in $(find "$___X_CMD_ENV_PATH/$candidate/versions" -maxdepth 1 -mindepth 1 \( -type l -o -type d \) -exec basename '{}' \; | sort -r); do
+			printf "%s\n" "$version"
+		done
+	fi
+}
 
 ___x_cmd_env_shim_dir(){
     local candidate="${1:?Provide candidate}"
@@ -99,135 +269,28 @@ ___x_cmd_env_common_pre_exec_check() {
 
 # EndSection
 
-___x_cmd_env_main() {
-    param:scope     "env"
-    param:dsl <<A
-subcommands:
-    ls                      "list all installed environments"
-    la                      "list all available environments"
-    download                "Download environment"
-    install                 "Install environment"
-    uninstall               "Remove environment"
-    try                     "Set default environment in this shell session"
-    use                     "Set global default environment"
-    ws                      "Set workspace default environment"
+# Section: Candidate API
 
-    current                 "Show current environment"
-    which                   "Display path of environment installed"
+___x_cmd_env_candidate_all(){
+    printf "%s" "
+python
+node
+go
+java
+kotlin
+"
 
-    exec                    "Run an executable with the selected candidates version"
-A
-    param:run
+}
 
-    if [ -z "$PARAM_SUBCMD" ]; then
-        ___x_cmd_env help
+___x_cmd_env_candidate_has(){
+    local target="${1:?Provide target}"
+    local s="$(___x_cmd_env_candidate_all)"
+    if [ "$s" = "${s#*
+$target
+}" ]; then
         return 1
     fi
-
-    "___x_cmd_env_main_$PARAM_SUBCMD" "$@"
+    return 0
 }
 
-___x_cmd_env_main_ls(){
-    param:scope "env"
-    param:dsl <<A
-options:
-    #1        "Environment Candidates" <candidates>:candidates_list
-A
-    param:run
-
-    if [ -z "$1" ]; then
-        ___x_cmd_env_main_install help
-        return 1
-    fi
-    # TODO: 增加 本地简写版本对应关系 和 全局简写版本对应关系
-    # TODO: V8 -> V8.2   --> (Remote) V8.6
-    ___x_cmd_env_op_candidate ls "$@"
-}
-
-___x_cmd_env_main_la(){
-    ___x_cmd_env_op_candidate la "$@"
-}
-
-___x_cmd_env_main_download(){
-    ___x_cmd_env_op_candidate download "$@"
-}
-
-___x_cmd_env_main_install() {
-    # TODO: You can do more better in #2 advise json
-    param:scope "env"
-    param:dsl <<A
-options:
-    #1        "Environment Candidates" <candidates>:candidates_list
-    #2        "Version"                <version>="default"
-A
-    param:run
-
-    if [ -z "$1" ]; then
-        ___x_cmd_env_main_install help
-        return 1
-    fi
-    ___x_cmd_env_op_candidate install "$@"
-}
-
-___x_cmd_env_main_uninstall(){
-    param:scope "env"
-    param:dsl <<A
-options:
-    #1        "Environment Candidates" <candidates>:candidates_list
-    #2        "Version"                <version>
-A
-    param:run
-
-    if [ -z "$1" ]; then
-        ___x_cmd_env_main_uninstall help
-        return 1
-    fi
-
-    ___x_cmd_env_op_candidate uninstall "$@"
-}
-
-___x_cmd_env_main_try(){
-    ___x_cmd_env_op_candidate try "$@"
-}
-
-___x_cmd_env_main_use(){
-    ___x_cmd_env_op_candidate use "$@"
-}
-
-___x_cmd_env_main_ws(){
-    if [ $# -eq 0 ]; then
-        : TODO: list workspace environment
-    fi
-
-    ___x_cmd_env_op_candidate ws "$@"
-}
-
-___x_cmd_env_main_current(){
-    if [ $# -eq 0 ]; then
-        : TODO: list current environment
-    fi
-
-    ___x_cmd_env_op_candidate current "$@"
-}
-
-___x_cmd_env_main_which(){
-    ___x_cmd_env_op_candidate which "$@"
-}
-
-___x_cmd_env_main_exec(){
-    param:scope "env"
-    param:dsl <<A
-options:
-    #1        "Environment Candidates" <candidates>:candidates_list
-    #2        "Version"                <version>
-A
-    param:run
-
-
-    if [ -z "$1" ]; then
-        ___x_cmd_env_main_exec help
-        return 1
-    fi
-
-    ___x_cmd_env_op_candidate exec "$@"
-}
+# EndSection
