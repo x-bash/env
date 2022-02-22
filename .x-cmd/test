@@ -23,7 +23,7 @@ case $1 in
         # x env install node v4.9.1
         # x env install node v6.17.1
         # x env use node v17.5.0
-        x env ls node node
+        x env ls node
         # x env current node
         # x env exec node v14.19.0
         # x env exec node v17.5.0

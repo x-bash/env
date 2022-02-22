@@ -1791,6 +1791,7 @@ ___x_cmd_env_node_ls(){
   local NVM_NO_COLORS
   local NVM_NO_ALIAS
 
+  PATTERN="node"
   while [ $# -gt 0 ]; do
     case "${1}" in
       --) ;;
@@ -1801,7 +1802,7 @@ ___x_cmd_env_node_ls(){
         return 55
       ;;
       *)
-        PATTERN="node"
+        PATTERN="${PATTERN:-$1}"
       ;;
     esac
     shift
@@ -1840,6 +1841,41 @@ ___x_cmd_env_node_la(){
   local NVM_LTS
   local PATTERN
   local NVM_NO_COLORS
+
+  while [ $# -gt 0 ]; do
+    case "${1-}" in
+      --) ;;
+      --lts)
+        NVM_LTS='*'
+      ;;
+      --lts=*)
+        NVM_LTS="${1##--lts=}"
+      ;;
+      --no-colors) NVM_NO_COLORS="${1}" ;;
+      --*)
+        nvm_err "Unsupported option \"${1}\"."
+        return 55
+      ;;
+      *)
+        if [ -z "${PATTERN-}" ]; then
+          PATTERN="${1-}"
+          if [ -z "${NVM_LTS-}" ]; then
+            case "${PATTERN}" in
+              'lts/*')
+                NVM_LTS='*'
+                PATTERN=''
+              ;;
+              lts/*)
+                NVM_LTS="${PATTERN##lts/}"
+                PATTERN=''
+              ;;
+            esac
+          fi
+        fi
+      ;;
+    esac
+    shift
+  done
 }
 
 # EndSection
