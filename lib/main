@@ -63,7 +63,7 @@ ___x_cmd_env_main_install() {
     param:scope "env"
     param:dsl <<A
 advise:
-    #2        ___x_cmd_xenv_advise_ls_version
+    #2        ___x_cmd_env_advise_ls_remote_version
 options:
     #1        "Environment Candidates" <candidates>:candidates_list
     #2        "Version"                <version>="default"
@@ -80,6 +80,8 @@ A
 ___x_cmd_env_main_uninstall(){
     param:scope "env"
     param:dsl <<A
+advise:
+    #2        ___x_cmd_env_advise_ls_locate_version
 options:
     #1        "Environment Candidates" <candidates>:candidates_list
     #2        "Version"                <version>
@@ -297,12 +299,18 @@ $target
 
 # EndSection
 
-# Section: advise
+# Section: advise ls_version
 
-___x_cmd_xenv_advise_ls_version(){
+___x_cmd_env_advise_ls_remote_version(){
     local candidate_idx="${1:-2}"
     [ -n "$ZSH_VERSION" ] && candidate_idx=$((candidate_idx+1))
     x env ls -r "${COMP_WORDS[candidate_idx]}"
+}
+
+___x_cmd_env_advise_ls_local_version(){
+    local candidate_idx="${1:-2}"
+    [ -n "$ZSH_VERSION" ] && candidate_idx=$((candidate_idx+1))
+    x env ls "${COMP_WORDS[candidate_idx]}"
 }
 
 # EndSection
