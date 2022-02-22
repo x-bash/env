@@ -3,13 +3,6 @@
 # author:       Li Junhao           l@x-cmd.com
 # license:      GPLv3
 
-
-# TODO:
-# alias
-# unalias
-# rehash
-# whence
-
 # Inject the environment.
 ___x_cmd_env_main() {
     x log init env
