@@ -2,7 +2,7 @@
 
 # Section: sdkman
 
-ENV_PLATFORM_TMP="$(xrc os && os name && os arch)"
+ENV_PLATFORM_TMP="$(xrc os && ___x_cmd_os name && ___x_cmd_os arch)"
 ENV_PLATFORM="$(cat <<A
 $ENV_PLATFORM_TMP
 A
