@@ -2,7 +2,7 @@
 
 xws install
 ___X_CMD_XRC_MODULE_IMPORTED=
-# advise rm ___x_cmd_env_main
+advise rm ___x_cmd_env_main
 xrc env
 x log env
 
@@ -10,20 +10,21 @@ case $1 in
     python)
         . "$(x wsroot)/.x-cmd/testcases/python"
         # TODO: Check if this version is available in your system
-        # x env install python py38_4.10.1
-        # x env ls python
+        x env install python py38_4.10.1
+        x env ls python
         # x env uninstall python py38_4.10.1
-        # x env current
-        # x env exec python py38_4.10.1 -V
+        x env current python
+        echo ""
+        x env exec python py38_4.10.1 -V
         ;;
     node)
         . "$(x wsroot)/.x-cmd/testcases/node"
-        # x env install node v14.19.0
-        # x env install node v17.5.0
+        x env install node v14.19.0
+        x env install node v17.5.0
         # x env use node v17.5.0
-        # x env ls node
+        x env ls node
         # x env current node
-        # x env exec node v14.19.0
+        x env exec node v14.19.0
         ;;
     java)
         . "$(x wsroot)/.x-cmd/testcases/java"
@@ -35,6 +36,13 @@ case $1 in
         x env la java
         # x env current
         # x env exec java 17.0.2.8.1-amzn -version
+        x env install java 17.0.2.8.1-amzn
+        x env uninstall java 17.0.2.8.1-amzn
+        # x env use java 17.0.2.8.1-amzn
+        x env ls java
+        x env current java
+        echo ""
+        x env exec java 17.0.2.8.1-amzn -version
         ;;
     *)
         echo "Usage: x test python|node|java"

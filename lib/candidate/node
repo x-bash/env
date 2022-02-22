@@ -1602,9 +1602,8 @@ nvm_install_default_packages() {
 # EndSection
 
 ___x_cmd_env_node_ls(){
-    x nvm ls
+    ls "$___X_CMD_ENV_PATH/java/versions"
 }
-
 
 ___x_cmd_env_node_la(){
     x nvm ls-remote
@@ -1832,7 +1831,7 @@ ___x_cmd_env_node_ws() {
 }
 
 ___x_cmd_env_node_current() {
-    :
+    printf "%s" "$(cat "$___X_CMD_ENV_PATH/node/version")"
 }
 
 ___x_cmd_env_node_which() {
@@ -1842,7 +1841,7 @@ ___x_cmd_env_node_which() {
 ___x_cmd_env_node_exec() {
     local version="${1:?Provide node version}" ; shift
     ___x_cmd_env_common_pre_exec_check node "$version" || return
-    local node_path="${___X_CMD_ENV_PATH}/node/${version}/bin/node"
+    local node_path="${___X_CMD_ENV_PATH}/node/versions/${version}/bin/node"
 
     "$node_path" "$@"
 }

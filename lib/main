@@ -1,10 +1,39 @@
 # shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263    # xrc
 
+# Section: ENV ___X_CMD_ENV_PATH
+
+___X_CMD_ENV_PATH="$___X_CMD_ROOT/.env"
+
+# EndSection
 
 # Section: common functions
 
-___X_CMD_ENV_PATH="$___X_CMD_ROOT/.bin/env"
-___X_CMD_ENV_TMP_PATH="$___X_CMD_ROOT/.tmp/env"
+___x_cmd_env_shim_dir(){
+    local candidate="${1:?Provide candidate}"
+    local version="${2:?Provide version}"
+    local version_path=".x-cmd/.env/$candidate/version"
+    local versions_path="$___X_CMD_ENV_PATH/$candidate/versions"
+
+    for name in $versions_path/${version}/bin/* ; do
+        printf "%s" "$(cat <<A
+#!/usr/bin/env sh
+set -e
+
+cur=\$(pwd)
+while [ ! "\$cur" = "" ]; do
+    if [ -f "\$cur/$version_path" ]; then
+        version=\$(cat "\$cur/$version_path")
+        exec $versions_path/\$version/bin/${name##*/} "\$@"
+        return 0
+    fi
+    cur=\${cur%/*}
+done
+## TODO: no found
+A
+)">"$___X_CMD_ENV_PATH/$candidate/shims/${name##*/}"
+        chmod +x "$___X_CMD_ENV_PATH/$candidate/shims/${name##*/}"
+    done
+}
 
 ___x_cmd_env_common_pre_install_check(){
     local candidate="${1:?Provide candidate}"
@@ -21,7 +50,7 @@ ___x_cmd_env_common_pre_install_check(){
 
     # Check the candidate version in general way.
     # The path should have no system and platform info.
-    local candidate_path="$___X_CMD_ENV_PATH/${candidate}"
+    local candidate_path="$___X_CMD_ENV_PATH/${candidate}/versions/${version}"
     if [ -d "$candidate_path" ]; then
         env_log info "$candidate $version is already installed in $candidate_path ."
         return 1
@@ -35,7 +64,7 @@ ___x_cmd_env_common_uninstall(){
     local version="${2:?Provide the version}"
     env_log info "Uninstalling $1 $2"
 
-    local candidate_path="$___X_CMD_ENV_PATH/${candidate}"
+    local candidate_path="$___X_CMD_ENV_PATH/${candidate}/versions/${version}"
     if [ -d "$candidate_path" ]; then
         rm -rf "${candidate_path}"
     else
@@ -48,7 +77,7 @@ ___x_cmd_env_common_pre_exec_check() {
     local candidate="${1:?Provide candidate}"
     local version="${2:?Provide the version}"
 
-    local candidate_path="$___X_CMD_ENV_PATH/${candidate}"
+    local candidate_path="$___X_CMD_ENV_PATH/${candidate}/versions/${version}"
     case $version in
         default)
             # TODO: Handle the python3 case.
@@ -58,7 +87,7 @@ ___x_cmd_env_common_pre_exec_check() {
             fi
             ;;
         *)
-            if [ ! -d "${candidate_path}/${version}" ]; then
+            if [ ! -d "${candidate_path}" ]; then
                 env_log error "$candidate $version is not installed."
                 return 1
             fi
@@ -112,7 +141,6 @@ A
     fi
     # TODO: 增加 本地简写版本对应关系 和 全局简写版本对应关系
     # TODO: V8 -> V8.2   --> (Remote) V8.6
-    # ls "$___X_CMD_ENV_PATH/$1"
     ___x_cmd_env_op_candidate ls "$@"
 }
 
