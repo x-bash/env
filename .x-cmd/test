@@ -19,12 +19,12 @@ case $1 in
         ;;
     node)
         . "$(x wsroot)/.x-cmd/testcases/node"
-        x env install node v14.19.0
-        x env install node v17.5.0
-        # x env use node v17.5.0
         x env ls node
+        # x env install node v14.19.0
+        # x env install node v17.5.0
+        # x env use node v17.5.0
         # x env current node
-        x env exec node v14.19.0
+        # x env exec node v14.19.0
         ;;
     java)
         . "$(x wsroot)/.x-cmd/testcases/java"
