@@ -62,6 +62,8 @@ ___x_cmd_env_main_install() {
     # TODO: You can do more better in #2 advise json
     param:scope "env"
     param:dsl <<A
+advise:
+    #2        ___x_cmd_xenv_advise_ls_version
 options:
     #1        "Environment Candidates" <candidates>:candidates_list
     #2        "Version"                <version>="default"
@@ -291,6 +293,16 @@ $target
         return 1
     fi
     return 0
+}
+
+# EndSection
+
+# Section: advise
+
+___x_cmd_xenv_advise_ls_version(){
+    local candidate_idx="${1:-2}"
+    [ -n "$ZSH_VERSION" ] && candidate_idx=$((candidate_idx+1))
+    x env ls -r "${COMP_WORDS[candidate_idx]}"
 }
 
 # EndSection
