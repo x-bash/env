@@ -200,6 +200,22 @@ ___x_cmd_env_main_ws(){
     ___x_cmd_env_run ws "$@"
 }
 
+___x_cmd_env_common_use(){
+    local candidate="${1:?Provide candidate}"
+    local version="${2:?Provide java version}"
+    PATH="${___X_CMD_ENV_PATH}/$candidate/shims:$PATH"
+    x boot rc add "x-env-$candidate" "PATH=\"${___X_CMD_ENV_PATH}/$candidate/shims:\$PATH\""
+	printf "%s" "$version" > "$___X_CMD_ENV_PATH/$candidate/version"
+    env_log info "Using $candidate $version . -> $___X_CMD_ENV_PATH/$candidate/version"
+    ___x_cmd_env_shim_dir "$candidate" "${version}"
+}
+
+___x_cmd_env_common_try(){
+    local candidate="${1:?Provide candidate}"
+    local version="${2:?Provide python version}"
+    PATH="${___X_CMD_ENV_PATH}/$candidate/versions/$version:$PATH"
+}
+
 ___x_cmd_env_shim_dir(){
     local candidate="${1:?Provide candidate}"
     local version="${2:?Provide version}"
@@ -225,21 +241,6 @@ A
 )">"$___X_CMD_ENV_PATH/$candidate/shims/${name##*/}"
         chmod +x "$___X_CMD_ENV_PATH/$candidate/shims/${name##*/}"
     done
-}
-
-___x_cmd_env_common_use(){
-    local candidate="${1:?Provide candidate}"
-    local version="${2:?Provide java version}"
-    x boot rc add "x-env-$candidate" "PATH=\"${___X_CMD_ENV_PATH}/$candidate/shims:\$PATH\""
-	printf "%s" "$version" > "$___X_CMD_ENV_PATH/$candidate/version"
-    env_log info "Using $candidate $version . -> $___X_CMD_ENV_PATH/$candidate/version"
-    ___x_cmd_env_shim_dir "$candidate" "${version}"
-}
-
-___x_cmd_env_common_try(){
-    local candidate="${1:?Provide candidate}"
-    local version="${2:?Provide python version}"
-    PATH="${___X_CMD_ENV_PATH}/$candidate/versions/$version:$PATH"
 }
 
 # EndSection

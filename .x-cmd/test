@@ -10,22 +10,35 @@ case $1 in
         # TODO: Check if this version is available in your system
         env_log info "Testing python ls."
         x env ls python
+
         env_log info "Testing python current."
         x env current python
         echo ""
+
         env_log info "Testing python install."
         x env install python py38_4.10.1
-        env_log info "Testing python uninstall."
-        x env uninstall python py38_4.10.1
+
         env_log info "Testing python exec."
         x env exec python py38_4.10.1 -V
+
+        env_log info "Testing python uninstall."
+        x env uninstall python py38_4.10.1
+
+        env_log info "Testing python exec."
+        x env exec python py38_4.10.1 -V
+
+        env_log info "Testing python current."
+        x env current python
+        echo ""
         ;;
     node)
-        # env_log info "Testing node ls."
-        # x env ls node
-        # env_log info "Testing node current."
-        # x env current node
-        # echo ""
+        env_log info "Testing node ls."
+        x env ls node
+
+        env_log info "Testing node current."
+        x env current node
+        echo ""
+
         # x env install node v14.19.0
         # x env install node v17.5.0
         x env la node
