@@ -1795,20 +1795,11 @@ ___x_cmd_env_node_ls(){
 
 # EndSection
 
+# Section: node download
+
 ___x_cmd_env_node_download() {
-    :
-}
-
-# Section: node install and uninstall
-
-___x_cmd_env_node_install() {
     local version_not_provided
     version_not_provided=0
-
-    if ! nvm_has "curl" && ! nvm_has "wget"; then
-        env_log error 'nvm needs curl or wget to proceed.'
-        return 1
-    fi
 
     if [ $# -lt 1 ]; then
         version_not_provided=1
@@ -1998,8 +1989,11 @@ ___x_cmd_env_node_install() {
     return $EXIT_CODE
 }
 
-___x_cmd_env_node_uninstall() {
-    :
+___x_cmd_env_node_install() {
+    local version="${1:?Provide python version}"
+    ___x_cmd_env_common_pre_install_check node "$version" && \
+        ___x_cmd_env_node_download "$version" || return
+    ___x_cmd_env_common_use node "$version"
 }
 
 # EndSection
