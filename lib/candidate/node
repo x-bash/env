@@ -1787,7 +1787,7 @@ nvm_print_versions() {
 # Section: node ls and la
 ___x_cmd_env_node_ls(){
   if [ -z "$remote" ] ; then
-		___x_cmd_env_common_ls java
+		___x_cmd_env_common_ls node
 	else
     local cache_path="$___X_CMD_ENV_PATH/node/cache"
     if [ -f "$cache_path/version_list" ] ; then

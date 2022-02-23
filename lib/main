@@ -400,6 +400,7 @@ $target
 
 # Section: advise ls_version
 
+# TODO: define the function when x-cmd start
 ___x_cmd_env_advise_ls_remote_version(){
     local candidate_idx="${1:-2}"
     [ -n "$ZSH_VERSION" ] && candidate_idx=$((candidate_idx+1))
