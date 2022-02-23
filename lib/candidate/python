@@ -33,9 +33,37 @@ ___x_cmd_env_python_get_miniconda_name_and_filename(){
 
 # EndSection
 
-# ___x_cmd_env_python_ls(){
-#     :
-# }
+___x_cmd_env_python_ls(){
+    if [ -z "$remote" ] ; then
+		___x_cmd_env_common_ls python
+	else
+        xrc os
+        case "$(os name)" in
+            linux)      system=Linux            ;;
+            windows)    system=Windows          ;;
+            darwin)     system=MacOSX           ;;
+            *)          return 1 ;;
+        esac
+
+        case "$(os arch)" in
+            aarch64)    platform=aarch64        ;;
+            x64)        platform=x86_64         ;;
+            arm64)      platform=arm64          ;;
+            *)          return 1 ;;
+        esac
+
+        curl --silent "https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/" | \
+            awk "$(cat <<A
+BEGIN{RS="<a href=";FS="\""}{
+    if (match(\$2, /^.*-$system-$platform.sh$/)) {
+        split(\$2, a, /-/)
+        print a[2]
+    }
+}
+A
+        )"
+	fi
+}
 
 ___x_cmd_env_python_la(){
     :
@@ -44,20 +72,6 @@ ___x_cmd_env_python_la(){
 
 ___x_cmd_env_python_download(){
     :
-}
-
-___x_cmd_env_python_try(){
-    local version="${1:?Provide python version}"
-    PATH="${___X_CMD_ENV_PATH}/python/shims:$PATH"
-}
-
-# TODO: ws和全局统一 <ws|$HOME>/.x-cmd/.env/<candidate>/version 来处理
-___x_cmd_env_python_use(){
-    local version="${1:?Provide python version}"
-    printf "%s" "$version" > "$___X_CMD_ENV_PATH/python/version"
-    env_log info "Using python $version . -> $___X_CMD_ENV_PATH/python/version"
-    ___x_cmd_env_python_try "$version"
-    x boot rc add "x-env-python" "x env try python $version"
 }
 
 # Section: Python install and uninstall
@@ -91,12 +105,11 @@ ___x_cmd_env_python_install(){
                 "./${miniconda_filename}" -b -u -p "./${version}" 1>&2
             rm -rf "./${miniconda_filename}"
         else
-            env_log info "Download failure from $url/${miniconda_filename}"
+            env_log error "Download failure from $url/${miniconda_filename}"
         fi
     )
 
-    ___x_cmd_env_shim_dir python "${version}"
-    ___x_cmd_env_python_use "$version"
+    ___x_cmd_env_common_use python "$version"
 }
 
 ___x_cmd_env_python_uninstall(){
