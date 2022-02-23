@@ -127,11 +127,3 @@ ___x_cmd_env_python_ws(){
 ___x_cmd_env_python_which(){
     :
 }
-
-___x_cmd_env_python_exec(){
-    local version="${1:?Provide python version}" ; shift
-    ___x_cmd_env_common_pre_exec_check python "$version" || return
-    local python_path="${___X_CMD_ENV_PATH}/python/versions/${version}/bin/python"
-
-    "$python_path" "$@"
-}
