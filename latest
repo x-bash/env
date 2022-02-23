@@ -3,13 +3,6 @@
 # author:       Li Junhao           l@x-cmd.com
 # license:      GPLv3
 
-
-# TODO:
-# alias
-# unalias
-# rehash
-# whence
-
 # Inject the environment.
 ___x_cmd_env_main() {
     x log init env
@@ -17,50 +10,8 @@ ___x_cmd_env_main() {
     xrc param
 
     # TODO: candidates list should be automatically generated
-    param_type  env  candidates_list  "=" "python" "java" "node"
+    param_type  env  candidates_list  = "python" "java" "node"
     ___x_cmd_env_main "$@"
 }
-
-# Section: Candidate API
-
-___x_cmd_env_op_candidate(){
-    local op="${1:?Provide op}";  shift
-    local candidate="${1:?Provide candidate}";  shift
-
-    if ! ___x_cmd_env_candidate_has "$candidate"; then
-        printf "Candidate inexisted: %s\n" "$candidate" >&2
-        return 1
-    fi
-
-    # TODO: It might be better to have one folder for one language.
-    xrc "env/lib/candidate/$candidate"
-
-    "___x_cmd_env_${candidate}_${op}" "$@"
-}
-
-
-___x_cmd_env_candidate_all(){
-    printf "%s" "
-python
-node
-go
-java
-kotlin
-"
-
-}
-
-___x_cmd_env_candidate_has(){
-    local target="${1:?Provide target}"
-    local s="$(___x_cmd_env_candidate_all)"
-    if [ "$s" = "${s#*
-$target
-}" ]; then
-        return 1
-    fi
-    return 0
-}
-
-# EndSection
 
 xrc setmain ___x_cmd_env_main

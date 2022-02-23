@@ -1785,57 +1785,57 @@ nvm_print_versions() {
 # EndSection
 
 # Section: node ls and la
-___x_cmd_env_node_ls(){
-  env_log info "List all installed Node"
-  local PATTERN
-  local NVM_NO_COLORS
-  local NVM_NO_ALIAS
+# ___x_cmd_env_node_ls(){
+#   env_log info "List all installed Node"
+#   local PATTERN
+#   local NVM_NO_COLORS
+#   local NVM_NO_ALIAS
 
-  PATTERN="node"
-  while [ $# -gt 0 ]; do
-    case "${1}" in
-      --) ;;
-      --no-colors) NVM_NO_COLORS="${1}" ;;
-      --no-alias) NVM_NO_ALIAS="${1}" ;;
-      --*)
-        env_log error "Unsupported option \"${1}\"."
-        return 55
-      ;;
-      *)
-        PATTERN="${PATTERN:-$1}"
-      ;;
-    esac
-    shift
-  done
-  if [ -n "${PATTERN-}" ] && [ -n "${NVM_NO_ALIAS-}" ]; then
-    env_log error '`--no-alias` is not supported when a pattern is provided.'
-    return 55
-  fi
-  local NVM_LS_OUTPUT
-  local NVM_LS_EXIT_CODE
-  NVM_LS_OUTPUT=$(nvm_ls "${PATTERN-}")
-  NVM_LS_EXIT_CODE=$?
-  NVM_NO_COLORS="${NVM_NO_COLORS-}" nvm_print_versions "${NVM_LS_OUTPUT}"
-  if [ -z "${NVM_NO_ALIAS-}" ] && [ -z "${PATTERN-}" ]; then
-    if [ -n "${NVM_NO_COLORS-}" ]; then
-      nvm alias --no-colors
-    else
-      nvm alias
-    fi
-  fi
-  return $NVM_LS_EXIT_CODE
+#   PATTERN="node"
+#   while [ $# -gt 0 ]; do
+#     case "${1}" in
+#       --) ;;
+#       --no-colors) NVM_NO_COLORS="${1}" ;;
+#       --no-alias) NVM_NO_ALIAS="${1}" ;;
+#       --*)
+#         env_log error "Unsupported option \"${1}\"."
+#         return 55
+#       ;;
+#       *)
+#         PATTERN="${PATTERN:-$1}"
+#       ;;
+#     esac
+#     shift
+#   done
+#   if [ -n "${PATTERN-}" ] && [ -n "${NVM_NO_ALIAS-}" ]; then
+#     env_log error '`--no-alias` is not supported when a pattern is provided.'
+#     return 55
+#   fi
+#   local NVM_LS_OUTPUT
+#   local NVM_LS_EXIT_CODE
+#   NVM_LS_OUTPUT=$(nvm_ls "${PATTERN-}")
+#   NVM_LS_EXIT_CODE=$?
+#   NVM_NO_COLORS="${NVM_NO_COLORS-}" nvm_print_versions "${NVM_LS_OUTPUT}"
+#   if [ -z "${NVM_NO_ALIAS-}" ] && [ -z "${PATTERN-}" ]; then
+#     if [ -n "${NVM_NO_COLORS-}" ]; then
+#       nvm alias --no-colors
+#     else
+#       nvm alias
+#     fi
+#   fi
+#   return $NVM_LS_EXIT_CODE
 
 
-  # local versions_csv
-	# versions_csv=""
-	# if [ -d "$___X_CMD_ENV_PATH/node/versions" ]; then
-	# 	for version in $(find "$___X_CMD_ENV_PATH/node/versions" -maxdepth 1 -mindepth 1 \( -type l -o -type d \) -exec basename '{}' \; | sort -r); do
-	# 		versions_csv="${version},${versions_csv}"
-	# 	done
-	# 	versions_csv=${versions_csv%?}
-	# fi
-	# printf "%s\n" "$versions_csv"
-}
+#   # local versions_csv
+# 	# versions_csv=""
+# 	# if [ -d "$___X_CMD_ENV_PATH/node/versions" ]; then
+# 	# 	for version in $(find "$___X_CMD_ENV_PATH/node/versions" -maxdepth 1 -mindepth 1 \( -type l -o -type d \) -exec basename '{}' \; | sort -r); do
+# 	# 		versions_csv="${version},${versions_csv}"
+# 	# 	done
+# 	# 	versions_csv=${versions_csv%?}
+# 	# fi
+# 	# printf "%s\n" "$versions_csv"
+# }
 
 ___x_cmd_env_node_la(){
   env_log info "List all available Node"
@@ -2068,10 +2068,6 @@ ___x_cmd_env_node_ws() {
     :
 }
 
-___x_cmd_env_node_current() {
-    :
-}
-
 ___x_cmd_env_node_which() {
     :
 }
@@ -2079,7 +2075,7 @@ ___x_cmd_env_node_which() {
 ___x_cmd_env_node_exec() {
     local version="${1:?Provide node version}" ; shift
     ___x_cmd_env_common_pre_exec_check node "$version" || return
-    local node_path="${___X_CMD_ENV_PATH}/node/${version}/bin/node"
+    local node_path="${___X_CMD_ENV_PATH}/node/versions/${version}/bin/node"
 
     "$node_path" "$@"
 }
