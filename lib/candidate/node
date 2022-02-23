@@ -1795,7 +1795,7 @@ ___x_cmd_env_node_ls(){
 
 # EndSection
 
-# Section: node download
+# Section: node download, install
 
 ___x_cmd_env_node_download() {
     local version_not_provided
