@@ -182,7 +182,7 @@ ___x_cmd_env_common_la() {
 
 # EndSection
 
-# Section: use, try, ws
+# Section: use, try, ws, shim_dir
 
 ___x_cmd_env_main_try(){
     param:scope "env"
