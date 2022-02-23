@@ -185,10 +185,30 @@ ___x_cmd_env_common_la() {
 # Section: use, try, ws
 
 ___x_cmd_env_main_try(){
+    param:scope "env"
+    param:dsl <<A
+advise:
+    #2        ___x_cmd_env_advise_ls_remote_version
+options:
+    #1        "Environment Candidates" <candidates>:candidates_list
+    #2        "Version"                <version>="default"
+A
+    param:run
+
     ___x_cmd_env_run try "$@"
 }
 
 ___x_cmd_env_main_use(){
+    param:scope "env"
+    param:dsl <<A
+advise:
+    #2        ___x_cmd_env_advise_ls_local_version
+options:
+    #1        "Environment Candidates" <candidates>:candidates_list
+    #2        "Version"                <version>="default"
+A
+    param:run
+
     ___x_cmd_env_run use "$@"
 }
 

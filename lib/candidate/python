@@ -71,25 +71,12 @@ ___x_cmd_env_python_la(){
 
 
 ___x_cmd_env_python_download(){
-    :
-}
-
-# Section: Python install and uninstall
-
-# 1. If no special version and no local python, we will install a default version for you.
-# 2. It will download and use the python version.
-___x_cmd_env_python_install(){
-    local version="${1:?Provide python version}"
-    ___x_cmd_env_common_pre_install_check python "$version" || return
-
-    local miniconda_name
-    local miniconda_filename
-    ___x_cmd_env_python_get_miniconda_name_and_filename "$version"
-
-    local candidate_path="$___X_CMD_ENV_PATH/python/versions"
-    local shim_path="$___X_CMD_ENV_PATH/python/shims"
-
     (
+        local miniconda_name
+        local miniconda_filename
+        ___x_cmd_env_python_get_miniconda_name_and_filename "$version"
+        local candidate_path="$___X_CMD_ENV_PATH/python/versions"
+        local shim_path="$___X_CMD_ENV_PATH/python/shims"
         mkdir -p "${candidate_path}"
         mkdir -p "${shim_path}"
         cd "${candidate_path}" || return 1
@@ -106,9 +93,19 @@ ___x_cmd_env_python_install(){
             rm -rf "./${miniconda_filename}"
         else
             env_log error "Download failure from $url/${miniconda_filename}"
+            return 1
         fi
     )
+}
 
+# Section: Python install and uninstall
+
+# 1. If no special version and no local python, we will install a default version for you.
+# 2. It will download and use the python version.
+___x_cmd_env_python_install(){
+    local version="${1:?Provide python version}"
+    ___x_cmd_env_common_pre_install_check python "$version" && \
+        ___x_cmd_env_python_download "$version" || return
     ___x_cmd_env_common_use python "$version"
 }
 

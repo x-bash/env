@@ -352,12 +352,9 @@ ___x_cmd_env_java_ls(){
 
 # EndSection
 
-___x_cmd_env_java_download(){
-    :
-}
+# Section: download, install
 
-# Section: Java install and uninstall
-___x_cmd_env_java_install(){
+___x_cmd_env_java_download(){
     local version="${1:-default}"
     # ___x_cmd_env_common_pre_install_check java "${version}" || return
 	local folder="${2}"
@@ -383,8 +380,6 @@ ___x_cmd_env_java_install(){
         # TODO: Maybe link will be better?
         # ___x_cmd_env_link_candidate_version "$version"
         # ___x_cmd_env_add_to_path
-        ___x_cmd_env_java_use "$version"
-		___x_cmd_env_shim_dir java "$version"
 
 		return 0
 	elif [ "$VERSION_VALID" = 'invalid' ] && [ -n "$folder" ]; then
@@ -393,7 +388,12 @@ ___x_cmd_env_java_install(){
 		env_log error "Stop! $1 is not a valid java version."
 		return 1
 	fi
+}
 
+___x_cmd_env_java_install(){
+	local version="${1:-default}"
+	___x_cmd_env_java_download "$version" && \
+	___x_cmd_env_common_use "$version"
 }
 
 # EndSection
@@ -404,10 +404,4 @@ ___x_cmd_env_java_ws(){
 
 ___x_cmd_env_java_which(){
     :
-}
-
-___x_cmd_env_java_exec(){
-	local version="${1:?Provide java version}" ; shift
-    ___x_cmd_env_common_pre_exec_check java "$version" || return
-    "${___X_CMD_ENV_PATH}/java/versions/${version}/bin/java" "$@"
 }
