@@ -188,7 +188,7 @@ ___x_cmd_env_main_try(){
     param:scope "env"
     param:dsl <<A
 advise:
-    #2        ___x_cmd_env_advise_ls_remote_version
+    #2        ___x_cmd_env_advise_ls_local_version
 options:
     #1        "Environment Candidates" <candidates>:candidates_list
     #2        "Version"                <version>="default"
