@@ -268,9 +268,12 @@ A
 # Section: current
 
 ___x_cmd_env_main_current(){
-    if [ $# -eq 0 ]; then
-        : TODO: list current environment
-    fi
+    param:scope "env"
+    param:dsl <<A
+options:
+    #1        "Environment Candidates" <candidates>:candidates_list
+A
+    param:run
 
     ___x_cmd_env_run current "$@"
 }
@@ -294,6 +297,17 @@ ___x_cmd_env_common_current() {
 # Section: download, which, exec
 
 ___x_cmd_env_main_download(){
+
+    param:scope "env"
+    param:dsl <<A
+advise:
+    #2        ___x_cmd_env_advise_ls_remote_version
+options:
+    #1        "Environment Candidates" <candidates>:candidates_list
+    #2        "Version"                <version>="default"
+A
+    param:run
+
     ___x_cmd_env_run download "$@"
 }
 
