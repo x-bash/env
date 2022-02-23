@@ -401,7 +401,7 @@ ___x_cmd_env_java_download(){
 ___x_cmd_env_java_install(){
 	local version="${1:-default}"
 	___x_cmd_env_java_download "$version" && \
-	___x_cmd_env_common_use "$version"
+	___x_cmd_env_common_use java "$version"
 }
 
 # EndSection
