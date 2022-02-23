@@ -1152,7 +1152,7 @@ nvm_compare_checksum() {
     env_log error "Checksums do not match: '${COMPUTED_SUM}' found, '${CHECKSUM}' expected."
     return 1
   fi
-  env_log error 'Checksums matched!'
+  env_log info 'Checksums matched!'
 }
 
 nvm_download_artifact() {
