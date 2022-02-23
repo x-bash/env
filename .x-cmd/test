@@ -15,7 +15,8 @@ case $1 in
         echo ""
         env_log info "Testing python install."
         x env install python py38_4.10.1
-        # x env uninstall python py38_4.10.1
+        env_log info "Testing python uninstall."
+        x env uninstall python py38_4.10.1
         env_log info "Testing python exec."
         x env exec python py38_4.10.1 -V
         ;;
@@ -44,7 +45,7 @@ case $1 in
         x env current java
         echo ""
         env_log info "Testing java install."
-        x env install java 17.0.2.8.1-amzn
+        # x env install java 17.0.2.8.1-amzn
 
         # x env install java 17.0.2-zulu
         # x env install java 21.3.0.0-mandrel

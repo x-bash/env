@@ -1,6 +1,12 @@
 # shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263    # xrc
 
-# Section: xenv main
+# Section: ENV ___X_CMD_ENV_PATH
+
+___X_CMD_ENV_PATH="$___X_CMD_ROOT/.env"
+
+# EndSection
+
+# Section: main, run
 
 ___x_cmd_env_main() {
     param:scope     "env"
@@ -30,33 +36,30 @@ A
     "___x_cmd_env_main_$PARAM_SUBCMD" "$@"
 }
 
-___x_cmd_env_main_ls(){
-    param:scope "env"
-    param:dsl <<A
-options:
-    --remote|-r        "List version including remote"
-    #1|--candidate     "Environment Candidates" <candidates>:candidates_list
-A
-    param:run
+___x_cmd_env_run(){
+    local op="${1:?Provide op}";  shift
+    local candidate="${1:?Provide candidate}";  shift
 
-    if [ -z "$candidate" ]; then
-        env_log warn "No candidate specified"
-        ___x_cmd_env_main_ls --help
+    if ! ___x_cmd_env_candidate_has "$candidate"; then
+        env_log error "Candidate inexisted: $candidate"
         return 1
     fi
 
-    # TODO: 增加 本地简写版本对应关系 和 全局简写版本对应关系
-    # TODO: V8 -> V8.2   --> (Remote) V8.6
-    ___x_cmd_env_run ls "$@"
+    # TODO: It might be better to have one folder for one language.
+    xrc "env/lib/candidate/$candidate"
+
+    local cmd="___x_cmd_env_${candidate}_${op}"
+    if command -v "$cmd" >/dev/null; then
+        "$cmd" "$@"
+    else
+        # env_log warn "Candidate ${candidate} has no op: $op, use common $op function."
+        "___x_cmd_env_common_${op}" "$candidate" "$@"
+    fi
 }
 
-___x_cmd_env_main_la(){
-    ___x_cmd_env_run la "$@"
-}
+# EndSection
 
-___x_cmd_env_main_download(){
-    ___x_cmd_env_run download "$@"
-}
+# Section: install, uninstall
 
 ___x_cmd_env_main_install() {
     # TODO: You can do more better in #2 advise json
@@ -81,7 +84,7 @@ ___x_cmd_env_main_uninstall(){
     param:scope "env"
     param:dsl <<A
 advise:
-    #2        ___x_cmd_env_advise_ls_locate_version
+    #2        ___x_cmd_env_advise_ls_local_version
 options:
     #1        "Environment Candidates" <candidates>:candidates_list
     #2        "Version"                <version>
@@ -94,137 +97,6 @@ A
     fi
 
     ___x_cmd_env_run uninstall "$@"
-}
-
-___x_cmd_env_main_try(){
-    ___x_cmd_env_run try "$@"
-}
-
-___x_cmd_env_main_use(){
-    ___x_cmd_env_run use "$@"
-}
-
-___x_cmd_env_main_ws(){
-    if [ $# -eq 0 ]; then
-        : TODO: list workspace environment
-    fi
-
-    ___x_cmd_env_run ws "$@"
-}
-
-___x_cmd_env_main_current(){
-    if [ $# -eq 0 ]; then
-        : TODO: list current environment
-    fi
-
-    ___x_cmd_env_run current "$@"
-}
-
-___x_cmd_env_main_which(){
-    ___x_cmd_env_run which "$@"
-}
-
-___x_cmd_env_main_exec(){
-    param:scope "env"
-    param:dsl <<A
-options:
-    #1        "Environment Candidates" <candidates>:candidates_list
-    #2        "Version"                <version>
-A
-    param:run
-
-
-    if [ -z "$1" ]; then
-        ___x_cmd_env_main_exec help
-        return 1
-    fi
-
-    ___x_cmd_env_run exec "$@"
-}
-
-# EndSection
-
-# Section: ENV ___X_CMD_ENV_PATH
-
-___X_CMD_ENV_PATH="$___X_CMD_ROOT/.env"
-
-# EndSection
-
-# Section: common functions
-
-___x_cmd_env_run(){
-    local op="${1:?Provide op}";  shift
-    local candidate="${1:?Provide candidate}";  shift
-
-    if ! ___x_cmd_env_candidate_has "$candidate"; then
-        env_log error "Candidate inexisted: $candidate"
-        return 1
-    fi
-
-    # TODO: It might be better to have one folder for one language.
-    xrc "env/lib/candidate/$candidate"
-
-    local cmd="___x_cmd_env_${candidate}_${op}"
-    if command -v "$cmd" >/dev/null; then
-        "$cmd" "$@"
-    else
-        # env_log warn "Candidate ${candidate} has no op: $op, use common $op function."
-        "___x_cmd_env_common_${op}" "$candidate" "$@"
-    fi
-}
-
-___x_cmd_env_common_la() {
-    :
-}
-
-___x_cmd_env_common_current() {
-    local candidate="${1:?Provide candidate}"
-    local version_path=".x-cmd/.env/$candidate/version"
-
-    cur=$(pwd)
-    while [ ! "$cur" = "" ]; do
-        if [ -f "$cur/$version_path" ]; then
-            printf "%s" "$(cat "$cur/$version_path")"
-            return 0
-        fi
-        cur=${cur%/*}
-    done
-}
-
-___x_cmd_env_common_ls() {
-    local candidate="${1:?Provide candidate}"
-	if [ -d "$___X_CMD_ENV_PATH/$candidate/versions" ]; then
-		for version in $(find "$___X_CMD_ENV_PATH/$candidate/versions" -maxdepth 1 -mindepth 1 \( -type l -o -type d \) -exec basename '{}' \; | sort -r); do
-			printf "%s\n" "$version"
-		done
-	fi
-}
-
-___x_cmd_env_shim_dir(){
-    local candidate="${1:?Provide candidate}"
-    local version="${2:?Provide version}"
-    local version_path=".x-cmd/.env/$candidate/version"
-    local versions_path="$___X_CMD_ENV_PATH/$candidate/versions"
-
-    for name in $versions_path/${version}/bin/* ; do
-        printf "%s" "$(cat <<A
-#!/usr/bin/env sh
-set -e
-
-cur=\$(pwd)
-while [ ! "\$cur" = "" ]; do
-    if [ -f "\$cur/$version_path" ]; then
-        version=\$(cat "\$cur/$version_path")
-        exec $versions_path/\$version/bin/${name##*/} "\$@"
-        return 0
-    fi
-    cur=\${cur%/*}
-done
-## TODO: no found
-A
-)">"$___X_CMD_ENV_PATH/$candidate/shims/${name##*/}"
-        chmod +x "$___X_CMD_ENV_PATH/$candidate/shims/${name##*/}"
-    done
 }
 
 ___x_cmd_env_common_pre_install_check(){
@@ -263,6 +135,178 @@ ___x_cmd_env_common_uninstall(){
         env_log  warn "This ${candidate} ${version} is no exist."
         return 1
     fi
+    x boot rc del "x-env-$candidate"
+    # TODO: remove the shims from $PATH
+}
+
+# EndSection
+
+# Section: ls, la
+
+___x_cmd_env_main_ls(){
+    param:scope "env"
+    param:dsl <<A
+options:
+    --remote|-r        "List version including remote"
+    #1|--candidate     "Environment Candidates" <candidates>:candidates_list
+A
+    param:run
+
+    if [ -z "$candidate" ]; then
+        env_log warn "No candidate specified"
+        ___x_cmd_env_main_ls --help
+        return 1
+    fi
+
+    # TODO: 增加 本地简写版本对应关系 和 全局简写版本对应关系
+    # TODO: V8 -> V8.2   --> (Remote) V8.6
+    ___x_cmd_env_run ls "$@"
+}
+
+___x_cmd_env_common_ls() {
+    local candidate="${1:?Provide candidate}"
+	if [ -d "$___X_CMD_ENV_PATH/$candidate/versions" ]; then
+		for version in $(find "$___X_CMD_ENV_PATH/$candidate/versions" -maxdepth 1 -mindepth 1 \( -type l -o -type d \) -exec basename '{}' \; | sort -r); do
+			printf "%s\n" "$version"
+		done
+	fi
+}
+
+___x_cmd_env_main_la(){
+    ___x_cmd_env_run la "$@"
+}
+
+___x_cmd_env_common_la() {
+    :
+}
+
+# EndSection
+
+# Section: use, try, ws
+
+___x_cmd_env_main_try(){
+    ___x_cmd_env_run try "$@"
+}
+
+___x_cmd_env_main_use(){
+    ___x_cmd_env_run use "$@"
+}
+
+___x_cmd_env_main_ws(){
+    if [ $# -eq 0 ]; then
+        : TODO: list workspace environment
+    fi
+
+    ___x_cmd_env_run ws "$@"
+}
+
+___x_cmd_env_shim_dir(){
+    local candidate="${1:?Provide candidate}"
+    local version="${2:?Provide version}"
+    local version_path=".x-cmd/.env/$candidate/version"
+    local versions_path="$___X_CMD_ENV_PATH/$candidate/versions"
+
+    for name in $versions_path/${version}/bin/* ; do
+        printf "%s" "$(cat <<A
+#!/usr/bin/env sh
+set -e
+
+cur=\$(pwd)
+while [ ! "\$cur" = "" ]; do
+    if [ -f "\$cur/$version_path" ]; then
+        version=\$(cat "\$cur/$version_path")
+        exec $versions_path/\$version/bin/${name##*/} "\$@"
+        return 0
+    fi
+    cur=\${cur%/*}
+done
+## TODO: no found
+A
+)">"$___X_CMD_ENV_PATH/$candidate/shims/${name##*/}"
+        chmod +x "$___X_CMD_ENV_PATH/$candidate/shims/${name##*/}"
+    done
+}
+
+___x_cmd_env_common_use(){
+    local candidate="${1:?Provide candidate}"
+    local version="${2:?Provide java version}"
+    x boot rc add "x-env-$candidate" "PATH=\"${___X_CMD_ENV_PATH}/$candidate/shims:\$PATH\""
+	printf "%s" "$version" > "$___X_CMD_ENV_PATH/$candidate/version"
+    env_log info "Using $candidate $version . -> $___X_CMD_ENV_PATH/$candidate/version"
+    ___x_cmd_env_shim_dir "$candidate" "${version}"
+}
+
+___x_cmd_env_common_try(){
+    local candidate="${1:?Provide candidate}"
+    local version="${2:?Provide python version}"
+    PATH="${___X_CMD_ENV_PATH}/$candidate/versions/$version:$PATH"
+}
+
+# EndSection
+
+# Section: current
+
+___x_cmd_env_main_current(){
+    if [ $# -eq 0 ]; then
+        : TODO: list current environment
+    fi
+
+    ___x_cmd_env_run current "$@"
+}
+
+___x_cmd_env_common_current() {
+    local candidate="${1:?Provide candidate}"
+    local version_path=".x-cmd/.env/$candidate/version"
+
+    cur=$(pwd)
+    while [ ! "$cur" = "" ]; do
+        if [ -f "$cur/$version_path" ]; then
+            printf "%s" "$(cat "$cur/$version_path")"
+            return 0
+        fi
+        cur=${cur%/*}
+    done
+}
+
+# EndSection
+
+# Section: download, which, exec
+
+___x_cmd_env_main_download(){
+    ___x_cmd_env_run download "$@"
+}
+
+___x_cmd_env_main_which(){
+    ___x_cmd_env_run which "$@"
+}
+
+___x_cmd_env_main_exec(){
+    param:scope "env"
+    param:dsl <<A
+advise:
+    #2        ___x_cmd_env_advise_ls_local_version
+options:
+    #1        "Environment Candidates" <candidates>:candidates_list
+    #2        "Version"                <version>
+A
+    param:run
+
+
+    if [ -z "$1" ]; then
+        ___x_cmd_env_main_exec help
+        return 1
+    fi
+
+    ___x_cmd_env_run exec "$@"
+}
+
+___x_cmd_env_common_exec(){
+    local candidate="${1:?Provide candidate}"
+    local version="${2:?Provide version}" ; shift
+    ___x_cmd_env_common_pre_exec_check "${candidate}" "${version}" || return
+    local bin_path="${___X_CMD_ENV_PATH}/${candidate}/versions/${version}/bin/${candidate}"
+
+    "$bin_path" "$@"
 }
 
 ___x_cmd_env_common_pre_exec_check() {
