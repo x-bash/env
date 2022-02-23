@@ -33,6 +33,7 @@ ___x_cmd_env_python_get_miniconda_name_and_filename(){
 
 # EndSection
 
+# Section: ls, la
 ___x_cmd_env_python_ls(){
     if [ -z "$remote" ] ; then
 		___x_cmd_env_common_ls python
@@ -68,6 +69,8 @@ A
 ___x_cmd_env_python_la(){
     :
 }
+
+# EndSection
 
 # Section: download,install
 
