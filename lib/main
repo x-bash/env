@@ -241,6 +241,7 @@ ___x_cmd_env_shim_dir(){
     local version="${2:?Provide version}"
     local version_path=".x-cmd/.env/$candidate/version"
     local versions_path="$___X_CMD_ENV_PATH/$candidate/versions"
+    rm -rf "${___X_CMD_ENV_PATH}/$candidate/shims"
     mkdir -p "${___X_CMD_ENV_PATH}/$candidate/shims"
 
     for name in $versions_path/${version}/bin/* ; do
