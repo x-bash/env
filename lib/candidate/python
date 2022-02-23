@@ -53,8 +53,13 @@ ___x_cmd_env_python_ls(){
             *)          return 1 ;;
         esac
 
-        curl --silent "https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/" | \
-            awk "$(cat <<A
+        local cache_path="$___X_CMD_ENV_PATH/python/cache"
+        if [ -f "$cache_path/version_list" ] ; then
+            cat "$cache_path/version_list"
+        else
+            mkdir -p "$cache_path"
+            curl --silent "https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/" | \
+                awk "$(cat <<A
 BEGIN{RS="<a href=";FS="\""}{
     if (match(\$2, /^.*-$system-$platform.sh$/)) {
         split(\$2, a, /-/)
@@ -62,8 +67,9 @@ BEGIN{RS="<a href=";FS="\""}{
     }
 }
 A
-        )"
-	fi
+            )" | tee "$cache_path/version_list"
+	    fi
+    fi
 }
 
 ___x_cmd_env_python_la(){

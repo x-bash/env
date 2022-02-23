@@ -344,9 +344,17 @@ ___x_cmd_env_java_ls(){
 	if [ -z "$remote" ] ; then
 		___x_cmd_env_common_ls java
 	else
-		local remote_version
-		remote_version="$(printf "%s\n" "$(curl --silent "https://api.sdkman.io/2/candidates/java/${ENV_PLATFORM_TMP}/versions/all")")"
-		printf "%s" "" | awk -v remote_version="$remote_version" 'BEGIN{gsub(",","\n",remote_version);print remote_version}'
+		local cache_path="$___X_CMD_ENV_PATH/java/cache"
+		if [ -f "$cache_path/version_list" ] ; then
+			cat "$cache_path/version_list"
+		else
+			mkdir -p "$cache_path"
+			local remote_version
+			remote_version="$(printf "%s\n" "$(curl --silent "https://api.sdkman.io/2/candidates/java/${ENV_PLATFORM_TMP}/versions/all")")"
+			printf "%s" "" | \
+				awk -v remote_version="$remote_version" 'BEGIN{gsub(",","\n",remote_version);print remote_version}' | \
+				tee "$cache_path/version_list"
+		fi
 	fi
 }
 

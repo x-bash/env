@@ -1789,7 +1789,15 @@ ___x_cmd_env_node_ls(){
   if [ -z "$remote" ] ; then
 		___x_cmd_env_common_ls java
 	else
-    nvm_remote_versions | awk '{str=$0; gsub("    ","",str);split(str, arr, / /);print arr[1]}'
+    local cache_path="$___X_CMD_ENV_PATH/node/cache"
+    if [ -f "$cache_path/version_list" ] ; then
+        cat "$cache_path/version_list"
+    else
+        mkdir -p "$cache_path"
+        nvm_remote_versions | \
+          awk '{str=$0; gsub("    ","",str);split(str, arr, / /);print arr[1]}' | \
+          tee "$cache_path/version_list"
+    fi
   fi
 }
 
