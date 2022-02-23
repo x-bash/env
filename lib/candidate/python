@@ -111,10 +111,6 @@ ___x_cmd_env_python_ws(){
     :
 }
 
-___x_cmd_env_python_current(){
-    printf "%s" "$(cat "$___X_CMD_ENV_PATH/python/version")"
-}
-
 ___x_cmd_env_python_which(){
     :
 }

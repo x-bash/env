@@ -1,40 +1,54 @@
 # shellcheck shell=sh disable=SC1072 #source
 
-xws install
+xws install >/dev/null
 ___X_CMD_XRC_MODULE_IMPORTED=
 advise rm ___x_cmd_env_main
 xrc env
-x log env
 
 case $1 in
     python)
-        . "$(x wsroot)/.x-cmd/testcases/python"
         # TODO: Check if this version is available in your system
-        x env install python py38_4.10.1
+        env_log info "Testing python ls."
         x env ls python
-        # x env uninstall python py38_4.10.1
+        env_log info "Testing python current."
         x env current python
         echo ""
+        env_log info "Testing python install."
+        x env install python py38_4.10.1
+        # x env uninstall python py38_4.10.1
+        env_log info "Testing python exec."
         x env exec python py38_4.10.1 -V
         ;;
     node)
-        . "$(x wsroot)/.x-cmd/testcases/node"
+        env_log info "Testing node ls."
         x env ls node
-        # x env install node v14.19.0
+        env_log info "Testing node current."
+        x env current node
+        echo ""
+        x env install node v14.19.0
         # x env install node v17.5.0
         # x env use node v17.5.0
         # x env current node
         # x env exec node v14.19.0
         ;;
     java)
-        . "$(x wsroot)/.x-cmd/testcases/java"
-        # x env install java 17.0.2.8.1-amzn
+        # . "$(x wsroot)/.x-cmd/testcases/java"
+        env_log info "Testing java ls."
+        x env ls java
+        env_log info "Testing java ls -r."
+        x env ls -r java
+        env_log info "Testing java la."
+        x env la java
+        env_log info "Testing java current."
+        x env current java
+        echo ""
+        env_log info "Testing java install."
+        x env install java 17.0.2.8.1-amzn
+
         # x env install java 17.0.2-zulu
         # x env install java 21.3.0.0-mandrel
         # x env use java 17.0.2.8.1-amzn
-        x env ls java
         # x env la java
-        # x env current
         # x env exec java 17.0.2.8.1-amzn -version
         # x env install java 17.0.2.8.1-amzn
         # x env uninstall java 17.0.2.8.1-amzn
@@ -43,6 +57,12 @@ case $1 in
         # x env current java
         # echo ""
         # x env exec java 17.0.2.8.1-amzn -version
+        ;;
+    all)
+
+        for cmd in python node java; do
+            x test "$cmd"
+        done
         ;;
     *)
         echo "Usage: x test python|node|java"

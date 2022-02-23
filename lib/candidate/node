@@ -2113,10 +2113,6 @@ ___x_cmd_env_node_ws() {
     :
 }
 
-___x_cmd_env_node_current() {
-    printf "%s" "$(cat "$___X_CMD_ENV_PATH/node/version")"
-}
-
 ___x_cmd_env_node_which() {
     :
 }

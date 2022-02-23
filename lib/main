@@ -34,7 +34,7 @@ ___x_cmd_env_main_ls(){
     param:scope "env"
     param:dsl <<A
 options:
-    -r                 "List version including remote"
+    --remote|-r        "List version including remote"
     #1|--candidate     "Environment Candidates" <candidates>:candidates_list
 A
     param:run
@@ -168,9 +168,27 @@ ___x_cmd_env_run(){
     if command -v "$cmd" >/dev/null; then
         "$cmd" "$@"
     else
-        env_log warn "Candidate ${candidate} has no op: $op, use common $op function."
+        # env_log warn "Candidate ${candidate} has no op: $op, use common $op function."
         "___x_cmd_env_common_${op}" "$candidate" "$@"
     fi
+}
+
+___x_cmd_env_common_la() {
+    :
+}
+
+___x_cmd_env_common_current() {
+    local candidate="${1:?Provide candidate}"
+    local version_path=".x-cmd/.env/$candidate/version"
+
+    cur=$(pwd)
+    while [ ! "$cur" = "" ]; do
+        if [ -f "$cur/$version_path" ]; then
+            printf "%s" "$(cat "$cur/$version_path")"
+            return 0
+        fi
+        cur=${cur%/*}
+    done
 }
 
 ___x_cmd_env_common_ls() {
@@ -304,13 +322,13 @@ $target
 ___x_cmd_env_advise_ls_remote_version(){
     local candidate_idx="${1:-2}"
     [ -n "$ZSH_VERSION" ] && candidate_idx=$((candidate_idx+1))
-    x env ls -r "${COMP_WORDS[candidate_idx]}"
+    ___x_cmd_env_main_ls -r "${COMP_WORDS[candidate_idx]}"
 }
 
 ___x_cmd_env_advise_ls_local_version(){
     local candidate_idx="${1:-2}"
     [ -n "$ZSH_VERSION" ] && candidate_idx=$((candidate_idx+1))
-    x env ls "${COMP_WORDS[candidate_idx]}"
+    ___x_cmd_env_main_ls "${COMP_WORDS[candidate_idx]}"
 }
 
 # EndSection
