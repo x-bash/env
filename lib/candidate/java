@@ -2,15 +2,25 @@
 
 # Section: utils
 
+___X_CMD_ENV_JAVA_PLATFORM_TMP="$(xrc os && ___x_cmd_os name && ___x_cmd_os arch)"
+
 # EndSection
 
 # Section: ls, la
 ___x_cmd_env_java_ls(){
-    if [ -z "$remote" ] ; then
+	if [ -z "$remote" ] ; then
 		___x_cmd_env_common_ls java
 	else
-	    :
-    fi
+		local cache_path="$___X_CMD_ENV_PATH/java/cache"
+		if [ -f "$cache_path/version_list" ] ; then
+			cat "$cache_path/version_list"
+		else
+			mkdir -p "$cache_path"
+			curl --silent "https://api.sdkman.io/2/candidates/java/${___X_CMD_ENV_JAVA_PLATFORM_TMP}/versions/all" | \
+				awk '{versions=$0 ;gsub(",","\n",versions);print versions}' | \
+				tee "$cache_path/version_list"
+		fi
+	fi
 }
 
 ___x_cmd_env_java_la(){
