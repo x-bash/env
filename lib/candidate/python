@@ -84,6 +84,8 @@ ___x_cmd_env_python_download(){
     (
         local miniconda_name
         local miniconda_filename
+        local version="${1:?Provide python version}"
+
         ___x_cmd_env_python_get_miniconda_name_and_filename "$version"
         local candidate_path="$___X_CMD_ENV_PATH/python/versions"
         mkdir -p "${candidate_path}"
