@@ -224,6 +224,7 @@ ___x_cmd_env_common_use(){
     local candidate="${1:?Provide candidate}"
     local version="${2:?Provide java version}"
     PATH="${___X_CMD_ENV_PATH}/$candidate/shims:$PATH"
+    # TODO: Add more check when seting the PATH
     x boot rc add "x-env-$candidate" "PATH=\"${___X_CMD_ENV_PATH}/$candidate/shims:\$PATH\""
 	printf "%s" "$version" > "$___X_CMD_ENV_PATH/$candidate/version"
     env_log info "Using $candidate $version . -> $___X_CMD_ENV_PATH/$candidate/version"
