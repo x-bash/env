@@ -1597,11 +1597,7 @@ ___x_cmd_env_node_download() {
     noprogress=0
     nosource=0
     local ALIAS
-    local NVM_UPGRADE_NPM
-    NVM_UPGRADE_NPM=1
-
     local PROVIDED_REINSTALL_PACKAGES_FROM
-    local REINSTALL_PACKAGES_FROM
     local SKIP_DEFAULT_PACKAGES
     local DEFAULT_PACKAGES
 
@@ -1611,17 +1607,6 @@ ___x_cmd_env_node_download() {
         env_log error "Version '${provided_version}' not found - try to browse available versions."
         return 3
     fi
-
-    ADDITIONAL_PARAMETERS=''
-
-    while [ $# -ne 0 ]; do
-        case "$1" in
-          *)
-            ADDITIONAL_PARAMETERS="${ADDITIONAL_PARAMETERS} $1"
-          ;;
-        esac
-    shift
-    done
 
     local FLAVOR
     FLAVOR="$(nvm_node_prefix)"
@@ -1667,24 +1652,17 @@ ___x_cmd_env_node_download() {
         env_log error 'Installing from source on non-WSL Windows is not supported'
         EXIT_CODE=87
       else
-        NVM_NO_PROGRESS="${NVM_NO_PROGRESS:-${noprogress}}" nvm_install_source "${FLAVOR}" std "${VERSION}" "${NVM_MAKE_JOBS}" "${ADDITIONAL_PARAMETERS}"
+        NVM_NO_PROGRESS="${NVM_NO_PROGRESS:-${noprogress}}" nvm_install_source "${FLAVOR}" std "${VERSION}" "${NVM_MAKE_JOBS}"
         EXIT_CODE=$?
       fi
     fi
 
     if [ $EXIT_CODE -eq 0 ] && nvm_install_npm_if_needed "${VERSION}"; then
         nvm_ensure_default_set "${provided_version}"
-        # if [ "${NVM_UPGRADE_NPM}" = 1 ]; then
-        #   nvm install-latest-npm
-        #   EXIT_CODE=$?
-        # fi
+        # TODO: maybe you should update npm here too?
         if [ -z "${SKIP_DEFAULT_PACKAGES-}" ] && [ -n "${DEFAULT_PACKAGES-}" ]; then
           nvm_install_default_packages "${DEFAULT_PACKAGES}"
         fi
-        # if [ -n "${REINSTALL_PACKAGES_FROM-}" ] && [ "_${REINSTALL_PACKAGES_FROM}" != "_N/A" ]; then
-        #   nvm reinstall-packages "${REINSTALL_PACKAGES_FROM}"
-        #   EXIT_CODE=$?
-        # fi
     else
         EXIT_CODE=$?
     fi
