@@ -9,14 +9,14 @@ ___x_cmd_env_python_get_miniconda_name_and_filename(){
     local platform
     local system
 
-    case "$(os name)" in
+    case "$(___x_cmd_os name)" in
         linux)      system=Linux            ;;
         windows)    system=Windows          ;;
         darwin)     system=MacOSX           ;;
         *)          return 1 ;;
     esac
 
-    case "$(os arch)" in
+    case "$(___x_cmd_os arch)" in
         aarch64)    platform=aarch64        ;;
         x64)        platform=x86_64         ;;
         arm64)      platform=arm64          ;;
@@ -39,14 +39,14 @@ ___x_cmd_env_python_ls(){
 		___x_cmd_env_common_ls python
 	else
         xrc os
-        case "$(os name)" in
+        case "$(___x_cmd_os name)" in
             linux)      system=Linux            ;;
             windows)    system=Windows          ;;
             darwin)     system=MacOSX           ;;
             *)          return 1 ;;
         esac
 
-        case "$(os arch)" in
+        case "$(___x_cmd_os arch)" in
             aarch64)    platform=aarch64        ;;
             x64)        platform=x86_64         ;;
             arm64)      platform=arm64          ;;
@@ -84,6 +84,8 @@ ___x_cmd_env_python_download(){
     (
         local miniconda_name
         local miniconda_filename
+        local version="${1:?Provide python version}"
+
         ___x_cmd_env_python_get_miniconda_name_and_filename "$version"
         local candidate_path="$___X_CMD_ENV_PATH/python/versions"
         mkdir -p "${candidate_path}"

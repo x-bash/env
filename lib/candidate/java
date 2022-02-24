@@ -2,7 +2,271 @@
 
 # Section: utils
 
+<<<<<<< HEAD
 ___X_CMD_ENV_JAVA_PLATFORM_TMP="$(xrc os && ___x_cmd_os name && ___x_cmd_os arch)"
+=======
+___x_cmd_env_determine_version(){
+    local version="$1"
+
+    if [ "$ENV_AVAILABLE" = "false" ] && [ -n "$version" ] && [ -d "$___X_CMD_ENV_PATH/java/${version}" ]; then
+		VERSION="$version"
+    elif [ "$ENV_AVAILABLE" = "false" ] && [ -z "$version" ] && [ -L "$___X_CMD_ENV_PATH/java/current" ]; then
+		VERSION=$(readlink "$___X_CMD_ENV_PATH/java/current" | sed "s!$___X_CMD_ENV_PATH/java/!!g")
+    elif [ "$ENV_AVAILABLE" = "false" ] && [ -n "$version" ]; then
+		env_log error "Stop! Java ${version} is not available while offline."
+		return 1
+    elif [ "$ENV_AVAILABLE" = "false" ] && [ -z "$version" ]; then
+		env_log error "This command is not available while offline."
+		return 1
+    else
+        if [ -z "$version" ]; then
+			version=$(curl --silent --location "https://api.sdkman.io/2/candidates/default/java")
+		fi
+
+		local validation_url
+		validation_url="https://api.sdkman.io/2/candidates/validate/java/${version}/$(echo "$ENV_PLATFORM" | tr '[:upper:]' '[:lower:]')"
+		VERSION_VALID=$(curl --silent --location "$validation_url")
+		env_log debug "Validate Java $version for $ENV_PLATFORM_TMP: $VERSION_VALID"
+		env_log debug "Validation URL: $validation_url"
+
+		if [ "$VERSION_VALID" = 'valid' ] || [ "$VERSION_VALID" = 'invalid' ]; then
+			VERSION="$version"
+
+		elif [ "$VERSION_VALID" = 'invalid' ] && [ -L "$___X_CMD_ENV_PATH/java/versions/${version}" ]; then
+			VERSION="$version"
+
+		elif [ "$VERSION_VALID" = 'invalid' ] && [ -d "$___X_CMD_ENV_PATH/java/versions/${version}" ]; then
+			VERSION="$version"
+
+		else
+			if [ -z "$version" ]; then
+				version="\b"
+			fi
+
+			env_log error "Stop! Java $version is not available. Possible causes:"
+			env_log error " * $version is an invalid version"
+			env_log error " * Java binaries are incompatible with your platform"
+			env_log error " * Java has not been released yet"
+			env_log info "Tip: see all available versions for your platform:"
+			env_log info "  $ sdk list java"
+			return 1
+		fi
+    fi
+}
+
+___x_cmd_env_path_contains(){
+    local candidate="$1"
+	local exists
+
+	exists="$(echo "$PATH" | grep "$candidate")"
+	if [ -n "$exists" ]; then
+		printf "%s\n" "true"
+	else
+		printf "%s\n" "false"
+	fi
+}
+
+___x_cmd_env_determine_current_version(){
+    local present
+
+	present=$(___x_cmd_env_path_contains "$___X_CMD_ENV_PATH/java")
+	if [ "$present" = 'true' ]; then
+		if [[ $PATH =~ $___X_CMD_ENV_PATH/java/([^/]+)/bin ]]; then
+			if [ "$zsh_shell" = "true" ]; then
+				CURRENT=${match[1]}
+			else
+				CURRENT=${BASH_REMATCH[1]}
+			fi
+		fi
+
+		if [ "$CURRENT" = "current" ]; then
+			CURRENT=$(readlink "$___X_CMD_ENV_PATH/java/current" | sed "s!$___X_CMD_ENV_PATH/java/!!g")
+		fi
+	else
+		CURRENT=""
+	fi
+}
+
+___x_cmd_env_install_candidate_version(){
+    local version="$1"
+
+	___x_cmd_env_download "$version" || return 1
+	env_log info "Installing: Java ${version}"
+	mkdir -p "$___X_CMD_ENV_PATH/java/versions"
+
+	rm -rf "$___X_CMD_ENV_PATH/java/tmp/out"
+	unzip -oq "$___X_CMD_ENV_PATH/java/archives/java-${version}.zip" -d "$___X_CMD_ENV_PATH/java/tmp/out"
+	mv -f "$___X_CMD_ENV_PATH"/java/tmp/out/* "$___X_CMD_ENV_PATH/java/versions/${version}"
+	env_log info "Done installing!"
+}
+
+___x_cmd_env_download(){
+    local version="$1"
+	local archives_folder="$___X_CMD_ENV_PATH/java/archives"
+	local headers_file
+
+	metadata_folder="$___X_CMD_ENV_PATH/java/var/metadata"
+	mkdir -p "${metadata_folder}"
+
+	if [ ! -f "${archives_folder}/java-${version}.zip" ]; then
+		local platform_parameter
+		platform_parameter="$(cat <<<"$ENV_PLATFORM_TMP" | tr '[:upper:]' '[:lower:]')"
+		local download_url="https://api.sdkman.io/2/broker/download/java/${version}/${platform_parameter}"
+		local base_name="java-${version}"
+		local zip_archive_target="$___X_CMD_ENV_PATH/java/archives/${base_name}.zip"
+		headers_file="${metadata_folder}/${base_name}.headers"
+
+		local pre_installation_hook="$___X_CMD_ENV_PATH/java/tmp/hook_pre_java_${version}.sh"
+		env_log debug "Get pre-installation hook: https://api.sdkman.io/2/hooks/pre/java/${version}/${platform_parameter}"
+		curl --silent --location "https://api.sdkman.io/2/hooks/pre/java/${version}/${platform_parameter}" >| "$pre_installation_hook"
+		env_log debug "Copy remote pre-installation hook: $pre_installation_hook"
+		. "$pre_installation_hook"
+		# __sdkman_pre_installation_hook || return 1
+		env_log debug "Completed pre-installation hook..."
+
+		export local binary_input="$___X_CMD_ENV_PATH/java/tmp/${base_name}.bin"
+		export local zip_output="$___X_CMD_ENV_PATH/java/tmp/$base_name.zip"
+
+		env_log info "Downloading: Java ${version}"
+		env_log info "In progress..."
+
+
+		# download binary
+		curl --progress-bar --location --retry-max-time 10 --retry 0 "${download_url}" --output "${binary_input}" --dump-header "${headers_file}"
+		env_log debug "Downloaded binary to: ${binary_input} (HTTP headers written to: ${headers_file})"
+
+		local post_installation_hook="$___X_CMD_ENV_PATH/java/tmp/hook_post_java_${version}.sh"
+		env_log debug "Get post-installation hook: https://api.sdkman.io/2/hooks/post/java/${version}/${platform_parameter}"
+		curl --silent --location "https://api.sdkman.io/2/hooks/post/java/${version}/${platform_parameter}" >| "$post_installation_hook"
+		env_log debug "Copy remote post-installation hook: ${post_installation_hook}"
+		. "$post_installation_hook"
+		__sdkman_post_installation_hook || return 1
+
+		env_log debug "Processed binary as: $zip_output"
+		env_log debug "Completed post-installation hook..."
+
+		mv -f "$zip_output" "$zip_archive_target"
+		env_log debug "Moved to archive folder: $zip_archive_target"
+	else
+		env_log info "Found a previously downloaded java ${version} archive. Not downloading it again..."
+	fi
+	___x_cmd_env_checksum_zip "${archives_folder}/java-${version}.zip" "${headers_file}" || return 1
+	___x_cmd_env_validate_zip "${archives_folder}/java-${version}.zip" || return 1
+}
+
+___x_cmd_env_checksum_zip(){
+    local -r zip_archive="$1"
+	local -r headers_file="$2"
+	local algorithm
+	local checksum
+	local cmd
+	local shasum_avail=false
+	local md5sum_avail=false
+
+	if [ -z "${headers_file}" ]; then
+		env_log debug "Skipping checksum for cached artifact"
+		return
+	elif [ ! -f "${headers_file}" ]; then
+		env_log info "Metadata file not found at '${headers_file}', skipping checksum..."
+		return
+	fi
+
+	#Check for the appropriate checksum tools
+	if command -v shasum > /dev/null 2>&1; then
+		shasum_avail=true
+	fi
+	if command -v md5sum > /dev/null 2>&1; then
+		md5sum_avail=true
+	fi
+
+	while IFS= read -r line; do
+		algorithm=$(echo "$line" | sed -n 's/^X-Sdkman-Checksum-\(.*\):.*$/\1/p' | tr '[:lower:]' '[:upper:]')
+		checksum=$(echo "$line" | sed -n 's/^X-Sdkman-Checksum-.*:\(.*\)$/\1/p' | tr -cd '[:alnum:]')
+
+		if [ -n "${algorithm}" ] && [ -n "${checksum}" ]; then
+
+			if [[ "$algorithm" =~ 'SHA' && "$shasum_avail" == 'true' ]]; then
+				cmd="echo \"${checksum} *${zip_archive}\" | shasum --check --quiet"
+			elif [[ "$algorithm" =~ 'MD5' && "$md5sum_avail" == 'true' ]]; then
+				cmd="echo \"${checksum} ${zip_archive}\" | md5sum --check --quiet"
+			fi
+
+			if [ -n "$cmd" ]; then
+				env_log debug "Checksumming downloaded artifact ${zip_archive} (${algorithm})"
+
+				if ! eval "$cmd"; then
+					rm -f "$zip_archive"
+					env_log error "Stop! An invalid checksum was detected and the archive removed! Please try re-installing."
+					return 1
+				fi
+			fi
+		fi
+  	done < "${headers_file}"
+}
+
+___x_cmd_env_validate_zip(){
+    local zip_archive="$1"
+	local zip_ok
+    # TODO: To use no unzip command.
+    zip_ok=$(unzip -t "$zip_archive" | grep 'No errors detected in compressed data')
+
+	if [ -z "$zip_ok" ]; then
+		rm -f "$zip_archive"
+		env_log error "Stop! The archive was corrupt and has been removed! Please try installing again."
+		return 1
+	fi
+}
+
+___x_cmd_env_link_candidate_version(){
+    local version="$1"
+
+	# Change the 'current' symlink for the candidate, hence affecting all shells.
+	if [ -L "$___X_CMD_ENV_PATH/java/current" ] || [ -d "$___X_CMD_ENV_PATH/java/current" ]; then
+		rm -rf "$___X_CMD_ENV_PATH/java/current"
+	fi
+
+	ln -s "${version}" "$___X_CMD_ENV_PATH/java/current"
+}
+
+___x_cmd_env_add_to_path(){
+    local present
+
+	present=$(___x_cmd_env_path_contains java)
+	if [ "$present" = 'false' ]; then
+		PATH="$___X_CMD_ENV_PATH/java/current/bin:$PATH"
+	fi
+}
+
+___x_cmd_env_offline_list() {
+	local versions_csv
+
+	versions_csv="$1"
+
+	__sdkman_echo_no_colour "--------------------------------------------------------------------------------"
+	__sdkman_echo_yellow "Offline: only showing installed Java versions"
+	__sdkman_echo_no_colour "--------------------------------------------------------------------------------"
+
+	local versions=($(echo ${versions_csv//,/ }))
+	for ((i = ${#versions} - 1; i >= 0; i--)); do
+		if [ -n "${versions[${i}]}" ]; then
+			if [ "${versions[${i}]}" == "$CURRENT" ]; then
+				__sdkman_echo_no_colour " > ${versions[${i}]}"
+			else
+				__sdkman_echo_no_colour " * ${versions[${i}]}"
+			fi
+		fi
+	done
+
+	if [ -z "${versions[@]}" ]; then
+		__sdkman_echo_yellow "   None installed!"
+	fi
+
+	__sdkman_echo_no_colour "--------------------------------------------------------------------------------"
+	__sdkman_echo_no_colour "* - installed                                                                   "
+	__sdkman_echo_no_colour "> - currently in use                                                            "
+	__sdkman_echo_no_colour "--------------------------------------------------------------------------------"
+}
+>>>>>>> origin/main
 
 # EndSection
 
@@ -32,7 +296,37 @@ ___x_cmd_env_java_la(){
 # Section: download,install
 
 ___x_cmd_env_java_download(){
+<<<<<<< HEAD
     :
+=======
+    local version="${1:-default}"
+
+	mkdir -p "$___X_CMD_ENV_PATH/java/tmp"
+	mkdir -p "$___X_CMD_ENV_PATH/java/archives"
+	mkdir -p "$___X_CMD_ENV_PATH/java/versions"
+
+    ENV_AVAILABLE="true" #availability set up
+    ___x_cmd_env_determine_version "$version" || return 1
+
+    if [ -d "$___X_CMD_ENV_PATH/java/versions/${version}" ] || [ -L "$___X_CMD_ENV_PATH/java/versions/${version}" ]; then
+        env_log info "Java ${version} is already installed."
+		return 0
+	fi
+
+    if [ "${VERSION_VALID}" = 'valid' ]; then
+		___x_cmd_env_determine_current_version
+		___x_cmd_env_install_candidate_version "$version" || return 1
+
+        # TODO: Maybe link will be better?
+        # ___x_cmd_env_link_candidate_version "$version"
+        # ___x_cmd_env_add_to_path
+
+		return 0
+	else
+		env_log error "Stop! $1 is not a valid java version."
+		return 1
+	fi
+>>>>>>> origin/main
 }
 
 ___x_cmd_env_java_install(){
