@@ -4,6 +4,7 @@ xws install >/dev/null
 ___X_CMD_XRC_MODULE_IMPORTED=
 advise rm ___x_cmd_env_main
 xrc env
+x log init env
 
 case $1 in
     python)
@@ -38,6 +39,9 @@ case $1 in
         env_log info "Testing node current."
         x env current node
         echo ""
+
+        env_log info "Testing node ls -r."
+        x env ls -r node
 
         # x env install node v14.19.0
         # x env install node v17.5.0

@@ -9,7 +9,31 @@ ___x_cmd_env_node_ls(){
     if [ -z "$remote" ] ; then
 		___x_cmd_env_common_ls node
 	else
-	    :
+	    local cache_path="$___X_CMD_ENV_PATH/node/cache"
+        if [ -f "$cache_path/version_list" ] ; then
+            cat "$cache_path/version_list"
+        else
+            mkdir -p "$cache_path"
+            local version_list
+            version_list="$({ awk '{
+    if (!$1) { next }
+    if ($10 !~ /^\-?$/) {
+        if ($10 && $10 != prev) {
+            print $1, $10, "*"
+        } else {
+            print $1, $10
+        }
+    } else {
+        print $1
+    }
+    prev=$10;
+}' | sort -t. -u -k 1.2,1n -k 2,2n -k 3,3n; } <<A
+$(curl --silent https://nodejs.org/dist/index.tab)
+A
+)"
+            printf "%s" "$version_list" | awk '{str=$0; gsub("    ","",str);split(str, arr, / /);print arr[1]}' | \
+            tee "$cache_path/version_list"
+        fi
     fi
 }
 
