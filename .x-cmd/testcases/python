@@ -1,13 +1,13 @@
 echo "hello"
 xrc os
-case "$(os name)" in
+case "$(___x_cmd_os name)" in
     linux)      system=Linux            ;;
     windows)    system=Windows          ;;
     darwin)     system=MacOSX           ;;
     *)          return 1 ;;
 esac
 
-case "$(os arch)" in
+case "$(___x_cmd_os arch)" in
     aarch64)    platform=aarch64        ;;
     x64)        platform=x86_64         ;;
     arm64)      platform=arm64          ;;
