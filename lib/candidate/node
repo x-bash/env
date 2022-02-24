@@ -1,0 +1,43 @@
+# shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263    # xrc
+
+# Section: utils
+
+# EndSection
+
+# Section: ls, la
+___x_cmd_env_node_ls(){
+    if [ -z "$remote" ] ; then
+		___x_cmd_env_common_ls node
+	else
+	    :
+    fi
+}
+
+___x_cmd_env_node_la(){
+    :
+}
+
+# EndSection
+
+# Section: download,install
+
+___x_cmd_env_node_download(){
+    :
+}
+
+___x_cmd_env_node_install(){
+    local version="${1:?Provide node version}"
+    ___x_cmd_env_common_pre_install_check node "$version" && \
+        ___x_cmd_env_node_download "$version" || return
+    ___x_cmd_env_common_use node "$version"
+}
+
+# EndSection
+
+___x_cmd_env_node_ws(){
+    :
+}
+
+___x_cmd_env_node_which(){
+    :
+}

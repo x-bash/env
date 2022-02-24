@@ -1,0 +1,43 @@
+# shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263    # xrc
+
+# Section: utils
+
+# EndSection
+
+# Section: ls, la
+___x_cmd_env_java_ls(){
+    if [ -z "$remote" ] ; then
+		___x_cmd_env_common_ls java
+	else
+	    :
+    fi
+}
+
+___x_cmd_env_java_la(){
+    :
+}
+
+# EndSection
+
+# Section: download,install
+
+___x_cmd_env_java_download(){
+    :
+}
+
+___x_cmd_env_java_install(){
+    local version="${1:?Provide java version}"
+    ___x_cmd_env_common_pre_install_check java "$version" && \
+        ___x_cmd_env_java_download "$version" || return
+    ___x_cmd_env_common_use java "$version"
+}
+
+# EndSection
+
+___x_cmd_env_java_ws(){
+    :
+}
+
+___x_cmd_env_java_which(){
+    :
+}
