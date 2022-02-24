@@ -1,6 +1,46 @@
 # shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263    # xrc
 
+# Section: mirror
+
+___X_CMD_ENV_NODE_MIRROR="https://nodejs.org/dist"
+
+# EndSection
+
 # Section: utils
+
+___x_cmd_env_node_full_version(){
+    local pattern="${1:?Provide node version pattern}"
+    awk 'BEGIN {
+      n = split(ARGV[1], a);
+      print a[1]
+    }' \
+    "$(___x_cmd_env_node_version_list "${pattern}" | tail -1)"
+}
+
+___x_cmd_env_node_version_list(){
+    local pattern="${1}"
+    [ -z "$pattern" ] && unset pattern
+
+    local pattern="${1}"
+	[ -z "$pattern" ] && unset pattern
+	{
+		awk '{
+            if (!$1) { next }
+            if ($10 !~ /^\-?$/) {
+                if ($10 && $10 != prev) {
+                    print $1, $10, "*"
+                } else {
+                    print $1, $10
+                }
+            } else {
+                print $1
+            }
+            prev=$10;
+        }' | grep -w "${pattern:-.*}" | sort -t. -u -k 1.2,1n -k 2,2n -k 3,3n
+	} <<A
+$(curl --silent https://nodejs.org/dist/index.tab)
+A
+}
 
 # EndSection
 
@@ -14,24 +54,7 @@ ___x_cmd_env_node_ls(){
             cat "$cache_path/version_list"
         else
             mkdir -p "$cache_path"
-            local version_list
-            version_list="$({ awk '{
-    if (!$1) { next }
-    if ($10 !~ /^\-?$/) {
-        if ($10 && $10 != prev) {
-            print $1, $10, "*"
-        } else {
-            print $1, $10
-        }
-    } else {
-        print $1
-    }
-    prev=$10;
-}' | sort -t. -u -k 1.2,1n -k 2,2n -k 3,3n; } <<A
-$(curl --silent https://nodejs.org/dist/index.tab)
-A
-)"
-            printf "%s" "$version_list" | awk '{str=$0; gsub("    ","",str);split(str, arr, / /);print arr[1]}' | \
+            ___x_cmd_env_node_version_list | awk '{str=$0; gsub("    ","",str);split(str, arr, / /);print arr[1]}' | \
             tee "$cache_path/version_list"
         fi
     fi
@@ -46,7 +69,77 @@ ___x_cmd_env_node_la(){
 # Section: download,install
 
 ___x_cmd_env_node_download(){
-    :
+    local version="${1:?Provide node version}"
+    local full_version
+    full_version=$(___x_cmd_env_node_full_version "${version}")
+
+    if [ -z "${full_version}" ]; then
+        env_log error "Version '${version}' not found $full_version. "
+        return 1
+    fi
+
+    # TODO: Check if version is already downloaded
+
+    # TODO: Handle bsd, sunos ..
+
+    local platform
+    platform="$(xrc os && ___x_cmd_os name)"
+
+    local arch
+    arch="$(xrc os && ___x_cmd_os arch)"
+    local slug="node-${full_version}-${platform}-${arch}"
+
+    local compression='tar.gz'
+    if [ "_${platform}" = '_win' ]; then
+        compression='zip'
+    fi
+    # TODO: tar.xz support
+
+    local tmpdir
+    tmpdir="$___X_CMD_ENV_PATH/node/cache/bin/${slug}"
+    mkdir -p "${tmpdir}/files"
+
+    local tarball
+    tarball="${tmpdir}/${slug}.${compression}"
+
+    local tarball_url
+    # TODO: node <= 0.1.13 does not have a directory
+    tarball_url="${___X_CMD_ENV_NODE_MIRROR}/${full_version}/${slug}.${compression}"
+
+    curl -L -C - --progress-bar "${tarball_url}" -o "${tarball}" || (
+        command rm -rf "${tarball}" "${tmpdir}"
+        env_log error "Binary download from ${tarball_url} failed, trying source."
+        return 1
+    )
+    env_log info "Downloaded ${tarball_url} to ${tarball}"
+
+    # TODO: checksum
+
+    local tmpdir_files="${tmpdir}/files"
+    mkdir -p "${tmpdir_files}"
+    # extract
+    local version_path="${___X_CMD_ENV_PATH}/node/versions/${full_version}"
+
+    if [ "${platform}" = 'win' ]; then
+        version_path="${version_path}/bin"
+        unzip -q "${tarball}" -d "${tmpdir_files}" || return 1
+    else
+        tar -xzf "${tarball}" -C "${tmpdir_files}" --strip-components 1 || return 1
+    fi
+
+    mkdir -p "${version_path}" || return 1
+
+    if [ "${NVM_OS}" = 'win' ]; then
+        mv "${tmpdir_files}/"*/* "${version_path}" || return 1
+        chmod +x "${version_path}"/node.exe || return 1
+        chmod +x "${version_path}"/npm || return 1
+        chmod +x "${version_path}"/npx 2>/dev/null
+    else
+        mv "${tmpdir_files}/"* "${version_path}" || return 1
+    fi
+
+    env_log info "Installed ${tarball_url} to ${version_path}"
+    rm -rf "${tmpdir_files}"
 }
 
 ___x_cmd_env_node_install(){

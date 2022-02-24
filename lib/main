@@ -147,6 +147,7 @@ ___x_cmd_env_main_ls(){
     param:scope "env"
     param:dsl <<A
 options:
+    --cache|-c         "Use cache"
     --remote|-r        "List version including remote"
     #1|--candidate     "Environment Candidates" <candidates>:candidates_list
 A
