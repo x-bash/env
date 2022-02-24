@@ -364,7 +364,6 @@ ___x_cmd_env_java_ls(){
 
 ___x_cmd_env_java_download(){
     local version="${1:-default}"
-    # ___x_cmd_env_common_pre_install_check java "${version}" || return
 	local folder="${2}"
 
 	mkdir -p "$___X_CMD_ENV_PATH/java/tmp"
@@ -383,7 +382,6 @@ ___x_cmd_env_java_download(){
 		___x_cmd_env_determine_current_version
 		___x_cmd_env_install_candidate_version "$version" || return 1
 
-        env_log info "Setting java ${version} as default."
         # TODO: Maybe link will be better?
         # ___x_cmd_env_link_candidate_version "$version"
         # ___x_cmd_env_add_to_path

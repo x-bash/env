@@ -222,7 +222,8 @@ ___x_cmd_env_main_ws(){
 
 ___x_cmd_env_common_use(){
     local candidate="${1:?Provide candidate}"
-    local version="${2:?Provide java version}"
+    local version="${2:?Provide version}"
+    env_log info "Setting ${candidate} ${version} as default."
     PATH="${___X_CMD_ENV_PATH}/$candidate/shims:$PATH"
     x boot rc add "x-env-$candidate" "PATH=\"${___X_CMD_ENV_PATH}/$candidate/shims:\$PATH\""
 	printf "%s" "$version" > "$___X_CMD_ENV_PATH/$candidate/version"
