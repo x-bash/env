@@ -66,7 +66,7 @@ ___x_cmd_env_main_install() {
     param:scope "env"
     param:dsl <<A
 advise:
-    #2        ___x_cmd_env_advise_ls_remote_version
+    #2        xrc env/latest && ___x_cmd_env_advise_ls_remote_version
 options:
     #1        "Environment Candidates" <candidates>:candidates_list
     #2        "Version"                <version>="default"
@@ -84,7 +84,7 @@ ___x_cmd_env_main_uninstall(){
     param:scope "env"
     param:dsl <<A
 advise:
-    #2        ___x_cmd_env_advise_ls_local_version
+    #2        xrc env/latest && ___x_cmd_env_advise_ls_local_version
 options:
     #1        "Environment Candidates" <candidates>:candidates_list
     #2        "Version"                <version>
@@ -188,7 +188,7 @@ ___x_cmd_env_main_try(){
     param:scope "env"
     param:dsl <<A
 advise:
-    #2        ___x_cmd_env_advise_ls_local_version
+    #2        xrc env/latest && ___x_cmd_env_advise_ls_local_version
 options:
     #1        "Environment Candidates" <candidates>:candidates_list
     #2        "Version"                <version>="default"
@@ -202,7 +202,7 @@ ___x_cmd_env_main_use(){
     param:scope "env"
     param:dsl <<A
 advise:
-    #2        ___x_cmd_env_advise_ls_local_version
+    #2        xrc env/latest && ___x_cmd_env_advise_ls_local_version
 options:
     #1        "Environment Candidates" <candidates>:candidates_list
     #2        "Version"                <version>="default"
@@ -304,7 +304,7 @@ ___x_cmd_env_main_download(){
     param:scope "env"
     param:dsl <<A
 advise:
-    #2        ___x_cmd_env_advise_ls_remote_version
+    #2        xrc env/latest && ___x_cmd_env_advise_ls_remote_version
 options:
     #1        "Environment Candidates" <candidates>:candidates_list
     #2        "Version"                <version>="default"
@@ -322,7 +322,7 @@ ___x_cmd_env_main_exec(){
     param:scope "env"
     param:dsl <<A
 advise:
-    #2        ___x_cmd_env_advise_ls_local_version
+    #2        xrc env/latest && ___x_cmd_env_advise_ls_local_version
 options:
     #1        "Environment Candidates" <candidates>:candidates_list
     #2        "Version"                <version>
@@ -394,23 +394,6 @@ $target
         return 1
     fi
     return 0
-}
-
-# EndSection
-
-# Section: advise ls_version
-
-# TODO: define the function when x-cmd start
-___x_cmd_env_advise_ls_remote_version(){
-    local candidate_idx="${1:-2}"
-    [ -n "$ZSH_VERSION" ] && candidate_idx=$((candidate_idx+1))
-    ___x_cmd_env_main_ls -r "${COMP_WORDS[candidate_idx]}"
-}
-
-___x_cmd_env_advise_ls_local_version(){
-    local candidate_idx="${1:-2}"
-    [ -n "$ZSH_VERSION" ] && candidate_idx=$((candidate_idx+1))
-    ___x_cmd_env_main_ls "${COMP_WORDS[candidate_idx]}"
 }
 
 # EndSection
