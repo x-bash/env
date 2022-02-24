@@ -19,9 +19,6 @@ ___x_cmd_env_node_full_version(){
 
 ___x_cmd_env_node_version_list(){
     local pattern="${1}"
-    [ -z "$pattern" ] && unset pattern
-
-    local pattern="${1}"
 	[ -z "$pattern" ] && unset pattern
 	{
 		awk '{
