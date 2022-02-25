@@ -357,7 +357,19 @@ A
 
 ___x_cmd_env_common_which(){
     local candidate="${1:?Provide candidate}"
-    command -v "$candidate"
+    local current_path
+    current_path="$(command -v "$candidate")"
+    if [ "$current_path" = "$___X_CMD_ENV_PATH/$candidate/shims/$candidate" ]; then
+        cur=$(pwd)
+        while [ ! "$cur" = "" ]; do
+            if [ -f "$cur/.x-cmd/.env/$candidate/version" ]; then
+                version=$(cat "$cur/.x-cmd/.env/$candidate/version")
+                printf "%s" "$___X_CMD_ENV_PATH/$candidate/versions/$version/bin/node"
+                return 0
+            fi
+            cur=${cur%/*}
+        done
+    fi
 }
 
 ___x_cmd_env_main_exec(){
