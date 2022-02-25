@@ -287,9 +287,10 @@ ___x_cmd_env_common_current() {
     local candidate="${1:?Provide candidate}"
     local version_path=".x-cmd/.env/$candidate/version"
 
+    cur=$(pwd)
     local vertify_list="$(___x_cmd_env_common_ls "$candidate")"
     local current_version="$(cat "$cur/$version_path")"
-    cur=$(pwd)
+
     while [ ! "$cur" = "" ]; do
         if [ -f "$cur/$version_path" ]; then
             if [ "$vertify_list" = "${vertify_list#*$current_version}" ]; then
