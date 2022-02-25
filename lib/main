@@ -240,6 +240,8 @@ ___x_cmd_env_common_use(){
 ___x_cmd_env_common_try(){
     local candidate="${1:?Provide candidate}"
     local version="${2:?Provide python version}"
+    ___x_cmd_env_common_pre_exec_check "${candidate}" "${version}" || return
+    env_log info "Setting ${candidate} ${version} in current Shell."
     PATH="${___X_CMD_ENV_PATH}/$candidate/versions/$version/bin:$PATH"
 }
 
