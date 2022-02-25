@@ -2,8 +2,8 @@
 
 # Section: sdkman
 
-___X_CMD_ENV_PLATFORM_TMP="$(xrc os && ___x_cmd_os name && ___x_cmd_os arch)"
-___X_CMD_ENV_PLATFORM="$(printf "%s" "${___X_CMD_ENV_PLATFORM_TMP}" | tr '[:lower:]' '[:upper:]')"
+___X_CMD_ENV_JAVA_PLATFORM_TMP="$(xrc os && ___x_cmd_os name && ___x_cmd_os arch)"
+___X_CMD_ENV_JAVA_PLATFORM="$(printf "%s" "${___X_CMD_ENV_JAVA_PLATFORM_TMP}" | tr '[:lower:]' '[:upper:]')"
 
 __sdkman_echo_debug() {
 	env_log debug "$1"
@@ -72,14 +72,14 @@ ___x_cmd_env_java_download(){
 	if [ -f "${archives_folder}/java-${version}.zip" ]; then
 		env_log info "Found a previously downloaded java ${version} archive. Not downloading it again..."
 	else
-		local download_url="https://api.sdkman.io/2/broker/download/java/${version}/${___X_CMD_ENV_PLATFORM}"
+		local download_url="https://api.sdkman.io/2/broker/download/java/${version}/${___X_CMD_ENV_JAVA_PLATFORM}"
 		local base_name="java-${version}"
 		local zip_archive_target="$___X_CMD_ENV_PATH/java/archives/${base_name}.zip"
 		headers_file="${metadata_folder}/${base_name}.headers"
 
 		local pre_installation_hook="$___X_CMD_ENV_PATH/java/tmp/hook_pre_java_${version}.sh"
-		env_log debug "Get pre-installation hook: https://api.sdkman.io/2/hooks/pre/java/${version}/${___X_CMD_ENV_PLATFORM}"
-		curl --silent --location "https://api.sdkman.io/2/hooks/pre/java/${version}/${___X_CMD_ENV_PLATFORM}" >| "$pre_installation_hook"
+		env_log debug "Get pre-installation hook: https://api.sdkman.io/2/hooks/pre/java/${version}/${___X_CMD_ENV_JAVA_PLATFORM}"
+		curl --silent --location "https://api.sdkman.io/2/hooks/pre/java/${version}/${___X_CMD_ENV_JAVA_PLATFORM}" >| "$pre_installation_hook"
 		env_log debug "Copy remote pre-installation hook: $pre_installation_hook"
 		. "$pre_installation_hook"
 		env_log debug "Completed pre-installation hook..."
@@ -95,8 +95,8 @@ ___x_cmd_env_java_download(){
 		env_log debug "Downloaded binary to: ${binary_input} (HTTP headers written to: ${headers_file})"
 
 		local post_installation_hook="$___X_CMD_ENV_PATH/java/tmp/hook_post_java_${version}.sh"
-		env_log debug "Get post-installation hook: https://api.sdkman.io/2/hooks/post/java/${version}/${___X_CMD_ENV_PLATFORM}"
-		curl --silent --location "https://api.sdkman.io/2/hooks/post/java/${version}/${___X_CMD_ENV_PLATFORM}" >| "$post_installation_hook"
+		env_log debug "Get post-installation hook: https://api.sdkman.io/2/hooks/post/java/${version}/${___X_CMD_ENV_JAVA_PLATFORM}"
+		curl --silent --location "https://api.sdkman.io/2/hooks/post/java/${version}/${___X_CMD_ENV_JAVA_PLATFORM}" >| "$post_installation_hook"
 		env_log debug "Copy remote post-installation hook: ${post_installation_hook}"
 		. "$post_installation_hook"
 		__sdkman_post_installation_hook || return 1

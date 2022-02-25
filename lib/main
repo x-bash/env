@@ -289,12 +289,19 @@ A
     ___x_cmd_env_run current "$@"
 }
 
+# TODO: There are four cases, one is try, one is shims, the other is native candidate, and the last one is no candidate
 ___x_cmd_env_common_current() {
     local candidate="${1:?Provide candidate}"
+    # local curent_path
+    # curent_path="$(command -v "$candidate")"
+    # if [ "$curent_path" != "$___X_CMD_ENV_PATH/$candidate/shims/$candidate" ]; then
+    #     printf "@@@"
+    #     printf "%s" "$curent_path" | awk '{str=$0;match(str,/^v*([0-9]$)/,arr);print arr[0]}'
+    #     return
+    # fi
+
     local version_path=".x-cmd/.env/$candidate/version"
-
     cur=$(pwd)
-
     while [ ! "$cur" = "" ]; do
         if [ -f "$cur/$version_path" ]; then
             local vertify_list
