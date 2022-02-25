@@ -54,7 +54,7 @@ ___x_cmd_env_python_ls(){
         esac
 
         local cache_path="$___X_CMD_ENV_PATH/python/cache"
-        if [ -f "$cache_path/version_list" ] ; then
+        if [ -f "$cache_path/version_list" ] && [ -n "$(find "$cache_path/version_list" -mtime -1)" ] ; then
             cat "$cache_path/version_list"
         else
             mkdir -p "$cache_path"
@@ -86,6 +86,7 @@ ___x_cmd_env_python_download(){
         local miniconda_filename
         local version="${1:?Provide python version}"
 
+        ___x_cmd_env_common_pre_install_check python "$version" || return 1
         ___x_cmd_env_python_get_miniconda_name_and_filename "$version"
         local candidate_path="$___X_CMD_ENV_PATH/python/versions"
         mkdir -p "${candidate_path}"
@@ -114,8 +115,7 @@ ___x_cmd_env_python_download(){
 # 2. It will download and use the python version.
 ___x_cmd_env_python_install(){
     local version="${1:?Provide python version}"
-    ___x_cmd_env_common_pre_install_check python "$version" && \
-        ___x_cmd_env_python_download "$version" || return
+    ___x_cmd_env_python_download "$version" || return
     ___x_cmd_env_common_use python "$version"
 }
 
@@ -126,5 +126,5 @@ ___x_cmd_env_python_ws(){
 }
 
 ___x_cmd_env_python_which(){
-    :
+    ___x_cmd_env_common_which python
 }

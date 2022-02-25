@@ -13,13 +13,11 @@ ___x_cmd_env_main() {
     param:dsl <<A
 subcommands:
     ls                      "list all installed environments"
-    la                      "list all available environments"
     download                "Download environment"
     install                 "Install environment"
     uninstall               "Remove environment"
     try                     "Set default environment in this shell session"
     use                     "Set global default environment"
-    ws                      "Set workspace default environment"
 
     current                 "Show current environment"
     which                   "Display path of environment installed"
@@ -27,6 +25,9 @@ subcommands:
     exec                    "Run an executable with the selected candidates version"
 A
     param:run
+
+    # TODO: la---"list all available environments"
+    # TODO: ws---"Set workspace default environment"
 
     if [ -z "$PARAM_SUBCMD" ]; then
         ___x_cmd_env_main help
@@ -61,7 +62,7 @@ ___x_cmd_env_run(){
 
 # Section: install, uninstall
 
-___x_cmd_env_main_install() {
+___x_cmd_env_main_install(){
     # TODO: You can do more better in #2 advise json
     param:scope "env"
     param:dsl <<A
@@ -164,7 +165,7 @@ A
     ___x_cmd_env_run ls "$@"
 }
 
-___x_cmd_env_common_ls() {
+___x_cmd_env_common_ls(){
     local candidate="${1:?Provide candidate}"
 	if [ -d "$___X_CMD_ENV_PATH/$candidate/versions" ]; then
 		for version in $(find "$___X_CMD_ENV_PATH/$candidate/versions" -maxdepth 1 -mindepth 1 \( -type l -o -type d \) -exec basename '{}' \; | sort -r); do
@@ -177,7 +178,7 @@ ___x_cmd_env_main_la(){
     ___x_cmd_env_run la "$@"
 }
 
-___x_cmd_env_common_la() {
+___x_cmd_env_common_la(){
     :
 }
 
@@ -224,11 +225,13 @@ ___x_cmd_env_main_ws(){
 ___x_cmd_env_common_use(){
     local candidate="${1:?Provide candidate}"
     local version="${2:?Provide version}"
+    ___x_cmd_env_common_pre_exec_check "${candidate}" "${version}" || return
     env_log info "Setting ${candidate} ${version} as default."
-    PATH="${___X_CMD_ENV_PATH}/$candidate/shims:$PATH"
-    # TODO: Add more check when seting the PATH
-    x boot rc add "x-env-$candidate" "PATH=\"${___X_CMD_ENV_PATH}/$candidate/shims:\$PATH\""
-	printf "%s" "$version" > "$___X_CMD_ENV_PATH/$candidate/version"
+
+    ___x_cmd_env_add_path "${___X_CMD_ENV_PATH}/$candidate/shims"
+    x boot rc add "x-env-$candidate" "xrc env/latest && ___x_cmd_env_add_path \"${___X_CMD_ENV_PATH}/$candidate/shims\""
+
+    printf "%s" "$version" > "$___X_CMD_ENV_PATH/$candidate/version"
     env_log info "Using $candidate $version . -> $___X_CMD_ENV_PATH/$candidate/version"
     ___x_cmd_env_shim_dir "$candidate" "${version}"
 }
@@ -236,7 +239,10 @@ ___x_cmd_env_common_use(){
 ___x_cmd_env_common_try(){
     local candidate="${1:?Provide candidate}"
     local version="${2:?Provide python version}"
-    PATH="${___X_CMD_ENV_PATH}/$candidate/versions/$version:$PATH"
+    ___x_cmd_env_common_pre_exec_check "${candidate}" "${version}" || return
+    env_log info "Setting ${candidate} ${version} in current Shell."
+
+    ___x_cmd_env_add_path "${___X_CMD_ENV_PATH}/$candidate/versions/$version/bin"
 }
 
 ___x_cmd_env_shim_dir(){
@@ -283,17 +289,32 @@ A
     ___x_cmd_env_run current "$@"
 }
 
-___x_cmd_env_common_current() {
+# TODO: There are four cases
+# 1. after try,
+# 2. no try, just use(shims)
+# 3. x env no any candidate version
+# 4. no any local candidate version
+___x_cmd_env_common_current(){
     local candidate="${1:?Provide candidate}"
+    local current_path
+    current_path="$(command -v $candidate)"
+    if [ "$current_path" != "$___X_CMD_ENV_PATH/$candidate/shims/$candidate" ]; then
+        local try_path
+        try_path="${current_path#*"versions/"}"
+        try_path="${try_path%%/*}"
+        printf "%s" "$try_path"
+        return
+    fi
+
     local version_path=".x-cmd/.env/$candidate/version"
-
     cur=$(pwd)
-
     while [ ! "$cur" = "" ]; do
         if [ -f "$cur/$version_path" ]; then
-            local vertify_list="$(___x_cmd_env_common_ls "$candidate")"
-            local current_version="$(cat "$cur/$version_path")"
-            if [ "$vertify_list" = "${vertify_list#*$current_version}" ]; then
+            local vertify_list
+            vertify_list="$(___x_cmd_env_common_ls "$candidate")"
+            local current_version
+            current_version="$(cat "$cur/$version_path")"
+            if [ "$vertify_list" = "${vertify_list#*"$current_version"}" ]; then
                 env_log error "There is currently no version in use, please use a version first!"
                 return 1
             fi
@@ -324,7 +345,32 @@ A
 }
 
 ___x_cmd_env_main_which(){
+    param:scope "env"
+    param:dsl <<A
+options:
+    #1        "Environment Candidates" <candidates>:candidates_list
+A
+    param:run
+
     ___x_cmd_env_run which "$@"
+}
+
+___x_cmd_env_common_which(){
+    local candidate="${1:?Provide candidate}"
+    local current_path
+    current_path="$(command -v "$candidate")"
+    if [ "$current_path" = "$___X_CMD_ENV_PATH/$candidate/shims/$candidate" ]; then
+        cur=$(pwd)
+        while [ ! "$cur" = "" ]; do
+            if [ -f "$cur/.x-cmd/.env/$candidate/version" ]; then
+                version=$(cat "$cur/.x-cmd/.env/$candidate/version")
+                printf "%s" "$___X_CMD_ENV_PATH/$candidate/versions/$version/bin/node"
+                return 0
+            fi
+            cur=${cur%/*}
+        done
+    fi
+    command -v "$candidate"
 }
 
 ___x_cmd_env_main_exec(){
