@@ -86,6 +86,7 @@ ___x_cmd_env_python_download(){
         local miniconda_filename
         local version="${1:?Provide python version}"
 
+        ___x_cmd_env_common_pre_install_check python "$version" || return 1
         ___x_cmd_env_python_get_miniconda_name_and_filename "$version"
         local candidate_path="$___X_CMD_ENV_PATH/python/versions"
         mkdir -p "${candidate_path}"
@@ -114,8 +115,7 @@ ___x_cmd_env_python_download(){
 # 2. It will download and use the python version.
 ___x_cmd_env_python_install(){
     local version="${1:?Provide python version}"
-    ___x_cmd_env_common_pre_install_check python "$version" && \
-        ___x_cmd_env_python_download "$version" || return
+    ___x_cmd_env_python_download "$version" || return
     ___x_cmd_env_common_use python "$version"
 }
 

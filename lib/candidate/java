@@ -71,6 +71,7 @@ ___x_cmd_env_java_download(){
 	local headers_file
 	if [ -f "${archives_folder}/java-${version}.zip" ]; then
 		env_log info "Found a previously downloaded java ${version} archive. Not downloading it again..."
+		return 1
 	else
 		local download_url="https://api.sdkman.io/2/broker/download/java/${version}/${___X_CMD_ENV_JAVA_PLATFORM}"
 		local base_name="java-${version}"
@@ -121,7 +122,7 @@ ___x_cmd_env_java_download(){
 
 ___x_cmd_env_java_install(){
 	local version="${1:-default}"
-	___x_cmd_env_java_download "$version" && \
+	___x_cmd_env_java_download "$version" || return
 	___x_cmd_env_common_use java "$version"
 }
 
