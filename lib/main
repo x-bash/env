@@ -237,7 +237,7 @@ ___x_cmd_env_common_use(){
 ___x_cmd_env_common_try(){
     local candidate="${1:?Provide candidate}"
     local version="${2:?Provide python version}"
-    PATH="${___X_CMD_ENV_PATH}/$candidate/versions/$version:$PATH"
+    PATH="${___X_CMD_ENV_PATH}/$candidate/versions/$version/bin:$PATH"
 }
 
 ___x_cmd_env_shim_dir(){
@@ -292,9 +292,11 @@ ___x_cmd_env_common_current() {
 
     while [ ! "$cur" = "" ]; do
         if [ -f "$cur/$version_path" ]; then
-            local vertify_list="$(___x_cmd_env_common_ls "$candidate")"
-            local current_version="$(cat "$cur/$version_path")"
-            if [ "$vertify_list" = "${vertify_list#*$current_version}" ]; then
+            local vertify_list
+            vertify_list="$(___x_cmd_env_common_ls "$candidate")"
+            local current_version
+            current_version="$(cat "$cur/$version_path")"
+            if [ "$vertify_list" = "${vertify_list#*"$current_version"}" ]; then
                 env_log error "There is currently no version in use, please use a version first!"
                 return 1
             fi
