@@ -13,13 +13,11 @@ ___x_cmd_env_main() {
     param:dsl <<A
 subcommands:
     ls                      "list all installed environments"
-    la                      "list all available environments"
     download                "Download environment"
     install                 "Install environment"
     uninstall               "Remove environment"
     try                     "Set default environment in this shell session"
     use                     "Set global default environment"
-    ws                      "Set workspace default environment"
 
     current                 "Show current environment"
     which                   "Display path of environment installed"
@@ -27,6 +25,9 @@ subcommands:
     exec                    "Run an executable with the selected candidates version"
 A
     param:run
+
+    # TODO: la---"list all available environments"
+    # TODO: ws---"Set workspace default environment"
 
     if [ -z "$PARAM_SUBCMD" ]; then
         ___x_cmd_env_main help
