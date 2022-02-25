@@ -42,7 +42,7 @@ ___x_cmd_env_java_ls(){
 		___x_cmd_env_common_ls java
 	else
 		local cache_path="$___X_CMD_ENV_PATH/java/cache"
-		if [ -f "$cache_path/version_list" ] ; then
+		if [ -f "$cache_path/version_list" ] && [ -n "$(find "$cache_path/version_list" -mtime -1)" ]  ; then
 			cat "$cache_path/version_list"
 		else
 			mkdir -p "$cache_path"

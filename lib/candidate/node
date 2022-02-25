@@ -47,7 +47,7 @@ ___x_cmd_env_node_ls(){
 		___x_cmd_env_common_ls node
 	else
 	    local cache_path="$___X_CMD_ENV_PATH/node/cache"
-        if [ -f "$cache_path/version_list" ] ; then
+        if [ -f "$cache_path/version_list" ] && [ -n "$(find "$cache_path/version_list" -mtime -1)" ]  ; then
             cat "$cache_path/version_list"
         else
             mkdir -p "$cache_path"
