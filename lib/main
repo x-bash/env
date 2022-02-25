@@ -225,6 +225,9 @@ ___x_cmd_env_main_ws(){
 ___x_cmd_env_common_use(){
     local candidate="${1:?Provide candidate}"
     local version="${2:?Provide version}"
+
+    ___x_cmd_env_common_pre_exec_check "${candidate}" "${version}" || return
+
     env_log info "Setting ${candidate} ${version} as default."
     PATH="${___X_CMD_ENV_PATH}/$candidate/shims:$PATH"
     # TODO: Add more check when seting the PATH
