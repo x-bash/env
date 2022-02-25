@@ -370,6 +370,7 @@ ___x_cmd_env_common_which(){
             cur=${cur%/*}
         done
     fi
+    command -v "$candidate"
 }
 
 ___x_cmd_env_main_exec(){
