@@ -1,12 +1,42 @@
 # shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263    # xrc
 
-# Section: utils
+# Section: sdkman
 
-___X_CMD_ENV_JAVA_PLATFORM_TMP="$(xrc os && ___x_cmd_os name && ___x_cmd_os arch)"
+___X_CMD_ENV_PLATFORM_TMP="$(xrc os && ___x_cmd_os name && ___x_cmd_os arch)"
+___X_CMD_ENV_PLATFORM="$(printf "%s" "${___X_CMD_ENV_PLATFORM_TMP}" | tr '[:lower:]' '[:upper:]')"
+
+__sdkman_echo_debug() {
+	env_log debug "$1"
+}
+
+__sdkman_echo() {
+	printf "\033[1;%s\033[0m\n" "$1$2"
+}
+
+__sdkman_echo_red() {
+	__sdkman_echo "31m" "$1"
+}
+
+__sdkman_echo_no_colour() {
+	printf "%s\n" "$1"
+}
+
+__sdkman_echo_yellow() {
+	__sdkman_echo "33m" "$1"
+}
+
+__sdkman_echo_green() {
+	__sdkman_echo "32m" "$1"
+}
+
+__sdkman_echo_cyan() {
+	__sdkman_echo "36m" "$1"
+}
 
 # EndSection
 
-# Section: ls, la
+# Section: Java ls and la
+
 ___x_cmd_env_java_ls(){
 	if [ -z "$remote" ] ; then
 		___x_cmd_env_common_ls java
@@ -16,30 +46,83 @@ ___x_cmd_env_java_ls(){
 			cat "$cache_path/version_list"
 		else
 			mkdir -p "$cache_path"
-			curl --silent "https://api.sdkman.io/2/candidates/java/${___X_CMD_ENV_JAVA_PLATFORM_TMP}/versions/all" | \
+			curl --silent "https://api.sdkman.io/2/candidates/java/${___X_CMD_ENV_JAVA_PLATFORM}/versions/all" | \
 				awk '{versions=$0 ;gsub(",","\n",versions);print versions}' | \
 				tee "$cache_path/version_list"
 		fi
 	fi
 }
 
-___x_cmd_env_java_la(){
-    :
-}
-
 # EndSection
 
-# Section: download,install
+# Section: download, install
 
 ___x_cmd_env_java_download(){
-    :
+    local version="${1:?Provide a version}"
+
+	mkdir -p "$___X_CMD_ENV_PATH/java/tmp"
+	mkdir -p "$___X_CMD_ENV_PATH/java/versions"
+
+	local archives_folder="$___X_CMD_ENV_PATH/java/archives"
+	local metadata_folder="$___X_CMD_ENV_PATH/java/var/metadata"
+	mkdir -p "$archives_folder"
+	mkdir -p "${metadata_folder}"
+
+	local headers_file
+	if [ -f "${archives_folder}/java-${version}.zip" ]; then
+		env_log info "Found a previously downloaded java ${version} archive. Not downloading it again..."
+	else
+		local download_url="https://api.sdkman.io/2/broker/download/java/${version}/${___X_CMD_ENV_PLATFORM}"
+		local base_name="java-${version}"
+		local zip_archive_target="$___X_CMD_ENV_PATH/java/archives/${base_name}.zip"
+		headers_file="${metadata_folder}/${base_name}.headers"
+
+		local pre_installation_hook="$___X_CMD_ENV_PATH/java/tmp/hook_pre_java_${version}.sh"
+		env_log debug "Get pre-installation hook: https://api.sdkman.io/2/hooks/pre/java/${version}/${___X_CMD_ENV_PLATFORM}"
+		curl --silent --location "https://api.sdkman.io/2/hooks/pre/java/${version}/${___X_CMD_ENV_PLATFORM}" >| "$pre_installation_hook"
+		env_log debug "Copy remote pre-installation hook: $pre_installation_hook"
+		. "$pre_installation_hook"
+		env_log debug "Completed pre-installation hook..."
+
+		export local binary_input="$___X_CMD_ENV_PATH/java/tmp/${base_name}.bin"
+		export local zip_output="$___X_CMD_ENV_PATH/java/tmp/$base_name.zip"
+
+		env_log info "Downloading: Java ${version}"
+		env_log info "In progress..."
+
+		# download binary
+		curl --progress-bar --location --retry-max-time 10 --retry 0 "${download_url}" --output "${binary_input}" --dump-header "${headers_file}"
+		env_log debug "Downloaded binary to: ${binary_input} (HTTP headers written to: ${headers_file})"
+
+		local post_installation_hook="$___X_CMD_ENV_PATH/java/tmp/hook_post_java_${version}.sh"
+		env_log debug "Get post-installation hook: https://api.sdkman.io/2/hooks/post/java/${version}/${___X_CMD_ENV_PLATFORM}"
+		curl --silent --location "https://api.sdkman.io/2/hooks/post/java/${version}/${___X_CMD_ENV_PLATFORM}" >| "$post_installation_hook"
+		env_log debug "Copy remote post-installation hook: ${post_installation_hook}"
+		. "$post_installation_hook"
+		__sdkman_post_installation_hook || return 1
+
+		env_log debug "Processed binary as: $zip_output"
+		env_log debug "Completed post-installation hook..."
+
+		mv -f "$zip_output" "$zip_archive_target"
+		env_log debug "Moved to archive folder: $zip_archive_target"
+	fi
+
+	env_log info "Installing: Java ${version}"
+	mkdir -p "$___X_CMD_ENV_PATH/java/versions"
+
+	rm -rf "$___X_CMD_ENV_PATH/java/tmp/out"
+	unzip -oq "$___X_CMD_ENV_PATH/java/archives/java-${version}.zip" -d "$___X_CMD_ENV_PATH/java/tmp/out"
+	mv -f "$___X_CMD_ENV_PATH"/java/tmp/out/* "$___X_CMD_ENV_PATH/java/versions/${version}"
+	env_log info "Done installing!"
+
+	return 0
 }
 
 ___x_cmd_env_java_install(){
-    local version="${1:?Provide java version}"
-    ___x_cmd_env_common_pre_install_check java "$version" && \
-        ___x_cmd_env_java_download "$version" || return
-    ___x_cmd_env_common_use java "$version"
+	local version="${1:-default}"
+	___x_cmd_env_java_download "$version" && \
+	___x_cmd_env_common_use java "$version"
 }
 
 # EndSection

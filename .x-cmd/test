@@ -62,7 +62,9 @@ case $1 in
         env_log info "Testing java current."
         x env current java
         echo ""
-        env_log info "Testing java install."
+        env_log info "Testing java download."
+        x env download java 17.0.2.8.1-amzn
+        # env_log info "Testing java install."
         # x env install java 17.0.2.8.1-amzn
 
         # x env install java 17.0.2-zulu

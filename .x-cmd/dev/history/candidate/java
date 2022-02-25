@@ -43,7 +43,6 @@ __sdkman_echo_cyan() {
 
 ___x_cmd_env_determine_version(){
     local version="$1"
-	local folder="$1"
 
     if [ "$ENV_AVAILABLE" = "false" ] && [ -n "$version" ] && [ -d "$___X_CMD_ENV_PATH/java/${version}" ]; then
 		VERSION="$version"
@@ -66,7 +65,7 @@ ___x_cmd_env_determine_version(){
 		env_log debug "Validate Java $version for $ENV_PLATFORM_TMP: $VERSION_VALID"
 		env_log debug "Validation URL: $validation_url"
 
-		if [ "$VERSION_VALID" = 'valid' ] || [ "$VERSION_VALID" = 'invalid' ] && [ -n "$folder" ]; then
+		if [ "$VERSION_VALID" = 'valid' ] || [ "$VERSION_VALID" = 'invalid' ]; then
 			VERSION="$version"
 
 		elif [ "$VERSION_VALID" = 'invalid' ] && [ -L "$___X_CMD_ENV_PATH/java/versions/${version}" ]; then
@@ -254,88 +253,6 @@ ___x_cmd_env_validate_zip(){
 	fi
 }
 
-___x_cmd_env_link_candidate_version(){
-    local version="$1"
-
-	# Change the 'current' symlink for the candidate, hence affecting all shells.
-	if [ -L "$___X_CMD_ENV_PATH/java/current" ] || [ -d "$___X_CMD_ENV_PATH/java/current" ]; then
-		rm -rf "$___X_CMD_ENV_PATH/java/current"
-	fi
-
-	ln -s "${version}" "$___X_CMD_ENV_PATH/java/current"
-}
-
-___x_cmd_env_add_to_path(){
-    local present
-
-	present=$(___x_cmd_env_path_contains java)
-	if [ "$present" = 'false' ]; then
-		PATH="$___X_CMD_ENV_PATH/java/current/bin:$PATH"
-	fi
-}
-
-___x_cmd_env_install_local_version(){
-    local version="$1"
-	local folder="$2"
-	local version_length=${#version} # Validate max length of version
-	local version_length_max=15
-
-	env_log debug "Validating that actual version length ($version_length) does not exceed max ($version_length_max)"
-
-	if [ "$version_length" -gt $version_length_max ]; then
-		env_log error "Invalid version! ${version} with length ${version_length} exceeds max of ${version_length_max}!"
-		return 1
-	fi
-
-	mkdir -p "$___X_CMD_ENV_PATH/java"
-
-	# handle relative paths
-	case "$folder" in
-		/*) ;;
-		*) folder="$(pwd)/$folder" ;;
-	esac
-
-	if [ -d "$folder" ]; then
-		env_log info "Linking java ${version} to ${folder}"
-		ln -s "$folder" "$___X_CMD_ENV_PATH/java/versions/${version}"
-		env_log info "Done installing!"
-	else
-		env_log error "Invalid path! Refusing to link Java ${version} to ${folder}."
-		return 1
-	fi
-
-}
-
-___x_cmd_env_offline_list() {
-	local versions_csv
-
-	versions_csv="$1"
-
-	__sdkman_echo_no_colour "--------------------------------------------------------------------------------"
-	__sdkman_echo_yellow "Offline: only showing installed Java versions"
-	__sdkman_echo_no_colour "--------------------------------------------------------------------------------"
-
-	local versions=($(echo ${versions_csv//,/ }))
-	for ((i = ${#versions} - 1; i >= 0; i--)); do
-		if [ -n "${versions[${i}]}" ]; then
-			if [ "${versions[${i}]}" == "$CURRENT" ]; then
-				__sdkman_echo_no_colour " > ${versions[${i}]}"
-			else
-				__sdkman_echo_no_colour " * ${versions[${i}]}"
-			fi
-		fi
-	done
-
-	if [ -z "${versions[@]}" ]; then
-		__sdkman_echo_yellow "   None installed!"
-	fi
-
-	__sdkman_echo_no_colour "--------------------------------------------------------------------------------"
-	__sdkman_echo_no_colour "* - installed                                                                   "
-	__sdkman_echo_no_colour "> - currently in use                                                            "
-	__sdkman_echo_no_colour "--------------------------------------------------------------------------------"
-}
-
 # EndSection
 
 # Section: Java ls and la
@@ -364,15 +281,13 @@ ___x_cmd_env_java_ls(){
 
 ___x_cmd_env_java_download(){
     local version="${1:-default}"
-    # ___x_cmd_env_common_pre_install_check java "${version}" || return
-	local folder="${2}"
 
 	mkdir -p "$___X_CMD_ENV_PATH/java/tmp"
 	mkdir -p "$___X_CMD_ENV_PATH/java/archives"
 	mkdir -p "$___X_CMD_ENV_PATH/java/versions"
 
     ENV_AVAILABLE="true" #availability set up
-    ___x_cmd_env_determine_version "$version" "$folder" || return 1
+    ___x_cmd_env_determine_version "$version" || return 1
 
     if [ -d "$___X_CMD_ENV_PATH/java/versions/${version}" ] || [ -L "$___X_CMD_ENV_PATH/java/versions/${version}" ]; then
         env_log info "Java ${version} is already installed."
@@ -383,14 +298,7 @@ ___x_cmd_env_java_download(){
 		___x_cmd_env_determine_current_version
 		___x_cmd_env_install_candidate_version "$version" || return 1
 
-        env_log info "Setting java ${version} as default."
-        # TODO: Maybe link will be better?
-        # ___x_cmd_env_link_candidate_version "$version"
-        # ___x_cmd_env_add_to_path
-
 		return 0
-	elif [ "$VERSION_VALID" = 'invalid' ] && [ -n "$folder" ]; then
-		___x_cmd_env_install_local_version "$VERSION" "$folder" || return 1
 	else
 		env_log error "Stop! $1 is not a valid java version."
 		return 1
