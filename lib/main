@@ -288,11 +288,11 @@ ___x_cmd_env_common_current() {
     local version_path=".x-cmd/.env/$candidate/version"
 
     cur=$(pwd)
-    local vertify_list="$(___x_cmd_env_common_ls "$candidate")"
-    local current_version="$(cat "$cur/$version_path")"
 
     while [ ! "$cur" = "" ]; do
         if [ -f "$cur/$version_path" ]; then
+            local vertify_list="$(___x_cmd_env_common_ls "$candidate")"
+            local current_version="$(cat "$cur/$version_path")"
             if [ "$vertify_list" = "${vertify_list#*$current_version}" ]; then
                 env_log error "There is currently no version in use, please use a version first!"
                 return 1
