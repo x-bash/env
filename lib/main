@@ -62,7 +62,7 @@ ___x_cmd_env_run(){
 
 # Section: install, uninstall
 
-___x_cmd_env_main_install() {
+___x_cmd_env_main_install(){
     # TODO: You can do more better in #2 advise json
     param:scope "env"
     param:dsl <<A
@@ -165,7 +165,7 @@ A
     ___x_cmd_env_run ls "$@"
 }
 
-___x_cmd_env_common_ls() {
+___x_cmd_env_common_ls(){
     local candidate="${1:?Provide candidate}"
 	if [ -d "$___X_CMD_ENV_PATH/$candidate/versions" ]; then
 		for version in $(find "$___X_CMD_ENV_PATH/$candidate/versions" -maxdepth 1 -mindepth 1 \( -type l -o -type d \) -exec basename '{}' \; | sort -r); do
@@ -178,7 +178,7 @@ ___x_cmd_env_main_la(){
     ___x_cmd_env_run la "$@"
 }
 
-___x_cmd_env_common_la() {
+___x_cmd_env_common_la(){
     :
 }
 
@@ -289,8 +289,12 @@ A
     ___x_cmd_env_run current "$@"
 }
 
-# TODO: There are four cases, one is try, one is shims, the other is native candidate, and the last one is no candidate
-___x_cmd_env_common_current() {
+# TODO: There are four cases
+# 1. after try,
+# 2. no try, just use(shims)
+# 3. x env no any candidate version
+# 4. no any local candidate version
+___x_cmd_env_common_current(){
     local candidate="${1:?Provide candidate}"
     local current_path
     current_path="$(command -v $candidate)"
@@ -341,7 +345,19 @@ A
 }
 
 ___x_cmd_env_main_which(){
+    param:scope "env"
+    param:dsl <<A
+options:
+    #1        "Environment Candidates" <candidates>:candidates_list
+A
+    param:run
+
     ___x_cmd_env_run which "$@"
+}
+
+___x_cmd_env_common_which(){
+    local candidate="${1:?Provide candidate}"
+    command -v "$candidate"
 }
 
 ___x_cmd_env_main_exec(){

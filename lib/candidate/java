@@ -132,5 +132,5 @@ ___x_cmd_env_java_ws(){
 }
 
 ___x_cmd_env_java_which(){
-    :
+    ___x_cmd_env_common_which java
 }

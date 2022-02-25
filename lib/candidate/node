@@ -156,5 +156,5 @@ ___x_cmd_env_node_ws(){
 }
 
 ___x_cmd_env_node_which(){
-    :
+    ___x_cmd_env_common_which node
 }
