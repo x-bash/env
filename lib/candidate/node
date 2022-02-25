@@ -67,11 +67,12 @@ ___x_cmd_env_node_la(){
 
 ___x_cmd_env_node_download(){
 
-    ___x_cmd_env_common_pre_install_check node "$version" || return
 
     local version="${1:?Provide node version}"
     local full_version
     full_version=$(___x_cmd_env_node_full_version "${version}")
+
+    ___x_cmd_env_common_pre_install_check node "$full_version" || return
 
     if [ -z "${full_version}" ]; then
         env_log error "Version '${version}' not found $full_version. "
