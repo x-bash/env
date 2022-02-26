@@ -145,8 +145,10 @@ ___x_cmd_env_node_download(){
 
 ___x_cmd_env_node_install(){
     local version="${1:?Provide node version}"
-    ___x_cmd_env_node_download "$version" || return
-    ___x_cmd_env_common_use node "$version"
+    local full_version
+    full_version=$(___x_cmd_env_node_full_version "${version}")
+    ___x_cmd_env_node_download "$full_version" || return
+    ___x_cmd_env_common_use node "$full_version"
 }
 
 # EndSection
