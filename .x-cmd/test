@@ -80,13 +80,26 @@ case $1 in
         # echo ""
         # x env exec java 17.0.2.8.1-amzn -version
         ;;
+    deno)
+        env_log info "Testing deno ls."
+        x env ls deno
+        env_log info "Testing deno ls -r."
+        x env ls -r deno
+        env_log info "Testing deno la."
+        x env la deno
+        env_log info "Testing deno current."
+        x env current deno
+        echo ""
+        env_log info "Testing deno download."
+        x env download deno latest
+        ;;
     all)
 
-        for cmd in python node java; do
+        for cmd in python node java deno; do
             x test "$cmd"
         done
         ;;
     *)
-        echo "Usage: x test python|node|java"
+        echo "Usage: x test python|node|java|deno"
         ;;
 esac
