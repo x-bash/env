@@ -295,7 +295,7 @@ A
     ___x_cmd_env_run current "$@"
 }
 
-# TODO: There are four cases
+# There are four cases in current:
 # 1. after try,
 # 2. no try, just use(shims)
 # 3. x env no any candidate version
