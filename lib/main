@@ -267,6 +267,12 @@ while [ ! "\$cur" = "" ]; do
     fi
     cur=\${cur%/*}
 done
+
+if [ -f $___X_CMD_ENV_PATH/$candidate/version ]; then
+    version=\$(cat $___X_CMD_ENV_PATH/$candidate/version)
+    exec $versions_path/\$version/bin/${name##*/} "\$@"
+    return 0
+fi
 ## TODO: no found
 A
 )">"$___X_CMD_ENV_PATH/$candidate/shims/${name##*/}"

@@ -124,7 +124,3 @@ ___x_cmd_env_python_install(){
 ___x_cmd_env_python_ws(){
     :
 }
-
-___x_cmd_env_python_which(){
-    ___x_cmd_env_common_which python
-}
