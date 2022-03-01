@@ -69,10 +69,19 @@ ___x_cmd_env_node_download(){
     # TODO: Handle bsd, sunos ..
 
     local platform
-    platform="$(xrc os && ___x_cmd_os name)"
-
     local arch
-    arch="$(xrc os && ___x_cmd_os arch)"
+
+#     x readline platform arch <<A
+# $(x os name; printf "\n"; x os arch)
+# A
+
+    {
+        read -r platform
+        read -r arch
+    } <<A
+$(x os name; printf "\n"; x os arch)
+A
+
     local slug="node-${full_version}-${platform}-${arch}"
 
     local compression='tar.gz'
