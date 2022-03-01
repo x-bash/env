@@ -9,7 +9,7 @@ ___X_CMD_ENV_NODE_MIRROR="https://nodejs.org/dist"
 # Section: utils
 
 ___x_cmd_env_node_full_version(){
-    ___x_cmd_env_node_version_list "${1:?Provide node version pattern}" "$2" | awk 'END{     print $1;   }'
+    ___x_cmd_env_node_version_list "${1:?Provide node version pattern}" "$2" | awk 'END{ if (NR<=0) { exit(1) } else print $1;   }'
 }
 
 ___x_cmd_env_node_version_list(){
@@ -130,10 +130,19 @@ ___x_cmd_env_node_download(){
 
 ___x_cmd_env_node_install(){
     local version="${1:?Provide node version}"
+
     local full_version
-    full_version=$(___x_cmd_env_node_full_version "${version}")
-    ___x_cmd_env_node_download "$full_version" || return
+    if ! full_version=$(___x_cmd_env_node_full_version "${version}"); then
+        env_log info "Version not found: $version"
+        return 1
+    fi
+
+    if ! ___x_cmd_env_node_download "$full_version"; then
+        env_log info "Fail to install node of version: $full_version."
+        return 1
+    fi
     ___x_cmd_env_common_use node "$full_version"
+
 }
 
 # EndSection
