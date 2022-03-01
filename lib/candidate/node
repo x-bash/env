@@ -9,12 +9,17 @@ ___X_CMD_ENV_NODE_MIRROR="https://nodejs.org/dist"
 # Section: utils
 
 ___x_cmd_env_node_full_version(){
-    ___x_cmd_env_node_version_list "${1:?Provide node version pattern}" | awk 'END{     print $1;   }'
+    ___x_cmd_env_node_version_list "${1:?Provide node version pattern}" "$2" | awk 'END{     print $1;   }'
 }
 
 ___x_cmd_env_node_version_list(){
     local pattern="${1:-""}"
-	curl --silent https://nodejs.org/dist/index.tab | awk -v pattern="$pattern" -v prev_codename="x-cmd" '
+    local cache_expiration="${2:-1}"
+
+    local cache_path="$___X_CMD_ENV_PATH/node/cache"
+
+	___x_cmd_httpget https://nodejs.org/dist/index.tab "$cache_path" "$cache_expiration" && \
+    awk -v pattern="$pattern" -v prev_codename="x-cmd" '
     ((NR>1)&&($1)){
         codename=$10
         version=$1
@@ -24,7 +29,7 @@ ___x_cmd_env_node_version_list(){
             else                                                    print version, codename
         }
         prev_codename=codename
-    }' | sort -t. -u -k 1.2,1n -k 2,2n -k 3,3n
+    }' <"$cache_path" | sort -t. -u -k 1.2,1n -k 2,2n -k 3,3n
 }
 
 # EndSection
@@ -33,16 +38,10 @@ ___x_cmd_env_node_version_list(){
 ___x_cmd_env_node_ls(){
     if [ -z "$remote" ] ; then
 		___x_cmd_env_common_ls node
-	else
-	    local cache_path="$___X_CMD_ENV_PATH/node/cache"
-        if [ -f "$cache_path/version_list" ] && [ -n "$(find "$cache_path/version_list" -mtime -1)" ]  ; then
-            cat "$cache_path/version_list"
-        else
-            mkdir -p "$cache_path"
-            ___x_cmd_env_node_version_list | awk '{str=$0; gsub("    ","",str);split(str, arr, / /);print arr[1]}' | \
-            tee "$cache_path/version_list"
-        fi
+        return
     fi
+
+    ___x_cmd_env_node_version_list
 }
 
 ___x_cmd_env_node_la(){
@@ -54,11 +53,9 @@ ___x_cmd_env_node_la(){
 # Section: download,install
 
 ___x_cmd_env_node_download(){
-
-
     local version="${1:?Provide node version}"
     local full_version
-    full_version=$(___x_cmd_env_node_full_version "${version}")
+    full_version=$(___x_cmd_env_node_full_version "${version}" -)
 
     ___x_cmd_env_common_pre_install_check node "$full_version" || return 1
 
