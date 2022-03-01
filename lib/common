@@ -1,0 +1,204 @@
+
+# Section: install, uninstall
+___x_cmd_env_common_install(){
+    local candidate="${1:?Provide canddidate}"
+    local version="${1:?Provide version}"
+
+    local full_version
+    if ! full_version=$(___x_cmd_env_run_common_ifnotfound "$candidate" full_version "${version}"); then
+        env_log info "Version of $candidate not found: $version"
+        return 1
+    fi
+
+    if ___x_cmd_env_common_util_is_version_installed "$candidate" "$full_version"; then
+        :
+        return 1
+    fi
+
+    if ! ___x_cmd_env_run_common_ifnotfound "$candidate" download "$full_version"; then
+        env_log info "Fail to install $candidate of version: $full_version."
+        return 1
+    fi
+
+    if ! ___x_cmd_env_run_common_ifnotfound "$candidate" unpack "$full_version"; then
+        env_log info "Fail to unpack $candidate of version: $full_version."
+        return 1
+    fi
+
+    # env_log info "Installed ${tarball_url} to ${version_path}"
+
+    ___x_cmd_env_common_use "$candidate" "$full_version"
+}
+
+___x_cmd_env_common_uninstall(){
+    local candidate="${1:?Provide candidate}"
+    local version="${2:?Provide the version}"
+    env_log info "Uninstalling $1 $2"
+
+    local candidate_path="$___X_CMD_ENV_PATH/${candidate}/versions/${version}"
+    if [ -d "$candidate_path" ]; then
+        rm -rf "${candidate_path}"
+    else
+        env_log  warn "This ${candidate} ${version} is no exist."
+        return 1
+    fi
+    x boot rc del "x-env-$candidate"
+    # TODO: remove the shims from $PATH
+}
+# EndSection
+
+# Section: ls la
+___x_cmd_env_common_ls_local(){
+    local candidate="${1:?Provide candidate}"
+	if [ -d "$___X_CMD_ENV_PATH/$candidate/versions" ]; then
+		for version in $(find "$___X_CMD_ENV_PATH/$candidate/versions" -maxdepth 1 -mindepth 1 \( -type l -o -type d \) -exec basename '{}' \; | sort -r); do
+			printf "%s\n" "$version"
+		done
+	fi
+}
+
+___x_cmd_env_common_ls(){
+    local candidate="${1:?Provide candidate}"
+
+    if [ -z "$remote" ] ; then
+		___x_cmd_env_common_ls "$candidate"
+        return
+    fi
+
+    ___x_cmd_env_run_common_if_notfound "$candidate" lsremote
+}
+
+___x_cmd_env_common_la(){
+    :
+}
+# EndSection
+
+# Section: use, try, ws
+
+___x_cmd_env_common_use(){
+    local candidate="${1:?Provide candidate}"
+    local version="${2:?Provide version}"
+    ___x_cmd_env_common_pre_exec_check "${candidate}" "${version}" || return
+    env_log info "Setting ${candidate} ${version} as default."
+
+    ___x_cmd_env_add_path "${___X_CMD_ENV_PATH}/$candidate/shims"
+    x boot rc add "x-env-$candidate" "xrc env/latest && ___x_cmd_env_add_path \"${___X_CMD_ENV_PATH}/$candidate/shims\""
+
+    printf "%s" "$version" > "$___X_CMD_ENV_PATH/$candidate/version"
+    env_log info "Using $candidate $version . -> $___X_CMD_ENV_PATH/$candidate/version"
+    ___x_cmd_env_shim_dir "$candidate" "${version}"
+}
+
+___x_cmd_env_common_try(){
+    local candidate="${1:?Provide candidate}"
+    local version="${2:?Provide python version}"
+    ___x_cmd_env_common_pre_exec_check "${candidate}" "${version}" || return
+    env_log info "Setting ${candidate} ${version} in current Shell."
+
+    ___x_cmd_env_add_path "${___X_CMD_ENV_PATH}/$candidate/versions/$version/bin"
+}
+
+___x_cmd_env_shim_dir(){
+    local candidate="${1:?Provide candidate}"
+    local version="${2:?Provide version}"
+    local version_path=".x-cmd/.env/$candidate/version"
+    local versions_path="$___X_CMD_ENV_PATH/$candidate/versions"
+    rm -rf "${___X_CMD_ENV_PATH}/$candidate/shims"
+    mkdir -p "${___X_CMD_ENV_PATH}/$candidate/shims"
+
+    for name in $versions_path/${version}/bin/* ; do
+        printf "%s" "$(cat <<A
+#!/usr/bin/env sh
+set -e
+
+cur=\$(pwd)
+while [ ! "\$cur" = "" ]; do
+    if [ -f "\$cur/$version_path" ]; then
+        version=\$(cat "\$cur/$version_path")
+        exec $versions_path/\$version/bin/${name##*/} "\$@"
+        return 0
+    fi
+    cur=\${cur%/*}
+done
+
+if [ -f $___X_CMD_ENV_PATH/$candidate/version ]; then
+    version=\$(cat $___X_CMD_ENV_PATH/$candidate/version)
+    exec $versions_path/\$version/bin/${name##*/} "\$@"
+    return 0
+fi
+## TODO: no found
+A
+)">"$___X_CMD_ENV_PATH/$candidate/shims/${name##*/}"
+        chmod +x "$___X_CMD_ENV_PATH/$candidate/shims/${name##*/}"
+    done
+}
+
+# EndSection
+
+# Section: current
+
+# There are four cases in current:
+# 1. after try,
+# 2. no try, just use(shims)
+# 3. x env no any candidate version
+# 4. no any local candidate version
+___x_cmd_env_common_current(){
+    local candidate="${1:?Provide candidate}"
+    local current_path
+    current_path="$(command -v $candidate)"
+    if [ "$current_path" != "$___X_CMD_ENV_PATH/$candidate/shims/$candidate" ]; then
+        local try_path
+        try_path="${current_path#*"versions/"}"
+        try_path="${try_path%%/*}"
+        printf "%s" "$try_path"
+        return
+    fi
+
+    local version_path=".x-cmd/.env/$candidate/version"
+    cur=$(pwd)
+    while [ ! "$cur" = "" ]; do
+        if [ -f "$cur/$version_path" ]; then
+            local vertify_list
+            vertify_list="$(___x_cmd_env_common_ls "$candidate")"
+            local current_version
+            current_version="$(cat "$cur/$version_path")"
+            if [ "$vertify_list" = "${vertify_list#*"$current_version"}" ]; then
+                env_log error "There is currently no version in use, please use a version first!"
+                return 1
+            fi
+            printf "%s" "$current_version"
+            return 0
+        fi
+        cur=${cur%/*}
+    done
+}
+# EndSection
+
+# Section: which
+___x_cmd_env_common_which(){
+    local candidate="${1:?Provide candidate}"
+    local current_path
+    current_path="$(command -v "$candidate")"
+    if [ "$current_path" = "$___X_CMD_ENV_PATH/$candidate/shims/$candidate" ]; then
+        cur=$(pwd)
+        while [ ! "$cur" = "" ]; do
+            if [ -f "$cur/.x-cmd/.env/$candidate/version" ]; then
+                version=$(cat "$cur/.x-cmd/.env/$candidate/version")
+                printf "%s" "$___X_CMD_ENV_PATH/$candidate/versions/$version/bin/node"
+                return 0
+            fi
+            cur=${cur%/*}
+        done
+    fi
+    command -v "$candidate"
+}
+
+
+___x_cmd_env_common_exec(){
+    local candidate="${1:?Provide candidate}"
+    local version="${2:?Provide version}" ; shift 2
+    ___x_cmd_env_common_pre_exec_check "${candidate}" "${version}" || return
+    local PATH="${___X_CMD_ENV_PATH}/${candidate}/versions/${version}/bin:$PATH"
+    "${candidate}" "$@"
+}
+# EndSection

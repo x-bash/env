@@ -9,10 +9,10 @@ ___X_CMD_ENV_NODE_MIRROR="https://nodejs.org/dist"
 # Section: utils
 
 ___x_cmd_env_node_full_version(){
-    ___x_cmd_env_node_version_list "${1:?Provide node version pattern}" "$2" | awk 'END{ if (NR<=0) { exit(1) } else print $1;   }'
+    ___x_cmd_env_node_lsremote "${1:?Provide node version pattern}" "$2" | awk 'END{ if (NR<=0) { exit(1) } else print $1;   }'
 }
 
-___x_cmd_env_node_version_list(){
+___x_cmd_env_node_lsremote(){
     local pattern="${1:-""}"
     local cache_expiration="${2:-1}"
 
@@ -35,14 +35,7 @@ ___x_cmd_env_node_version_list(){
 # EndSection
 
 # Section: ls, la
-___x_cmd_env_node_ls(){
-    if [ -z "$remote" ] ; then
-		___x_cmd_env_common_ls node
-        return
-    fi
 
-    ___x_cmd_env_node_version_list
-}
 
 ___x_cmd_env_node_la(){
     :
@@ -55,14 +48,12 @@ ___x_cmd_env_node_la(){
 ___x_cmd_env_node_download(){
     local version="${1:?Provide node version}"
     local full_version
-    full_version=$(___x_cmd_env_node_full_version "${version}" -)
-
-    ___x_cmd_env_common_pre_install_check node "$full_version" || return 1
-
-    if [ -z "${full_version}" ]; then
+    if full_version=$(___x_cmd_env_node_full_version "${version}" -); then
         env_log error "Version '${version}' not found $full_version. "
         return 1
     fi
+
+    ___x_cmd_env_common_util_is_archieve_cached node "$full_version" || return 1
 
     # TODO: Check if version is already downloaded
 
@@ -72,7 +63,7 @@ ___x_cmd_env_node_download(){
     local arch
 
 #     x readline platform arch <<A
-# $(x os name; printf "\n"; x os arch)
+# $(x os name; x os arch)
 # A
 
     {
@@ -108,50 +99,43 @@ A
     )
     env_log info "Downloaded ${tarball_url} to ${tarball}"
 
-    # TODO: checksum
+}
+# EndSection
 
-    local tmpdir_files="${tmpdir}/files"
-    mkdir -p "${tmpdir_files}"
-    # extract
-    local version_path="${___X_CMD_ENV_PATH}/node/versions/${full_version}"
+# Section: unpack
+___x_cmd_env_node_unpack_win(){
+    local version_path
+    version_path="${___X_CMD_ENV_PATH}/node/versions/${full_version}/bin"
 
-    if [ "${platform}" = 'win' ]; then
-        version_path="${version_path}/bin"
-        unzip -q "${tarball}" -d "${tmpdir_files}" || return 1
-    else
-        tar -xzf "${tarball}" -C "${tmpdir_files}" --strip-components 1 || return 1
-    fi
+    unzip -q "${tarball}" -d "${tmpdir_files}" || return 1
 
-    mkdir -p "${version_path}" || return 1
-
-    if [ "${NVM_OS}" = 'win' ]; then
+    mkdir -p "${version_path}" && (
         mv "${tmpdir_files}/"*/* "${version_path}" || return 1
-        chmod +x "${version_path}"/node.exe || return 1
-        chmod +x "${version_path}"/npm || return 1
-        chmod +x "${version_path}"/npx 2>/dev/null
-    else
-        mv "${tmpdir_files}/"* "${version_path}" || return 1
-    fi
-
-    env_log info "Installed ${tarball_url} to ${version_path}"
-    rm -rf "${tmpdir_files}"
+        cd "${version_path}" && chmod +x node.exe npm npx
+        # chmod +x "${version_path}"/npx 2>/dev/null
+    )
 }
 
-___x_cmd_env_node_install(){
-    local version="${1:?Provide node version}"
+___x_cmd_env_node_unpack_other(){
+    tar -xzf "${tarball}" -C "${tmpdir_files}" --strip-components 1 || return 1
 
-    local full_version
-    if ! full_version=$(___x_cmd_env_node_full_version "${version}"); then
-        env_log info "Version not found: $version"
-        return 1
-    fi
+    local version_path="${___X_CMD_ENV_PATH}/node/versions/${full_version}"
+    mkdir -p "${version_path}" && mv "${tmpdir_files}/"* "${version_path}"
+}
 
-    if ! ___x_cmd_env_node_download "$full_version"; then
-        env_log info "Fail to install node of version: $full_version."
-        return 1
-    fi
-    ___x_cmd_env_common_use node "$full_version"
+___x_cmd_env_node_unpack(){
+    # TODO: checksum
+    local tmpdir_files="${tmpdir}/files"
+    mkdir -p "${tmpdir_files}"
 
+    case "$platform" in
+        win)    ___x_cmd_env_node_unpack_win    ;;
+        *)      ___x_cmd_env_node_unpack_other  ;;
+    esac
+    local code=$?
+
+    rm -rf "${tmpdir_files}"
+    return $code
 }
 
 # EndSection

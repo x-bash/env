@@ -86,7 +86,7 @@ ___x_cmd_env_python_download(){
         local miniconda_filename
         local version="${1:?Provide python version}"
 
-        ___x_cmd_env_common_pre_install_check python "$version" || return 1
+        ___x_cmd_env_common_util_is_archieve_cached python "$version" || return 1
         ___x_cmd_env_python_get_miniconda_name_and_filename "$version"
         local candidate_path="$___X_CMD_ENV_PATH/python/versions"
         mkdir -p "${candidate_path}"
@@ -115,8 +115,23 @@ ___x_cmd_env_python_download(){
 # 2. It will download and use the python version.
 ___x_cmd_env_python_install(){
     local version="${1:?Provide python version}"
-    ___x_cmd_env_python_download "$version" || return
-    ___x_cmd_env_common_use python "$version"
+
+    if ___x_cmd_env_common_util_is_version_installed; then
+        :
+        return 1
+    fi
+
+    local full_version
+    if ! full_version=$(___x_cmd_env_python_full_version "${version}"); then
+        env_log info "Version not found: $version"
+        return 1
+    fi
+
+    if ! ___x_cmd_env_python_download "$full_version"; then
+        env_log info "Fail to install python of version: $full_version."
+        return 1
+    fi
+    ___x_cmd_env_common_use python "$full_version"
 }
 
 # EndSection
