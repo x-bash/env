@@ -9,34 +9,22 @@ ___X_CMD_ENV_NODE_MIRROR="https://nodejs.org/dist"
 # Section: utils
 
 ___x_cmd_env_node_full_version(){
-    local pattern="${1:?Provide node version pattern}"
-    awk 'BEGIN {
-      n = split(ARGV[1], a);
-      print a[1]
-    }' \
-    "$(___x_cmd_env_node_version_list "${pattern}" | tail -1)"
+    ___x_cmd_env_node_version_list "${1:?Provide node version pattern}" | awk 'END{     print $1;   }'
 }
 
 ___x_cmd_env_node_version_list(){
-    local pattern="${1}"
-	[ -z "$pattern" ] && unset pattern
-	{
-		awk '{
-            if (!$1) { next }
-            if ($10 !~ /^\-?$/) {
-                if ($10 && $10 != prev) {
-                    print $1, $10, "*"
-                } else {
-                    print $1, $10
-                }
-            } else {
-                print $1
-            }
-            prev=$10;
-        }' | grep -w "${pattern:-.*}" | sort -t. -u -k 1.2,1n -k 2,2n -k 3,3n
-	} <<A
-$(curl --silent https://nodejs.org/dist/index.tab)
-A
+    local pattern="${1:-""}"
+	curl --silent https://nodejs.org/dist/index.tab | awk -v pattern="$pattern" -v prev_codename="x-cmd" '
+    ((NR>1)&&($1)){
+        codename=$10
+        version=$1
+        if ( (pattern == "") || ( index( version, pattern ) > 0 ) ) {
+            if (codename ~ /^\-?$/)                                 print version
+            else if (codename!="" && codename != prev_codename)     print version, codename, "*"        # The latest version of this code name
+            else                                                    print version, codename
+        }
+        prev_codename=codename
+    }' | sort -t. -u -k 1.2,1n -k 2,2n -k 3,3n
 }
 
 # EndSection
