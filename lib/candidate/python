@@ -26,7 +26,6 @@ ___x_cmd_env_python_get_miniconda_name_and_filename(){
     local system
     ___x_cmd_env_python_get_system_platform
 
-
     miniconda_name="Miniconda3-${version}-${system}-${platform}"
     if [ $system = "Windows" ] ; then
         miniconda_filename="${miniconda_name}.exe"
@@ -38,27 +37,23 @@ ___x_cmd_env_python_get_miniconda_name_and_filename(){
 # EndSection
 
 # Section: ls, la
-___x_cmd_env_python_lsremote(){
+___x_cmd_env_python_ls_remote(){
+    local pattern="${1:-""}"
+	local cache_expiration="${2:-1}"
+	local cache_path="$___X_CMD_ENV_PATH/python/cache/version_list"
+
     local platform
     local system
     ___x_cmd_env_python_get_system_platform
 
-    local cache_path="$___X_CMD_ENV_PATH/python/cache"
-    if [ -f "$cache_path/version_list" ] && [ -n "$(find "$cache_path/version_list" -mtime -1)" ] ; then
-        cat "$cache_path/version_list"
-    else
-        mkdir -p "$cache_path"
-        curl --silent "https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/" | \
-            awk "$(cat <<A
-BEGIN{RS="<a href=";FS="\""}{
-    if (match(\$2, /^.*-$system-$platform.sh$/)) {
-        split(\$2, a, /-/)
-        print a[2]
-    }
-}
-A
-        )" | tee "$cache_path/version_list"
-    fi
+    ___x_cmd_httpget "https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/" "$cache_path" "$cache_expiration" 2>/dev/null && \
+    awk -v platform="${platform}" -v arch="${system}" '
+        BEGIN{RS="<a href=";FS="\""}{
+            if (match($2, "^.*-" arch "-" platform ".sh$")) {
+                split($2, a, /-/)
+                print a[2]
+            }
+        }' <"$cache_path"
 }
 
 # EndSection

@@ -43,7 +43,7 @@ ___x_cmd_env_run_common_if_notfound(){
     local candidate="${1:?Provide candidate}";  shift
 
     if ! ___x_cmd_env_candidate_has "$candidate"; then
-        env_log error "Candidate inexisted: $candidate"
+        env_log error "Candidate in existed: $candidate"
         return 1
     fi
 
@@ -121,11 +121,11 @@ A
     # TODO: 增加 本地简写版本对应关系 和 全局简写版本对应关系
     # TODO: V8 -> V8.2   --> (Remote) V8.6
     if [ -n "$remote" ] ; then
-		___x_cmd_env_run_common_if_notfound "$candidate" ls_remote
+		___x_cmd_env_run_common_if_notfound ls_remote "$@"
         return
     fi
 
-    ___x_cmd_env_run_common_if_notfound "$candidate" ls_local
+    ___x_cmd_env_run_common_if_notfound ls_local "$@"
 }
 
 
@@ -156,8 +156,9 @@ ___x_cmd_env_main_use(){
 advise:
     #2        xrc env/latest && ___x_cmd_env_advise_ls_local_version
 options:
-    #1        "Environment Candidates" <candidates>:candidates_list
-    #2        "Version"                <version>="default"
+    --no-shims    "Don't use shims"
+    #1            "Environment Candidates" <candidates>:candidates_list
+    #2            "Version"                <version>="default"
 A
     param:run
 

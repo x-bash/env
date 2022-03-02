@@ -38,8 +38,10 @@ __sdkman_echo_cyan() {
 # Section: Java ls and la
 
 ___x_cmd_env_java_ls_remote(){
+	local pattern="${1:-""}"
+	local cache_expiration="${2:-1}"
 	local cache_path="$___X_CMD_ENV_PATH/java/cache/version_list"
-	___x_cmd_httpget "https://api.sdkman.io/2/candidates/java/${___X_CMD_ENV_JAVA_PLATFORM}/versions/all" "$cache_path" && \
+	___x_cmd_httpget "https://api.sdkman.io/2/candidates/java/${___X_CMD_ENV_JAVA_PLATFORM}/versions/all" "$cache_path" "$cache_expiration" 2>/dev/null && \
 	awk '{versions=$0 ;gsub(",","\n",versions);print versions}' <"$cache_path"
 }
 

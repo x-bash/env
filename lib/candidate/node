@@ -8,27 +8,26 @@ ___X_CMD_ENV_NODE_MIRROR="https://nodejs.org/dist"
 
 # Section: full_version, ls_remote
 ___x_cmd_env_node_full_version(){
-    ___x_cmd_env_node_lsremote "${1:?Provide node version pattern}" "$2" | awk 'END{ if (NR<=0) { exit(1) } else print $1;   }'
+    ___x_cmd_env_node_ls_remote "${1:?Provide node version pattern}" "$2" | awk 'END{ if (NR<=0) { exit(1) } else print $1;   }'
 }
 
 ___x_cmd_env_node_ls_remote(){
     local pattern="${1:-""}"
     local cache_expiration="${2:-1}"
+    local cache_path="$___X_CMD_ENV_PATH/node/cache/version_list"
 
-    local cache_path="$___X_CMD_ENV_PATH/node/cache"
-
-	___x_cmd_httpget "$___X_CMD_ENV_NODE_MIRROR/index.tab" "$cache_path" "$cache_expiration" && \
+	___x_cmd_httpget "$___X_CMD_ENV_NODE_MIRROR/index.tab" "$cache_path" "$cache_expiration" 2>/dev/null && \
     awk -v pattern="$pattern" -v prev_codename="x-cmd" '
-    ((NR>1)&&($1)){
-        codename=$10
-        version=$1
-        if ( (pattern == "") || ( index( version, pattern ) > 0 ) ) {
-            if (codename ~ /^\-?$/)                                 print version
-            else if (codename!="" && codename != prev_codename)     print version, codename, "*"        # The latest version of this code name
-            else                                                    print version, codename
-        }
-        prev_codename=codename
-    }' <"$cache_path" | sort -t. -u -k 1.2,1n -k 2,2n -k 3,3n
+        ((NR>1)&&($1)){
+            codename=$10
+            version=$1
+            if ( (pattern == "") || ( index( version, pattern ) > 0 ) ) {
+                if (codename ~ /^\-?$/)                                 print version
+                else if (codename!="" && codename != prev_codename)     print version, codename, "*"        # The latest version of this code name
+                else                                                    print version, codename
+            }
+            prev_codename=codename
+        }' <"$cache_path" | sort -t. -u -k 1.2,1n -k 2,2n -k 3,3n
 }
 # EndSection
 
@@ -73,7 +72,7 @@ A
     local tarball_url="${___X_CMD_ENV_NODE_MIRROR}/${full_version}/${slug}.${compression}"
 
     if ! curl -L -C - --progress-bar "${tarball_url}" -o "${tarball}"; then
-        command rm -rf "${tarball}" "${archieve_dir}"
+        rm -rf "${tarball}" "${archieve_dir}"
         env_log error "Binary download from ${tarball_url} failed, trying source."
         return 1
     fi
