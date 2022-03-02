@@ -37,7 +37,7 @@ __sdkman_echo_cyan() {
 
 # Section: Java ls and la
 
-___x_cmd_env_java_lsremote(){
+___x_cmd_env_java_ls_remote(){
 	local cache_path="$___X_CMD_ENV_PATH/java/cache/version_list"
 	___x_cmd_httpget "https://api.sdkman.io/2/candidates/java/${___X_CMD_ENV_JAVA_PLATFORM}/versions/all" "$cache_path" && \
 	awk '{versions=$0 ;gsub(",","\n",versions);print versions}' <"$cache_path"

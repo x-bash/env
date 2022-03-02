@@ -120,7 +120,12 @@ A
 
     # TODO: 增加 本地简写版本对应关系 和 全局简写版本对应关系
     # TODO: V8 -> V8.2   --> (Remote) V8.6
-    ___x_cmd_env_run_common_if_notfound ls "$@"
+    if [ -n "$remote" ] ; then
+		___x_cmd_env_run_common_if_notfound "$candidate" ls_remote
+        return
+    fi
+
+    ___x_cmd_env_run_common_if_notfound "$candidate" ls_local
 }
 
 
