@@ -149,7 +149,7 @@ ___x_cmd_env_common_current(){
     while [ ! "$cur" = "" ]; do
         if [ -f "$cur/$version_path" ]; then
             local vertify_list
-            vertify_list="$(___x_cmd_env_common_ls "$candidate")"
+            vertify_list="$(___x_cmd_env_common_ls_local "$candidate")"
             local current_version
             current_version="$(cat "$cur/$version_path")"
             if [ "$vertify_list" = "${vertify_list#*"$current_version"}" ]; then
