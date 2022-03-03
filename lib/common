@@ -20,23 +20,27 @@ ___x_cmd_env_common_install(){
         return 1
     fi
 
-    if ___x_cmd_env_util_is_version_installed "$candidate" "$full_version"; then
-        :
+    # TODO: version needs to be changed to full_ version
+    if ___x_cmd_env_util_is_version_installed "$candidate" "$version"; then
+        env_log error "Version of $candidate $version already installed"
         return 1
     fi
 
-    if ! ___x_cmd_env_run_common_if_notfound download "$candidate" "$full_version"; then
-        env_log info "Fail to install $candidate of version: $full_version."
+    # TODO: version needs to be changed to full_ version
+    if ! ___x_cmd_env_run_common_if_notfound download "$candidate" "$version"; then
+        env_log info "Fail to install $candidate of version: $version."
         return 1
     fi
 
-    if ! ___x_cmd_env_run_common_if_notfound unpack "$candidate" "$full_version"; then
-        env_log info "Fail to unpack $candidate of version: $full_version."
+    # TODO: version needs to be changed to full_ version
+    if ! ___x_cmd_env_run_common_if_notfound unpack "$candidate" "$version"; then
+        env_log info "Fail to unpack $candidate of version: $version."
         return 1
     fi
 
-    ___x_cmd_env_common_use "$candidate" "$full_version"
-    env_log info "Installed to "
+    # TODO: version needs to be changed to full_ version
+    ___x_cmd_env_common_use "$candidate" "$version"
+    env_log info "Successfully installed $candidate $version"
 }
 
 ___x_cmd_env_common_uninstall(){
@@ -76,7 +80,14 @@ ___x_cmd_env_common_la(){
 ___x_cmd_env_common_use(){
     local candidate="${1:?Provide candidate}"
     local version="${2:?Provide version}"
-    ___x_cmd_env_util_is_version_installed "${candidate}" "${version}" || return
+
+    # TODO: Check if the installation package exists
+    # TODO: Check whether the installation package is unzipped
+    # if ___x_cmd_env_util_is_archieve_cached "$candidate" "$version"; then
+    #     env_log error "Installation package of $candidate $version does not exist"
+    #     return 1
+    # fi
+
     env_log info "Setting ${candidate} ${version} as default."
 
     ___x_cmd_env_add_path "${___X_CMD_ENV_PATH}/$candidate/shims"

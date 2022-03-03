@@ -13,7 +13,7 @@ ___x_cmd_env_util_is_version_installed(){
             ;;
         *)
             if [ ! -d "${candidate_path}" ]; then
-                env_log error "$candidate $version is not installed."
+                env_log debug "$candidate $version is not installed."
                 return 1
             fi
             ;;
