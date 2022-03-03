@@ -1,34 +1,42 @@
 # shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263    # xrc
 
+# Section: full_version
+
+___x_cmd_env_common_full_version(){
+    printf "%s\n" "$1"
+    return
+}
+
+# Section
+
 # Section: install, uninstall
 ___x_cmd_env_common_install(){
     local candidate="${1:?Provide canddidate}"
-    local version="${1:?Provide version}"
+    local version="${2:?Provide version}"
 
     local full_version
-    if ! full_version=$(___x_cmd_env_run_common_ifnotfound "$candidate" full_version "${version}"); then
-        env_log info "Version of $candidate not found: $version"
+    if ! full_version=$(___x_cmd_env_run_common_if_notfound full_version "$candidate" "${version}"); then
+        env_log error "Version of $candidate not found: $version"
         return 1
     fi
 
-    if ___x_cmd_env_common_util_is_version_installed "$candidate" "$full_version"; then
+    if ___x_cmd_env_util_is_version_installed "$candidate" "$full_version"; then
         :
         return 1
     fi
 
-    if ! ___x_cmd_env_run_common_ifnotfound "$candidate" download "$full_version"; then
+    if ! ___x_cmd_env_run_common_if_notfound download "$candidate" "$full_version"; then
         env_log info "Fail to install $candidate of version: $full_version."
         return 1
     fi
 
-    if ! ___x_cmd_env_run_common_ifnotfound "$candidate" unpack "$full_version"; then
+    if ! ___x_cmd_env_run_common_if_notfound unpack "$candidate" "$full_version"; then
         env_log info "Fail to unpack $candidate of version: $full_version."
         return 1
     fi
 
-    # env_log info "Installed ${tarball_url} to ${version_path}"
-
     ___x_cmd_env_common_use "$candidate" "$full_version"
+    env_log info "Installed to "
 }
 
 ___x_cmd_env_common_uninstall(){
