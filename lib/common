@@ -1,5 +1,14 @@
 # shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263    # xrc
 
+# Section: full_version
+
+___x_cmd_env_common_full_version(){
+    printf "%s\n" "$1"
+    return
+}
+
+# Section
+
 # Section: install, uninstall
 ___x_cmd_env_common_install(){
     local candidate="${1:?Provide canddidate}"
@@ -7,11 +16,11 @@ ___x_cmd_env_common_install(){
 
     local full_version
     if ! full_version=$(___x_cmd_env_run_common_if_notfound full_version "$candidate" "${version}"); then
-        env_log info "Version of $candidate not found: $version"
+        env_log error "Version of $candidate not found: $version"
         return 1
     fi
 
-    if ___x_cmd_env_common_util_is_version_installed "$candidate" "$full_version"; then
+    if ___x_cmd_env_util_is_version_installed "$candidate" "$full_version"; then
         :
         return 1
     fi
@@ -26,9 +35,8 @@ ___x_cmd_env_common_install(){
         return 1
     fi
 
-    # env_log info "Installed ${tarball_url} to ${version_path}"
-
     ___x_cmd_env_common_use "$candidate" "$full_version"
+    env_log info "Installed to "
 }
 
 ___x_cmd_env_common_uninstall(){
@@ -68,7 +76,7 @@ ___x_cmd_env_common_la(){
 ___x_cmd_env_common_use(){
     local candidate="${1:?Provide candidate}"
     local version="${2:?Provide version}"
-    ___x_cmd_env_common_pre_exec_check "${candidate}" "${version}" || return
+    # ___x_cmd_env_common_pre_exec_check "${candidate}" "${version}" || return
     env_log info "Setting ${candidate} ${version} as default."
 
     ___x_cmd_env_add_path "${___X_CMD_ENV_PATH}/$candidate/shims"
@@ -82,7 +90,7 @@ ___x_cmd_env_common_use(){
 ___x_cmd_env_common_try(){
     local candidate="${1:?Provide candidate}"
     local version="${2:?Provide python version}"
-    ___x_cmd_env_common_pre_exec_check "${candidate}" "${version}" || return
+    # ___x_cmd_env_common_pre_exec_check "${candidate}" "${version}" || return
     env_log info "Setting ${candidate} ${version} in current Shell."
 
     ___x_cmd_env_add_path "${___X_CMD_ENV_PATH}/$candidate/versions/$version/bin"
@@ -187,7 +195,7 @@ ___x_cmd_env_common_which(){
 ___x_cmd_env_common_exec(){
     local candidate="${1:?Provide candidate}"
     local version="${2:?Provide version}" ; shift 2
-    ___x_cmd_env_common_pre_exec_check "${candidate}" "${version}" || return
+    # ___x_cmd_env_common_pre_exec_check "${candidate}" "${version}" || return
     local PATH="${___X_CMD_ENV_PATH}/${candidate}/versions/${version}/bin:$PATH"
     "${candidate}" "$@"
 }

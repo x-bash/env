@@ -65,7 +65,7 @@ ___x_cmd_env_python_download()(
     local miniconda_filename
     local version="${1:?Provide python version}"
 
-    if ___x_cmd_env_common_util_is_archieve_cached python "$version"; then
+    if ___x_cmd_env_util_is_archieve_cached python "$version"; then
         env_log info "Archieve existed: $version"
         return 0
     fi
