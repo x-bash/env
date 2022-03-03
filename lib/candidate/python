@@ -2,13 +2,8 @@
 
 # Section: utils
 
-___x_cmd_env_python_get_miniconda_name_and_filename(){
-    local version="${1:?Provide python version}"
-
+___x_cmd_env_python_get_system_platform(){
     xrc os
-    local platform
-    local system
-
     case "$(___x_cmd_os name)" in
         linux)      system=Linux            ;;
         windows)    system=Windows          ;;
@@ -22,6 +17,14 @@ ___x_cmd_env_python_get_miniconda_name_and_filename(){
         arm64)      platform=arm64          ;;
         *)          return 1 ;;
     esac
+}
+
+___x_cmd_env_python_get_miniconda_name_and_filename(){
+    local version="${1:?Provide python version}"
+
+    local platform
+    local system
+    ___x_cmd_env_python_get_system_platform
 
     miniconda_name="Miniconda3-${version}-${system}-${platform}"
     if [ $system = "Windows" ] ; then
@@ -34,97 +37,74 @@ ___x_cmd_env_python_get_miniconda_name_and_filename(){
 # EndSection
 
 # Section: ls, la
-___x_cmd_env_python_ls(){
-    if [ -z "$remote" ] ; then
-		___x_cmd_env_common_ls python
-	else
-        xrc os
-        case "$(___x_cmd_os name)" in
-            linux)      system=Linux            ;;
-            windows)    system=Windows          ;;
-            darwin)     system=MacOSX           ;;
-            *)          return 1 ;;
-        esac
+___x_cmd_env_python_ls_remote(){
+    local pattern="${1:-""}"
+	local cache_expiration="${2:-1}"
+	local cache_path="$___X_CMD_ENV_PATH/python/cache/version_list"
 
-        case "$(___x_cmd_os arch)" in
-            aarch64)    platform=aarch64        ;;
-            x64)        platform=x86_64         ;;
-            arm64)      platform=arm64          ;;
-            *)          return 1 ;;
-        esac
+    local platform
+    local system
+    ___x_cmd_env_python_get_system_platform
 
-        local cache_path="$___X_CMD_ENV_PATH/python/cache"
-        if [ -f "$cache_path/version_list" ] && [ -n "$(find "$cache_path/version_list" -mtime -1)" ] ; then
-            cat "$cache_path/version_list"
-        else
-            mkdir -p "$cache_path"
-            curl --silent "https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/" | \
-                awk "$(cat <<A
-BEGIN{RS="<a href=";FS="\""}{
-    if (match(\$2, /^.*-$system-$platform.sh$/)) {
-        split(\$2, a, /-/)
-        print a[2]
-    }
-}
-A
-            )" | tee "$cache_path/version_list"
-	    fi
-    fi
-}
-
-___x_cmd_env_python_la(){
-    :
+    ___x_cmd_httpget "https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/" "$cache_path" "$cache_expiration" 2>/dev/null && \
+    awk -v platform="${platform}" -v arch="${system}" '
+        BEGIN{RS="<a href=";FS="\""}{
+            if (match($2, "^.*-" arch "-" platform ".sh$")) {
+                split($2, a, /-/)
+                print a[2]
+            }
+        }' <"$cache_path"
 }
 
 # EndSection
 
 # Section: download,install
 
-___x_cmd_env_python_download(){
-    (
-        local miniconda_name
-        local miniconda_filename
-        local version="${1:?Provide python version}"
-
-        ___x_cmd_env_common_pre_install_check python "$version" || return 1
-        ___x_cmd_env_python_get_miniconda_name_and_filename "$version"
-        local candidate_path="$___X_CMD_ENV_PATH/python/versions"
-        mkdir -p "${candidate_path}"
-        cd "${candidate_path}" || return 1
-        local url="https://repo.anaconda.com/miniconda"
-        if [ "${___X_CMD_IN_CHINA_NET:-0}" -eq 1 ]; then
-            url="https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda"
-        fi
-
-        env_log info "Downloading $url/$miniconda_filename"
-        if curl --fail --output "$miniconda_filename" "$url/$miniconda_filename"; then
-            env_log info "Install python $miniconda_name"
-            chmod +x "${miniconda_filename}" && \
-                "./${miniconda_filename}" -b -u -p "./${version}" 1>&2 && \
-                rm -rf "./${miniconda_filename}"
-            return
-        else
-            env_log error "Download failure from $url/${miniconda_filename}"
-            return 1
-        fi
-    )
-}
-
-
-# 1. If no special version and no local python, we will install a default version for you.
-# 2. It will download and use the python version.
-___x_cmd_env_python_install(){
+___x_cmd_env_python_download()(
+    local miniconda_name
+    local miniconda_filename
     local version="${1:?Provide python version}"
-    ___x_cmd_env_python_download "$version" || return
-    ___x_cmd_env_common_use python "$version"
+
+    if ___x_cmd_env_common_util_is_archieve_cached python "$version"; then
+        env_log info "Archieve existed: $version"
+        return 0
+    fi
+
+    ___x_cmd_env_python_get_miniconda_name_and_filename "$version"
+
+    local candidate_path="$___X_CMD_ENV_PATH/python/versions"
+    mkdir -p "${candidate_path}"
+    cd "${candidate_path}" || return 1
+    local url="https://repo.anaconda.com/miniconda"
+    if [ "${___X_CMD_IN_CHINA_NET:-0}" -eq 1 ]; then
+        url="https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda"
+    fi
+
+    env_log info "Downloading $url/$miniconda_filename"
+    if curl --fail --output "$miniconda_filename" "$url/$miniconda_filename"; then
+        env_log info "Install python $miniconda_name"
+        return
+    else
+        env_log error "Download failure from $url/${miniconda_filename}"
+        return 1
+    fi
+)
+
+___x_cmd_env_node_unpack(){
+    local version="${1:?Provide python version}"
+
+    local miniconda_name
+    local miniconda_filename
+    ___x_cmd_env_python_get_miniconda_name_and_filename "$version"
+
+    chmod +x "${miniconda_filename}" && \
+        "./${miniconda_filename}" -b -u -p "./${version}" 1>&2 && \
+        rm -rf "./${miniconda_filename}"
 }
+
 
 # EndSection
 
 ___x_cmd_env_python_ws(){
     :
-}
-
-___x_cmd_env_python_which(){
-    ___x_cmd_env_common_which python
 }

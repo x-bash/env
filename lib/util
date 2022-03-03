@@ -1,0 +1,35 @@
+# shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263    # xrc
+
+___x_cmd_env_util_is_version_installed(){
+    local candidate="${1:?Provide candidate}"
+    local version="${2:?Provide version}"
+    case $version in
+        default)
+            # TODO: Handle the python3 case.
+            if command -v "${candidate}" >/dev/null; then
+                env_log info "${candidate} is already installed in $(command -v "${candidate}")"
+                return 1
+            fi
+            ;;
+        *)
+            if [ ! -d "${candidate_path}" ]; then
+                env_log error "$candidate $version is not installed."
+                return 1
+            fi
+            ;;
+    esac
+}
+
+___x_cmd_env_util_is_archieve_cached(){
+    local candidate="${1:?Provide candidate}"
+    local version="${2:?Provide version}"
+
+    # Check the candidate version in general way.
+    local candidate_path="$___X_CMD_ENV_PATH/${candidate}/versions/${version}"
+    if [ -d "$candidate_path" ]; then
+        env_log info "$candidate $version is already installed in $candidate_path ."
+        return 0
+    fi
+
+    # env_log info "Installing $1 $2"
+}
