@@ -14,11 +14,12 @@ ___x_cmd_env_common_install(){
     local candidate="${1:?Provide canddidate}"
     local version="${2:?Provide version}"
 
-    local full_version
-    if ! full_version=$(___x_cmd_env_run_common_if_notfound full_version "$candidate" "${version}"); then
-        env_log error "Version of $candidate not found: $version"
-        return 1
-    fi
+    # TODO: full_version check
+    # local full_version
+    # if ! full_version=$(___x_cmd_env_run_common_if_notfound full_version "$candidate" "${version}"); then
+    #     env_log error "Version of $candidate not found: $version"
+    #     return 1
+    # fi
 
     # TODO: version needs to be changed to full_ version
     if ___x_cmd_env_util_is_version_installed "$candidate" "$version"; then
@@ -115,7 +116,7 @@ ___x_cmd_env_shim_dir(){
     rm -rf "${___X_CMD_ENV_PATH}/$candidate/shims"
     mkdir -p "${___X_CMD_ENV_PATH}/$candidate/shims"
 
-    for name in $versions_path/${version}/bin/* ; do
+    for name in "${versions_path}/${version}/bin/"* ; do
         printf "%s" "$(cat <<A
 #!/usr/bin/env sh
 set -e
