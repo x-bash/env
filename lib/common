@@ -3,10 +3,10 @@
 # Section: install, uninstall
 ___x_cmd_env_common_install(){
     local candidate="${1:?Provide canddidate}"
-    local version="${1:?Provide version}"
+    local version="${2:?Provide version}"
 
     local full_version
-    if ! full_version=$(___x_cmd_env_run_common_ifnotfound "$candidate" full_version "${version}"); then
+    if ! full_version=$(___x_cmd_env_run_common_if_notfound full_version "$candidate" "${version}"); then
         env_log info "Version of $candidate not found: $version"
         return 1
     fi
@@ -16,12 +16,12 @@ ___x_cmd_env_common_install(){
         return 1
     fi
 
-    if ! ___x_cmd_env_run_common_ifnotfound "$candidate" download "$full_version"; then
+    if ! ___x_cmd_env_run_common_if_notfound download "$candidate" "$full_version"; then
         env_log info "Fail to install $candidate of version: $full_version."
         return 1
     fi
 
-    if ! ___x_cmd_env_run_common_ifnotfound "$candidate" unpack "$full_version"; then
+    if ! ___x_cmd_env_run_common_if_notfound unpack "$candidate" "$full_version"; then
         env_log info "Fail to unpack $candidate of version: $full_version."
         return 1
     fi

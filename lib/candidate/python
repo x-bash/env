@@ -58,7 +58,7 @@ ___x_cmd_env_python_ls_remote(){
 
 # EndSection
 
-# Section: download,install
+# Section: download
 
 ___x_cmd_env_python_download()(
     local miniconda_name
@@ -90,7 +90,7 @@ ___x_cmd_env_python_download()(
     fi
 )
 
-___x_cmd_env_node_unpack(){
+___x_cmd_env_python_unpack(){
     local version="${1:?Provide python version}"
 
     local miniconda_name
