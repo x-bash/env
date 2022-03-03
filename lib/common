@@ -68,7 +68,7 @@ ___x_cmd_env_common_la(){
 ___x_cmd_env_common_use(){
     local candidate="${1:?Provide candidate}"
     local version="${2:?Provide version}"
-    ___x_cmd_env_common_pre_exec_check "${candidate}" "${version}" || return
+    ___x_cmd_env_util_is_version_installed "${candidate}" "${version}" || return
     env_log info "Setting ${candidate} ${version} as default."
 
     ___x_cmd_env_add_path "${___X_CMD_ENV_PATH}/$candidate/shims"
@@ -82,7 +82,7 @@ ___x_cmd_env_common_use(){
 ___x_cmd_env_common_try(){
     local candidate="${1:?Provide candidate}"
     local version="${2:?Provide python version}"
-    ___x_cmd_env_common_pre_exec_check "${candidate}" "${version}" || return
+    ___x_cmd_env_util_is_version_installed "${candidate}" "${version}" || return
     env_log info "Setting ${candidate} ${version} in current Shell."
 
     ___x_cmd_env_add_path "${___X_CMD_ENV_PATH}/$candidate/versions/$version/bin"
@@ -187,7 +187,7 @@ ___x_cmd_env_common_which(){
 ___x_cmd_env_common_exec(){
     local candidate="${1:?Provide candidate}"
     local version="${2:?Provide version}" ; shift 2
-    ___x_cmd_env_common_pre_exec_check "${candidate}" "${version}" || return
+    ___x_cmd_env_util_is_version_installed "${candidate}" "${version}" || return
     local PATH="${___X_CMD_ENV_PATH}/${candidate}/versions/${version}/bin:$PATH"
     "${candidate}" "$@"
 }
