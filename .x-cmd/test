@@ -113,6 +113,6 @@ case $1 in
         done
         ;;
     *)
-        echo "Usage: x test python|node|java|deno"
+        echo "Usage: x test python|node|java|deno|perl"
         ;;
 esac

@@ -65,10 +65,12 @@ ___x_cmd_env_python_download()(
     local miniconda_filename
     local version="${1:?Provide python version}"
 
-    if ___x_cmd_env_util_is_archieve_cached python "$version"; then
-        env_log info "Archieve existed: $version"
-        return 0
-    fi
+    # TODO: Check if it is installed
+    # TODO: Check if the installation package exists
+    # if ! ___x_cmd_env_util_is_archieve_cached python "$version"; then
+    #     env_log info "Archieve existed: $version"
+    #     return 0
+    # fi
 
     ___x_cmd_env_python_get_miniconda_name_and_filename "$version"
 
@@ -93,13 +95,12 @@ ___x_cmd_env_python_download()(
 ___x_cmd_env_python_unpack(){
     local version="${1:?Provide python version}"
 
-    local miniconda_name
-    local miniconda_filename
-    ___x_cmd_env_python_get_miniconda_name_and_filename "$version"
+    # local miniconda_filename
+    # ___x_cmd_env_python_get_miniconda_name_and_filename "$version"
 
     chmod +x "${miniconda_filename}" && \
-        "./${miniconda_filename}" -b -u -p "./${version}" 1>&2 && \
-        rm -rf "./${miniconda_filename}"
+    "./${miniconda_filename}" -b -u -p "./${version}" 1>&2 && \
+    rm -rf "./${miniconda_filename}"
 }
 
 
