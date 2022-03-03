@@ -436,6 +436,7 @@ node
 go
 java
 deno
+perl
 kotlin
 "
 
