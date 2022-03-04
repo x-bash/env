@@ -38,15 +38,13 @@ ___x_cmd_env_python_get_miniconda_name_and_filename(){
 
 # Section: ls, la
 ___x_cmd_env_python_ls_remote(){
-    local pattern="${1:-""}"
-	local cache_expiration="${2:-1}"
 	local cache_path="$___X_CMD_ENV_PATH/python/cache/version_list"
 
     local platform
     local system
     ___x_cmd_env_python_get_system_platform
 
-    ___x_cmd_httpget "https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/" "$cache_path" "$cache_expiration" 2>/dev/null && \
+    ___x_cmd_httpget "https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/" "$cache_path" 2>/dev/null && \
     awk -v platform="${platform}" -v arch="${system}" '
         BEGIN{RS="<a href=";FS="\""}{
             if (match($2, "^.*-" arch "-" platform ".sh$")) {
