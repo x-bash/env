@@ -5,6 +5,7 @@ ___X_CMD_XRC_MODULE_IMPORTED=
 advise rm ___x_cmd_env_main
 xrc env
 x log init env
+x log env
 
 case $1 in
     python)
