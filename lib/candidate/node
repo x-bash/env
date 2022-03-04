@@ -59,7 +59,7 @@ ___x_cmd_env_node_download(){
         read -r platform
         read -r arch
     } <<A
-$(x os name; printf "\n"; x os arch)
+$(x os name; x os arch)
 A
 
     local slug="node-${full_version}-${platform}-${arch}"
