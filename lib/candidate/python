@@ -83,7 +83,7 @@ ___x_cmd_env_python_download()(
     env_log info "Downloading $url/$miniconda_filename"
     if curl --fail --output "$miniconda_filename" "$url/$miniconda_filename"; then
         env_log info "Install python $miniconda_name"
-        # return
+        return
     else
         env_log error "Download failure from $url/${miniconda_filename}"
         return 1
@@ -96,9 +96,12 @@ ___x_cmd_env_python_unpack(){
     local miniconda_filename
     ___x_cmd_env_python_get_miniconda_name_and_filename "$version"
 
-    chmod +x "${miniconda_filename}" && \
-    "./${miniconda_filename}" -b -u -p "./${version}" 1>&2 && \
-    rm -rf "./${miniconda_filename}"
+    (
+        cd "$___X_CMD_ENV_PATH/python/versions" || return 1
+        chmod +x "${miniconda_filename}" && \
+        "./${miniconda_filename}" -b -u -p "./${version}" 1>&2 && \
+        rm -rf "./${miniconda_filename}"
+    )
 }
 
 
