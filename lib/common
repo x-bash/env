@@ -148,48 +148,56 @@ A
 # Section: current
 
 # There are four cases in current:
-# 1. after try,
-# 2. no try, just use(shims)
-# 3. x env no any candidate version
-# 4. no any local candidate version
+#   1. After try.
+#   2. Use(shims).
+#   3. No candidate version in xenv, but has candidate version in current shell.
+#   4. No any candidate version.
 ___x_cmd_env_common_current(){
     local candidate="${1:?Provide candidate}"
-    local current_path
-    current_path="$(command -v $candidate)"
-    if [ "$current_path" != "$___X_CMD_ENV_PATH/$candidate/shims/$candidate" ]; then
-        local try_path
-        try_path="${current_path#*"versions/"}"
+    local candidate_path
+    candidate_path="$(command -v "$candidate")"
+    if [ "$candidate_path" != "$___X_CMD_ENV_PATH/$candidate/shims/$candidate" ]; then
+        local try_path="${candidate_path#*"versions/"}"
         try_path="${try_path%%/*}"
-        printf "%s\n" "$try_path"
-        return
+
+        if [ -n "$try_path" ]; then
+            printf "%s\n" "$try_path"
+
+        else
+            printf "%s\n" "system"
+        fi
+        return 0
     fi
 
     local version_path=".x-cmd/.env/$candidate/version"
+    local cur
     cur=$(pwd)
     while [ ! "$cur" = "" ]; do
         if [ -f "$cur/$version_path" ]; then
             local vertify_list
             vertify_list="$(___x_cmd_env_common_ls_local "$candidate")"
-            local current_version
-            current_version="$(cat "$cur/$version_path")"
-            if [ "$vertify_list" = "${vertify_list#*"$current_version"}" ]; then
+            local version
+            version="$(cat "$cur/$version_path")"
+            if [ "$vertify_list" = "${vertify_list#*"$version"}" ]; then
                 env_log error "There is currently no version in use, please use a version first!"
                 return 1
             fi
-            printf "%s\n" "$current_version"
+            printf "%s\n" "$version"
             return 0
         fi
         cur=${cur%/*}
     done
+
+    # FIXME: If there is no in home directory, that you will get an error.
 }
 # EndSection
 
 # Section: which
 ___x_cmd_env_common_which(){
     local candidate="${1:?Provide candidate}"
-    local current_path
-    current_path="$(command -v "$candidate")"
-    if [ "$current_path" = "$___X_CMD_ENV_PATH/$candidate/shims/$candidate" ]; then
+    local candidate_path
+    candidate_path="$(command -v "$candidate")"
+    if [ "$candidate_path" = "$___X_CMD_ENV_PATH/$candidate/shims/$candidate" ]; then
         cur=$(pwd)
         while [ ! "$cur" = "" ]; do
             if [ -f "$cur/.x-cmd/.env/$candidate/version" ]; then
