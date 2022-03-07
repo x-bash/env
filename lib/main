@@ -54,7 +54,7 @@ ___x_cmd_env_run_common_if_notfound(){
     if command -v "$cmd" >/dev/null; then
         "$cmd" "$@"
     else
-        # env_log warn "Candidate ${candidate} has no op: $op, use common $op function."
+        env_log debug "Candidate ${candidate} has no op: $op, use common $op function."
         "___x_cmd_env_common_${op}" "$candidate" "$@"
     fi
 }

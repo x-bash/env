@@ -35,7 +35,6 @@ ___x_cmd_env_util_is_archieve_cached(){
     local candidate="${1:?Provide candidate}"
     local version="${2:?Provide version}"
 
-    # Check the candidate version in general way.
     local candidate_path="$___X_CMD_ENV_PATH/${candidate}/versions/${version}"
     if [ -d "$candidate_path" ]; then
         env_log info "$candidate $version is already installed in $candidate_path ."

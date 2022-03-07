@@ -7,7 +7,7 @@ ___x_cmd_env_common_full_version(){
     return
 }
 
-# Section
+# EndSection
 
 # Section: install, uninstall
 ___x_cmd_env_common_install(){
@@ -94,7 +94,7 @@ ___x_cmd_env_common_use(){
     ___x_cmd_env_add_path "${___X_CMD_ENV_PATH}/$candidate/shims"
     x boot rc add "x-env-$candidate" "xrc env/latest && ___x_cmd_env_add_path \"${___X_CMD_ENV_PATH}/$candidate/shims\""
 
-    printf "%s" "$version" > "$___X_CMD_ENV_PATH/$candidate/version"
+    printf "%s\n" "$version" > "$___X_CMD_ENV_PATH/$candidate/version"
     env_log info "Using $candidate $version . -> $___X_CMD_ENV_PATH/$candidate/version"
     ___x_cmd_env_shim_dir "$candidate" "${version}"
 }
@@ -117,7 +117,7 @@ ___x_cmd_env_shim_dir(){
     mkdir -p "${___X_CMD_ENV_PATH}/$candidate/shims"
 
     for name in "${versions_path}/${version}/bin/"* ; do
-        printf "%s" "$(cat <<A
+        printf "%s\n" "$(cat <<A
 #!/usr/bin/env sh
 set -e
 
@@ -160,7 +160,7 @@ ___x_cmd_env_common_current(){
         local try_path
         try_path="${current_path#*"versions/"}"
         try_path="${try_path%%/*}"
-        printf "%s" "$try_path"
+        printf "%s\n" "$try_path"
         return
     fi
 
@@ -176,7 +176,7 @@ ___x_cmd_env_common_current(){
                 env_log error "There is currently no version in use, please use a version first!"
                 return 1
             fi
-            printf "%s" "$current_version"
+            printf "%s\n" "$current_version"
             return 0
         fi
         cur=${cur%/*}
@@ -194,7 +194,7 @@ ___x_cmd_env_common_which(){
         while [ ! "$cur" = "" ]; do
             if [ -f "$cur/.x-cmd/.env/$candidate/version" ]; then
                 version=$(cat "$cur/.x-cmd/.env/$candidate/version")
-                printf "%s" "$___X_CMD_ENV_PATH/$candidate/versions/$version/bin/node"
+                printf "%s\n" "$___X_CMD_ENV_PATH/$candidate/versions/$version/bin/node"
                 return 0
             fi
             cur=${cur%/*}
