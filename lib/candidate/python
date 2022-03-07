@@ -103,7 +103,6 @@ ___x_cmd_env_python_unpack(){
         chmod +x "${miniconda_filename}" && \
         "./${miniconda_filename}" -b -u -p "${candidate_path}/${version}" 1>&2
     )
-
 }
 
 
