@@ -105,13 +105,26 @@ case $1 in
         env_log info "Testing perl download."
         x env download deno latest
         ;;
+    kotlin)
+        env_log info "Testing perl ls."
+        x env ls perl
+        env_log info "Testing perl ls -r."
+        x env ls -r perl
+        env_log info "Testing perl la."
+        x env la perl
+        env_log info "Testing perl current."
+        x env current perl
+        echo ""
+        env_log info "Testing perl download."
+        x env download deno latest
+        ;;
     all)
 
-        for cmd in python node java deno perl; do
+        for cmd in python node java deno perl kotlin; do
             x test "$cmd"
         done
         ;;
     *)
-        echo "Usage: x test python|node|java|deno|perl"
+        echo "Usage: x test python|node|java|deno|perl|kotlin"
         ;;
 esac
