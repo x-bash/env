@@ -25,11 +25,6 @@ ___x_cmd_env_deno_get_target(){
 # EndSection
 
 # Section: ls, la
-___x_cmd_env_deno_ls(){
-
-}
-
-
 ___x_cmd_env_deno_la(){
     :
 }
@@ -65,20 +60,6 @@ ___x_cmd_env_deno_download(){
         env_log error "Download failure from $url"
         return 1
     fi
-}
-
-___x_cmd_env_deno_install(){
-    local version="${1:?Provide deno version}"
-    ___x_cmd_env_deno_download "$version" || return
-    ___x_cmd_env_common_use deno "$version"
-}
-
-___x_cmd_env_deno_uninstall(){
-    :
-}
-
-___x_cmd_env_deno_try(){
-    :
 }
 
 ___x_cmd_env_deno_use(){
