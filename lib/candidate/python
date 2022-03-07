@@ -72,7 +72,7 @@ ___x_cmd_env_python_download()(
 
     ___x_cmd_env_python_get_miniconda_name_and_filename "$version"
 
-    local candidate_path="$___X_CMD_ENV_PATH/python/versions"
+    local candidate_path="$___X_CMD_ENV_PATH/python/archives"
     mkdir -p "${candidate_path}"
     cd "${candidate_path}" || return 1
     local url="https://repo.anaconda.com/miniconda"
@@ -82,7 +82,7 @@ ___x_cmd_env_python_download()(
 
     env_log info "Downloading $url/$miniconda_filename"
     if curl --fail --output "$miniconda_filename" "$url/$miniconda_filename"; then
-        env_log info "Install python $miniconda_name"
+        env_log info "Download completed python $miniconda_name"
         return
     else
         env_log error "Download failure from $url/${miniconda_filename}"
@@ -92,15 +92,16 @@ ___x_cmd_env_python_download()(
 
 ___x_cmd_env_python_unpack(){
     local version="${1:?Provide python version}"
-
     local miniconda_filename
     ___x_cmd_env_python_get_miniconda_name_and_filename "$version"
 
+    env_log info "Unpacking $miniconda_filename"
     (
-        cd "$___X_CMD_ENV_PATH/python/versions" || return 1
+        local candidate_path="$___X_CMD_ENV_PATH/python/versions"
+        mkdir -p "${candidate_path}"
+        cd "$___X_CMD_ENV_PATH/python/archives" || return 1
         chmod +x "${miniconda_filename}" && \
-        "./${miniconda_filename}" -b -u -p "./${version}" 1>&2 && \
-        rm -rf "./${miniconda_filename}"
+        "./${miniconda_filename}" -b -u -p "${candidate_path}/${version}" 1>&2
     )
 }
 

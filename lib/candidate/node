@@ -35,7 +35,7 @@ ___x_cmd_env_node_ls_remote(){
 
 ___x_cmd_env_node_download(){
     local version="${1:?Provide node version}"
-    if ! full_version=$(___x_cmd_env_node_full_version "${version}"); then
+    if ! full_version=$(___x_cmd_env_node_full_version "${version}" -); then
         env_log error "Version '${version}' not found: $full_version. "
         return 1
     fi
