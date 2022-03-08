@@ -6,7 +6,7 @@ ___x_cmd_env_util_add_path(){
     local path_target="$dir"
 
     if [ ! -d "$dir" ] ; then
-        env_log error "Directory not found: $dir"
+        env_log error "util_add_path: Directory not found: $dir"
         return 1
     fi
 
@@ -62,4 +62,39 @@ ___x_cmd_env_util_is_archieve_cached(){
         return 0
     fi
 
+}
+
+___x_cmd_env_util_make_shim_dir(){
+    local candidate="${1:?Provide candidate}"
+    local version="${2:?Provide version}"
+    local version_path=".x-cmd/.env/$candidate/version"
+    local versions_path="$___X_CMD_ENV_PATH/$candidate/versions"
+    rm -rf "${___X_CMD_ENV_PATH}/$candidate/shims"
+    mkdir -p "${___X_CMD_ENV_PATH}/$candidate/shims"
+
+    for name in "${versions_path}/${version}/bin/"* ; do
+        printf "%s\n" "$(cat <<A
+#!/usr/bin/env sh
+set -e
+
+cur=\$(pwd)
+while [ ! "\$cur" = "" ]; do
+    if [ -f "\$cur/$version_path" ]; then
+        version=\$(cat "\$cur/$version_path")
+        exec $versions_path/\$version/bin/${name##*/} "\$@"
+        return 0
+    fi
+    cur=\${cur%/*}
+done
+
+if [ -f $___X_CMD_ENV_PATH/$candidate/version ]; then
+    version=\$(cat $___X_CMD_ENV_PATH/$candidate/version)
+    exec $versions_path/\$version/bin/${name##*/} "\$@"
+    return 0
+fi
+## TODO: no found
+A
+)">"$___X_CMD_ENV_PATH/$candidate/shims/${name##*/}"
+        chmod +x "$___X_CMD_ENV_PATH/$candidate/shims/${name##*/}"
+    done
 }
