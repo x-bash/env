@@ -48,7 +48,7 @@ ___x_cmd_env_common_use(){
 ___x_cmd_env_common_try(){
     local candidate="${1:?Provide candidate}"
     local version="${2:?Provide version}"
-    local versions_path="${3:-"$___X_CMD_ENV_PATH/$candidate/versions/$version"}"
+    local versions_path="${3:-"$___X_CMD_ENV_PATH/$candidate/versions/$version/bin"}"
 
     # TODO: Check if it is installed
     # ___x_cmd_env_util_is_version_installed "${candidate}" "${version}" || return
