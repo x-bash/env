@@ -70,10 +70,6 @@ ___x_cmd_env_deno_ws(){
     :
 }
 
-___x_cmd_env_deno_current(){
-    :
-}
-
 ___x_cmd_env_deno_which(){
     :
 }
