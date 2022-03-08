@@ -33,7 +33,7 @@ ___x_cmd_env_common_use(){
     #     return 1
     # fi
 
-    ___x_cmd_env_util_make_shim_dir "$candidate" "${version}"
+    ___x_cmd_env_util_make_shim_dir "$candidate" "${version}" || return 1
     ___x_cmd_env_util_add_path "${___X_CMD_ENV_PATH}/$candidate/shims" || return 1
 
     x boot rc add "x-env-$candidate" "xrc env/lib/util && ___x_cmd_env_util_add_path \"${___X_CMD_ENV_PATH}/$candidate/shims\"" && \

@@ -69,6 +69,12 @@ ___x_cmd_env_util_make_shim_dir(){
     local version="${2:?Provide version}"
     local version_path=".x-cmd/.env/$candidate/version"
     local versions_path="$___X_CMD_ENV_PATH/$candidate/versions"
+
+    if [ ! -d "$versions_path/$version" ]; then
+        env_log error "Versions path not found: $versions_path/$version"
+        return 1
+    fi
+
     rm -rf "${___X_CMD_ENV_PATH}/$candidate/shims"
     mkdir -p "${___X_CMD_ENV_PATH}/$candidate/shims"
 
