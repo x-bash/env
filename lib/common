@@ -162,10 +162,8 @@ ___x_cmd_env_common_current(){
     elif [ "$candidate_path" != "$___X_CMD_ENV_PATH/$candidate/shims/$candidate" ]; then
         local try_path="${candidate_path#*"versions/"}"
         try_path="${try_path%%/*}"
-
-        if [ -n "$try_path" ]; then
-            printf "%s\n" "$try_path"
-
+        if [ "$try_path" != "$candidate" ] && [ -n "$try_path" ]; then
+            printf "%s\n" "$try_path"   # try
         else
             printf "%s\n" "system"
         fi
@@ -192,6 +190,11 @@ ___x_cmd_env_common_current(){
     done
 
     # FIXME: If there is no in home directory, that you will get an error.
+    if [ -f "$___X_CMD_ENV_PATH/$candidate/version" ]; then
+        version=$(cat "$___X_CMD_ENV_PATH/$candidate"/version)
+        printf "%s\n" "$version"
+        return 0
+    fi
 }
 # EndSection
 
