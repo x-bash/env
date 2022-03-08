@@ -14,7 +14,7 @@ ___x_cmd_env_node_sort_versions(){
 
 # EndSection
 
-# Section: full_version, ls_remote
+# Section: full_version, ls_local, ls_remote
 ___x_cmd_env_node_full_version(){
     ___x_cmd_env_node_ls_remote "${1:?Provide node version pattern}" "$2" | awk 'END{ if (NR<=0) { exit(1) } else print $1;}'
 }
@@ -48,6 +48,17 @@ ___x_cmd_env_node_ls_remote(){
             prev_codename=codename
         }' <"$cache_path" | ___x_cmd_env_node_sort_versions
 }
+# EndSection
+
+# Section: try
+___x_cmd_env_node_try(){
+    ___x_cmd_env_common_try node
+}
+
+# EndSection
+
+# Section: use
+
 # EndSection
 
 # Section: download
