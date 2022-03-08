@@ -2,8 +2,7 @@
 
 # Section: sdkman
 
-___X_CMD_ENV_JAVA_PLATFORM_TMP="$(xrc os && ___x_cmd_os name && ___x_cmd_os arch)"
-___X_CMD_ENV_JAVA_PLATFORM="$(printf "%s" "${___X_CMD_ENV_JAVA_PLATFORM_TMP}" | tr '[:lower:]' '[:upper:]')"
+___X_CMD_ENV_JAVA_PLATFORM="$(xrc os && printf "%s%s" "$(___x_cmd_os name)" "$(___x_cmd_os arch)" | tr '[:lower:]' '[:upper:]' )"
 
 __sdkman_echo_debug() {
 	env_log debug "$1"
