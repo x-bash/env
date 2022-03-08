@@ -2,7 +2,7 @@
 
 
 
-___x_cmd_env_add_path(){
+___x_cmd_env_util_add_path(){
     local dir="$1"
     local path_tmp="$PATH:"
     local path_target="$dir"

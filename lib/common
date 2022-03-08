@@ -1,67 +1,12 @@
 # shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263    # xrc
 
-# Section: full_version
+# Section: full_version ls_local ls_remote
 
 ___x_cmd_env_common_full_version(){
-    printf "%s\n" "$1"
+    printf "%s\n" "$2"
     return
 }
 
-# EndSection
-
-# Section: install, uninstall
-___x_cmd_env_common_install(){
-    local candidate="${1:?Provide canddidate}"
-    local version="${2:?Provide version}"
-
-    # TODO: full_version check
-    # local full_version
-    # if ! full_version=$(___x_cmd_env_run_common_if_notfound full_version "$candidate" "${version}"); then
-    #     env_log error "Version of $candidate not found: $version"
-    #     return 1
-    # fi
-
-    # TODO: version needs to be changed to full_ version
-    if ___x_cmd_env_util_is_version_installed "$candidate" "$version"; then
-        env_log error "Version of $candidate $version already installed"
-        return 1
-    fi
-
-    # TODO: version needs to be changed to full_ version
-    if ! ___x_cmd_env_run_common_if_notfound download "$candidate" "$version"; then
-        env_log info "Fail to install $candidate of version: $version."
-        return 1
-    fi
-
-    # TODO: version needs to be changed to full_ version
-    if ! ___x_cmd_env_run_common_if_notfound unpack "$candidate" "$version"; then
-        env_log info "Fail to unpack $candidate of version: $version."
-        return 1
-    fi
-
-    # TODO: version needs to be changed to full_ version
-    ___x_cmd_env_common_use "$candidate" "$version"
-    env_log info "Successfully installed $candidate $version"
-}
-
-___x_cmd_env_common_uninstall(){
-    local candidate="${1:?Provide candidate}"
-    local version="${2:?Provide the version}"
-    env_log info "Uninstalling $1 $2"
-
-    local candidate_path="$___X_CMD_ENV_PATH/${candidate}/versions/${version}"
-    if [ -d "$candidate_path" ]; then
-        rm -rf "${candidate_path}"
-    else
-        env_log  warn "This ${candidate} ${version} is no exist."
-        return 1
-    fi
-    x boot rc del "x-env-$candidate"
-    # TODO: remove the shims from $PATH
-}
-# EndSection
-
-# Section: ls lsremote
 ___x_cmd_env_common_ls_local(){
     local candidate="${1:?Provide candidate}"
 	if [ -d "$___X_CMD_ENV_PATH/$candidate/versions" ]; then
@@ -89,23 +34,29 @@ ___x_cmd_env_common_use(){
     #     return 1
     # fi
 
-    env_log info "Setting ${candidate} ${version} as default."
-
-    ___x_cmd_env_add_path "${___X_CMD_ENV_PATH}/$candidate/shims"
-    x boot rc add "x-env-$candidate" "xrc env/latest && ___x_cmd_env_add_path \"${___X_CMD_ENV_PATH}/$candidate/shims\""
-
-    printf "%s\n" "$version" > "$___X_CMD_ENV_PATH/$candidate/version"
-    env_log info "Using $candidate $version . -> $___X_CMD_ENV_PATH/$candidate/version"
     ___x_cmd_env_shim_dir "$candidate" "${version}"
+    if ! ___x_cmd_env_util_add_path "${___X_CMD_ENV_PATH}/$candidate/shims" ; then
+        env_log error "Failed to add ${candidate} ${version} to $PATH"
+        return 1
+    fi
+
+    x boot rc add "x-env-$candidate" "xrc env/lib/util && ___x_cmd_env_util_add_path \"${___X_CMD_ENV_PATH}/$candidate/shims\"" && \
+        printf "%s\n" "$version" > "$___X_CMD_ENV_PATH/$candidate/version" && \
+        env_log info "Using $candidate $version . -> $___X_CMD_ENV_PATH/$candidate/version"
 }
 
 ___x_cmd_env_common_try(){
     local candidate="${1:?Provide candidate}"
-    local version="${2:?Provide python version}"
-    ___x_cmd_env_util_is_version_installed "${candidate}" "${version}" || return
-    env_log info "Setting ${candidate} ${version} in current Shell."
+    local version="${2:?Provide version}"
+    local versions_path="${3:-"$___X_CMD_ENV_PATH/$candidate/versions/$version/bin"}"
 
-    ___x_cmd_env_add_path "${___X_CMD_ENV_PATH}/$candidate/versions/$version/bin"
+    # TODO: Check if it is installed
+    # ___x_cmd_env_util_is_version_installed "${candidate}" "${version}" || return
+
+    env_log info "Setting ${candidate} ${version} in current Shell."
+    if ! ___x_cmd_env_util_add_path "$versions_path" ; then
+        env_log error "Failed to try ${candidate} ${version} in $versions_path"
+    fi
 }
 
 ___x_cmd_env_shim_dir(){
@@ -156,13 +107,13 @@ ___x_cmd_env_common_current(){
     local candidate="${1:?Provide candidate}"
     local candidate_path
     candidate_path="$(command -v "$candidate")"
-    if [ "$candidate_path" != "$___X_CMD_ENV_PATH/$candidate/shims/$candidate" ]; then
+    if [ -z "$candidate_path" ]; then
+        printf "No version of %s is detected, please install it first!\n" "$candidate"
+    elif [ "$candidate_path" != "$___X_CMD_ENV_PATH/$candidate/shims/$candidate" ]; then
         local try_path="${candidate_path#*"versions/"}"
         try_path="${try_path%%/*}"
-
-        if [ -n "$try_path" ]; then
-            printf "%s\n" "$try_path"
-
+        if [ "$try_path" != "$candidate" ] && [ -n "$try_path" ]; then
+            printf "%s\n" "$try_path"   # try
         else
             printf "%s\n" "system"
         fi
@@ -189,6 +140,60 @@ ___x_cmd_env_common_current(){
     done
 
     # FIXME: If there is no in home directory, that you will get an error.
+    if [ -f "$___X_CMD_ENV_PATH/$candidate/version" ]; then
+        version=$(cat "$___X_CMD_ENV_PATH/$candidate"/version)
+        printf "%s\n" "$version"
+        return 0
+    fi
+}
+# EndSection
+
+# Section: install, uninstall
+___x_cmd_env_common_install(){
+    local candidate="${1:?Provide canddidate}"
+    local version="${2:?Provide version}"
+
+    local full_version
+    if ! full_version=$(___x_cmd_env_run_common_if_notfound full_version "$candidate" "${version}"); then
+        env_log error "Version of $candidate not found: $version"
+        return 1
+    fi
+    unset version
+
+    env_log info "Installing $candidate $full_version"
+    if ___x_cmd_env_util_is_version_installed "$candidate" "$full_version"; then
+        env_log error "Version of $candidate $version already installed"
+        return 1
+    fi
+
+    if ! ___x_cmd_env_run_common_if_notfound download "$candidate" "$full_version"; then
+        env_log info "Fail to download $candidate of version: $full_version."
+        return 1
+    fi
+
+    if ! ___x_cmd_env_run_common_if_notfound unpack "$candidate" "$full_version"; then
+        env_log info "Fail to unpack $candidate of version: $full_version."
+        return 1
+    fi
+
+    ___x_cmd_env_common_use "$candidate" "$full_version"
+    env_log info "Successfully installed $candidate $full_version"
+}
+
+___x_cmd_env_common_uninstall(){
+    local candidate="${1:?Provide candidate}"
+    local version="${2:?Provide the version}"
+    env_log info "Uninstalling $1 $2"
+
+    local candidate_path="$___X_CMD_ENV_PATH/${candidate}/versions/${version}"
+    if [ -d "$candidate_path" ]; then
+        rm -rf "${candidate_path}"
+    else
+        env_log  warn "This ${candidate} ${version} is no exist."
+        return 1
+    fi
+    x boot rc del "x-env-$candidate"
+    # TODO: remove the shims from $PATH
 }
 # EndSection
 
