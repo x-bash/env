@@ -95,17 +95,18 @@ A
 
     local slug="node-${full_version}-${platform}-${arch}"
     local compression='tar.gz'; [ "${platform}" = 'win' ] && compression='zip' # TODO: tar.xz support
-    local archieve_dir="$___X_CMD_ENV_PATH/node/cache/bin/${slug}"
-    archieve_dir_files="${archieve_dir}/files"
-    mkdir -p "${archieve_dir_files}"
+    local candidate_path="$___X_CMD_ENV_PATH/node/archives"
+    archieve_dir_files="${candidate_path}/files"
+    mkdir -p "$archieve_dir_files"
 
-    tarball="${archieve_dir}/${slug}.${compression}"
+    tarball="$candidate_path/node-${full_version}.${compression}"
 
     # TODO: node <= 0.1.13 does not have a directory
     local tarball_url="${___X_CMD_ENV_NODE_MIRROR}/${full_version}/${slug}.${compression}"
 
     if ! curl -L -C - --progress-bar "${tarball_url}" -o "${tarball}"; then
-        rm -rf "${tarball}" "${archieve_dir}"
+        rm -rf "${tarball}" "${candidate_path}"
+        # TODO: Prompt message to modify
         env_log error "Binary download from ${tarball_url} failed, trying source."
         return 1
     fi
