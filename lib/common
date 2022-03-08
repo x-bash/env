@@ -107,22 +107,25 @@ ___x_cmd_env_common_current(){
     local candidate="${1:?Provide candidate}"
     local candidate_path
     candidate_path="$(command -v "$candidate")"
+    local version_path=".x-cmd/.env/$candidate/version"
+    local cur
+    cur=$(pwd)
+
+    # After try and no any candidate version and has candidate version in current shell
     if [ -z "$candidate_path" ]; then
         printf "No version of %s is detected, please install it first!\n" "$candidate"
     elif [ "$candidate_path" != "$___X_CMD_ENV_PATH/$candidate/shims/$candidate" ]; then
         local try_path="${candidate_path#*"versions/"}"
         try_path="${try_path%%/*}"
         if [ "$try_path" != "$candidate" ] && [ -n "$try_path" ]; then
-            printf "%s\n" "$try_path"   # try
+            printf "%s\n" "$try_path"
         else
             printf "%s\n" "system"
         fi
         return 0
     fi
 
-    local version_path=".x-cmd/.env/$candidate/version"
-    local cur
-    cur=$(pwd)
+    # Use(shims)
     while [ ! "$cur" = "" ]; do
         if [ -f "$cur/$version_path" ]; then
             local vertify_list
@@ -139,7 +142,7 @@ ___x_cmd_env_common_current(){
         cur=${cur%/*}
     done
 
-    # FIXME: If there is no in home directory, that you will get an error.
+    # If there is no in home directory, that you will get an error.
     if [ -f "$___X_CMD_ENV_PATH/$candidate/version" ]; then
         version=$(cat "$___X_CMD_ENV_PATH/$candidate"/version)
         printf "%s\n" "$version"
