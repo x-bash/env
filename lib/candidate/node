@@ -1,14 +1,33 @@
 # shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263    # xrc
 
-# Section: mirror
+# Section: ENV mirror
 
 ___X_CMD_ENV_NODE_MIRROR="https://nodejs.org/dist"
+
+# EndSection
+
+# Section: sort_versions
+
+___x_cmd_env_node_sort_versions(){
+    sort -t. -u -k 1.2,1n -k 2,2n -k 3,3n
+}
 
 # EndSection
 
 # Section: full_version, ls_remote
 ___x_cmd_env_node_full_version(){
     ___x_cmd_env_node_ls_remote "${1:?Provide node version pattern}" "$2" | awk 'END{ if (NR<=0) { exit(1) } else print $1;}'
+}
+
+___x_cmd_env_node_ls_local(){
+    {
+        ___x_cmd_env_common_ls_local node
+        # Compatible node version in nvm.
+        if [ -n "$NVM_DIR" ] && [ -d "$NVM_DIR"/versions/node ] ; then
+            ls "$NVM_DIR"/versions/node
+        fi
+    # TODO: Do all environments have sort and uniq?
+    } | ___x_cmd_env_node_sort_versions | uniq
 }
 
 ___x_cmd_env_node_ls_remote(){
@@ -27,7 +46,7 @@ ___x_cmd_env_node_ls_remote(){
                 else                                                    print version, codename
             }
             prev_codename=codename
-        }' <"$cache_path" | sort -t. -u -k 1.2,1n -k 2,2n -k 3,3n
+        }' <"$cache_path" | ___x_cmd_env_node_sort_versions
 }
 # EndSection
 
