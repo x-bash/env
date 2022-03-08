@@ -47,7 +47,7 @@ ___x_cmd_env_common_use(){
 
 ___x_cmd_env_common_try(){
     local candidate="${1:?Provide candidate}"
-    local version="${2:?Provide python version}"
+    local version="${2:?Provide version}"
     # TODO: Check if it is installed
     # ___x_cmd_env_util_is_version_installed "${candidate}" "${version}" || return
     env_log info "Setting ${candidate} ${version} in current Shell."
