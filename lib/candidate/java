@@ -77,13 +77,12 @@ ___x_cmd_env_java_download(){
 	local metadata_folder="$___X_CMD_ENV_PATH/java/var/metadata"
 	mkdir -p "$archives_folder"  "${metadata_folder}"
 
-
 	local base_name="java-${version}"
 	local zip_archive_target="$___X_CMD_ENV_PATH/java/archives/${base_name}.zip"
 
 	local pre_installation_hook="$___X_CMD_ENV_PATH/java/tmp/hook_pre_java_${version}.sh"
 	env_log debug "Get pre-installation hook: https://api.sdkman.io/2/hooks/pre/java/${version}/${___X_CMD_ENV_JAVA_PLATFORM}"
-	curl --silent --location "https://api.sdkman.io/2/hooks/pre/java/${version}/${___X_CMD_ENV_JAVA_PLATFORM}" >| "$pre_installation_hook"
+	curl --silent --location "https://api.sdkman.io/2/hooks/pre/java/${version}/${___X_CMD_ENV_JAVA_PLATFORM}" > "$pre_installation_hook"
 	env_log debug "Copy remote pre-installation hook: $pre_installation_hook"
 	. "$pre_installation_hook"
 	env_log debug "Completed pre-installation hook..."
@@ -102,7 +101,7 @@ ___x_cmd_env_java_download(){
 
 	local post_installation_hook="$___X_CMD_ENV_PATH/java/tmp/hook_post_java_${version}.sh"
 	env_log debug "Get post-installation hook: https://api.sdkman.io/2/hooks/post/java/${version}/${___X_CMD_ENV_JAVA_PLATFORM}"
-	curl --silent --location "https://api.sdkman.io/2/hooks/post/java/${version}/${___X_CMD_ENV_JAVA_PLATFORM}" >| "$post_installation_hook"
+	curl --silent --location "https://api.sdkman.io/2/hooks/post/java/${version}/${___X_CMD_ENV_JAVA_PLATFORM}" > "$post_installation_hook"
 
 	env_log debug "Copy remote post-installation hook: ${post_installation_hook}"
 	. "$post_installation_hook"

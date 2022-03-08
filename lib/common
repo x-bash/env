@@ -160,7 +160,7 @@ ___x_cmd_env_common_install(){
     fi
 
     if ! ___x_cmd_env_run_common_if_notfound download "$candidate" "$full_version"; then
-        env_log info "Fail to install $candidate of version: $full_version."
+        env_log info "Fail to download $candidate of version: $full_version."
         return 1
     fi
 
