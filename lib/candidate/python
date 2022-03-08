@@ -29,8 +29,10 @@ ___x_cmd_env_python_get_miniconda_name_and_filename(){
     miniconda_name="Miniconda3-${version}-${system}-${platform}"
     if [ $system = "Windows" ] ; then
         miniconda_filename="${miniconda_name}.exe"
+        archives_name="python-${version}.exe"
     else
         miniconda_filename="${miniconda_name}.sh"
+        archives_name="python-${version}.sh"
     fi
 }
 
@@ -61,6 +63,7 @@ ___x_cmd_env_python_ls_remote(){
 ___x_cmd_env_python_download()(
     local miniconda_name
     local miniconda_filename
+    local archives_name
     local version="${1:?Provide python version}"
 
     # TODO: Check if it is installed
@@ -81,7 +84,7 @@ ___x_cmd_env_python_download()(
     fi
 
     env_log info "Downloading $url/$miniconda_filename"
-    if curl --fail --output "python-$miniconda_filename" "$url/$miniconda_filename"; then
+    if curl --fail --output "$archives_name" "$url/$miniconda_filename"; then
         env_log info "Download completed python $miniconda_name"
         return
     else
@@ -92,16 +95,16 @@ ___x_cmd_env_python_download()(
 
 ___x_cmd_env_python_unpack(){
     local version="${1:?Provide python version}"
-    local miniconda_filename
+    local archives_name
     ___x_cmd_env_python_get_miniconda_name_and_filename "$version"
 
-    env_log info "Unpacking python-$miniconda_filename"
+    env_log info "Unpacking $archives_name"
     (
         local candidate_path="$___X_CMD_ENV_PATH/python/versions"
         mkdir -p "${candidate_path}"
         cd "$___X_CMD_ENV_PATH/python/archives" || return 1
-        chmod +x "python-${miniconda_filename}" && \
-        "./python-${miniconda_filename}" -b -u -p "${candidate_path}/${version}" 1>&2
+        chmod +x "${archives_name}" && \
+        "./${archives_name}" -b -u -p "${candidate_path}/${version}" 1>&2
     )
 }
 
