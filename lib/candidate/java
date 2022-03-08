@@ -51,12 +51,6 @@ ___x_cmd_env_java_ls_remote(){
 ___x_cmd_env_java_download(){
     local version="${1:?Provide a version}"
 
-	# TODO: Check if it is installed
-	# if ___x_cmd_env_util_is_version_installed java "$full_version"; then
-    #     env_log info "Archieve existed: $full_version"
-    #     return 0
-    # fi
-
 	# TODO: Check if the installation package exists
 	# if ___x_cmd_env_util_is_archieve_cached java "$full_version"; then
     #     env_log info "Archieve existed: $full_version"
@@ -117,6 +111,7 @@ ___x_cmd_env_java_download(){
 }
 
 ___x_cmd_env_java_unpack(){
+	local version="${1:?Provide a version}"
 	env_log info "Unpacking: Java ${version}"
 	unzip -oq "$___X_CMD_ENV_PATH/java/archives/java-${version}.zip" -d "$___X_CMD_ENV_PATH/java/tmp/out"
 	mkdir -p "$___X_CMD_ENV_PATH/java/versions"
