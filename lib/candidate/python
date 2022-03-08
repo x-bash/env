@@ -81,7 +81,7 @@ ___x_cmd_env_python_download()(
     fi
 
     env_log info "Downloading $url/$miniconda_filename"
-    if curl --fail --output "$miniconda_filename" "$url/$miniconda_filename"; then
+    if curl --fail --output "python-$miniconda_filename" "$url/$miniconda_filename"; then
         env_log info "Download completed python $miniconda_name"
         return
     else
@@ -95,13 +95,13 @@ ___x_cmd_env_python_unpack(){
     local miniconda_filename
     ___x_cmd_env_python_get_miniconda_name_and_filename "$version"
 
-    env_log info "Unpacking $miniconda_filename"
+    env_log info "Unpacking python-$miniconda_filename"
     (
         local candidate_path="$___X_CMD_ENV_PATH/python/versions"
         mkdir -p "${candidate_path}"
         cd "$___X_CMD_ENV_PATH/python/archives" || return 1
-        chmod +x "${miniconda_filename}" && \
-        "./${miniconda_filename}" -b -u -p "${candidate_path}/${version}" 1>&2
+        chmod +x "python-${miniconda_filename}" && \
+        "./python-${miniconda_filename}" -b -u -p "${candidate_path}/${version}" 1>&2
     )
 }
 
