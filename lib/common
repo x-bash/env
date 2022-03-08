@@ -158,7 +158,9 @@ ___x_cmd_env_common_current(){
     local candidate="${1:?Provide candidate}"
     local candidate_path
     candidate_path="$(command -v "$candidate")"
-    if [ "$candidate_path" != "$___X_CMD_ENV_PATH/$candidate/shims/$candidate" ]; then
+    if [ -z "$candidate_path" ]; then
+        printf "No version of %s is detected, please install it first!\n" "$candidate"
+    elif [ "$candidate_path" != "$___X_CMD_ENV_PATH/$candidate/shims/$candidate" ]; then
         local try_path="${candidate_path#*"versions/"}"
         try_path="${try_path%%/*}"
 
