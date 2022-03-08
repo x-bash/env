@@ -102,7 +102,8 @@ ___x_cmd_env_common_use(){
 ___x_cmd_env_common_try(){
     local candidate="${1:?Provide candidate}"
     local version="${2:?Provide python version}"
-    ___x_cmd_env_util_is_version_installed "${candidate}" "${version}" || return
+    # TODO: Check if it is installed
+    # ___x_cmd_env_util_is_version_installed "${candidate}" "${version}" || return
     env_log info "Setting ${candidate} ${version} in current Shell."
 
     ___x_cmd_env_add_path "${___X_CMD_ENV_PATH}/$candidate/versions/$version/bin"
@@ -157,7 +158,7 @@ ___x_cmd_env_common_current(){
     local candidate_path
     candidate_path="$(command -v "$candidate")"
     if [ "$candidate_path" != "$___X_CMD_ENV_PATH/$candidate/shims/$candidate" ]; then
-        local try_path="${candidate_path#*"versions/"}"
+        local try_path="${candidate_path#*"$candidate/"}"
         try_path="${try_path%%/*}"
 
         if [ -n "$try_path" ]; then
