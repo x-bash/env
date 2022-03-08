@@ -27,12 +27,7 @@ ___x_cmd_env_common_use(){
     local candidate="${1:?Provide candidate}"
     local version="${2:?Provide version}"
 
-    # TODO: Check if it is downloaded and unpacked
-    # if ___x_cmd_env_util_is_archieve_cached "$candidate" "$version"; then
-    #     env_log error "Installation package of $candidate $version does not exist"
-    #     return 1
-    # fi
-
+    ___x_cmd_env_util_if_downloaded_then_unpack "$candidate" "$version" || return 1
     ___x_cmd_env_util_make_shim_dir "$candidate" "${version}" || return 1
     ___x_cmd_env_util_add_path "${___X_CMD_ENV_PATH}/$candidate/shims" || return 1
 
@@ -46,11 +41,7 @@ ___x_cmd_env_common_try(){
     local version="${2:?Provide version}"
     local versions_path="${3:-"$___X_CMD_ENV_PATH/$candidate/versions/$version/bin"}"
 
-    # TODO: Check if it is downloaded and unpacked, if downloaded, unpack it.
-    # ___x_cmd_env_util_is_version_installed "${candidate}" "${version}" || return
-
-    # TODO: handle other version mangement tools
-
+    ___x_cmd_env_util_if_downloaded_then_unpack "$candidate" "$version" || return 1
     ___x_cmd_env_util_add_path "$versions_path" && \
         env_log info "Setting ${candidate} ${version} in current Shell."
 }
@@ -118,7 +109,7 @@ ___x_cmd_env_common_install(){
     local version="${2:?Provide version}"
 
     env_log info "Installing $candidate $version"
-    if ___x_cmd_env_util_is_version_installed "$candidate" "$version"; then
+    if ___x_cmd_env_util_is_download_and_unpack "$candidate" "$version"; then
         env_log error "Version of $candidate $version already installed"
         return 1
     fi
