@@ -47,7 +47,7 @@ ___x_cmd_env_java_ls_remote(){
 
 # EndSection
 
-# Section: download, install
+# Section: download, unpack
 
 ___x_cmd_env_java_download(){
     local version="${1:?Provide a version}"
