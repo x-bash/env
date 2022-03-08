@@ -52,7 +52,8 @@ ___x_cmd_env_node_ls_remote(){
 
 # Section: try
 ___x_cmd_env_node_try(){
-    ___x_cmd_env_common_try node
+    local version="${1:?Provide a version}"
+    ___x_cmd_env_common_try node "$version"
 }
 
 # EndSection
