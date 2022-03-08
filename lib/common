@@ -61,7 +61,7 @@ ___x_cmd_env_common_uninstall(){
 }
 # EndSection
 
-# Section: ls lsremote
+# Section: ls_local ls_remote
 ___x_cmd_env_common_ls_local(){
     local candidate="${1:?Provide candidate}"
 	if [ -d "$___X_CMD_ENV_PATH/$candidate/versions" ]; then
@@ -89,14 +89,15 @@ ___x_cmd_env_common_use(){
     #     return 1
     # fi
 
-    env_log info "Setting ${candidate} ${version} as default."
-
-    ___x_cmd_env_add_path "${___X_CMD_ENV_PATH}/$candidate/shims"
-    x boot rc add "x-env-$candidate" "xrc env/latest && ___x_cmd_env_add_path \"${___X_CMD_ENV_PATH}/$candidate/shims\""
-
-    printf "%s\n" "$version" > "$___X_CMD_ENV_PATH/$candidate/version"
-    env_log info "Using $candidate $version . -> $___X_CMD_ENV_PATH/$candidate/version"
     ___x_cmd_env_shim_dir "$candidate" "${version}"
+    if ! ___x_cmd_env_util_add_path "${___X_CMD_ENV_PATH}/$candidate/shims" ; then
+        env_log error "Failed to add ${candidate} ${version} to $PATH"
+        return 1
+    fi
+
+    x boot rc add "x-env-$candidate" "xrc env/lib/util && ___x_cmd_env_util_add_path \"${___X_CMD_ENV_PATH}/$candidate/shims\"" && \
+        printf "%s\n" "$version" > "$___X_CMD_ENV_PATH/$candidate/version" && \
+        env_log info "Using $candidate $version . -> $___X_CMD_ENV_PATH/$candidate/version"
 }
 
 ___x_cmd_env_common_try(){
@@ -106,7 +107,7 @@ ___x_cmd_env_common_try(){
     # ___x_cmd_env_util_is_version_installed "${candidate}" "${version}" || return
     env_log info "Setting ${candidate} ${version} in current Shell."
 
-    ___x_cmd_env_add_path "${___X_CMD_ENV_PATH}/$candidate/versions/$version/bin"
+    ___x_cmd_env_util_add_path "${___X_CMD_ENV_PATH}/$candidate/versions/$version/bin"
 }
 
 ___x_cmd_env_shim_dir(){
