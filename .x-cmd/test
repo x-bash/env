@@ -22,6 +22,9 @@ case $1 in
         env_log info "Testing python exec."
         x env exec python py38_4.10.1 -V
 
+        env_log info "Testing python current."
+        x env current python
+
         env_log info "Testing python uninstall."
         x env uninstall python py38_4.10.1
 

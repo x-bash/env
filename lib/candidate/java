@@ -51,27 +51,20 @@ ___x_cmd_env_java_ls_remote(){
 ___x_cmd_env_java_download(){
     local version="${1:?Provide a version}"
 
-	# TODO: Check if the installation package exists
-	# if ___x_cmd_env_util_is_archieve_cached java "$full_version"; then
-    #     env_log info "Archieve existed: $full_version"
-    #     return 0
-    # fi
-
-	# Reference:
-	# if [ -f "${archives_folder}/java-${version}.zip" ]; then
-	# 	env_log info "Found a previously downloaded java ${version} archive. Not downloading it again..."
-	# 	return 1
-	# else
+	if ___x_cmd_env_util_is_archive_cached node "$version"; then
+        env_log info "Archive existed: $version"
+        return 0
+    fi
 
 	mkdir -p "$___X_CMD_ENV_PATH/java/tmp"
 	mkdir -p "$___X_CMD_ENV_PATH/java/versions"
 
-	local archives_folder="$___X_CMD_ENV_PATH/java/archives"
+	local archive_folder="$___X_CMD_ENV_PATH/java/archive"
 	local metadata_folder="$___X_CMD_ENV_PATH/java/var/metadata"
-	mkdir -p "$archives_folder"  "${metadata_folder}"
+	mkdir -p "$archive_folder"  "${metadata_folder}"
 
 	local base_name="java-${version}"
-	local zip_archive_target="$___X_CMD_ENV_PATH/java/archives/${base_name}.zip"
+	local zip_archive_target="$___X_CMD_ENV_PATH/java/archive/${base_name}.zip"
 
 	local pre_installation_hook="$___X_CMD_ENV_PATH/java/tmp/hook_pre_java_${version}.sh"
 	env_log debug "Get pre-installation hook: https://api.sdkman.io/2/hooks/pre/java/${version}/${___X_CMD_ENV_JAVA_PLATFORM}"
@@ -113,7 +106,7 @@ ___x_cmd_env_java_download(){
 ___x_cmd_env_java_unpack(){
 	local version="${1:?Provide a version}"
 	env_log info "Unpacking: Java ${version}"
-	unzip -oq "$___X_CMD_ENV_PATH/java/archives/java-${version}.zip" -d "$___X_CMD_ENV_PATH/java/tmp/out"
+	unzip -oq "$___X_CMD_ENV_PATH/java/archive/java-${version}.zip" -d "$___X_CMD_ENV_PATH/java/tmp/out"
 	mkdir -p "$___X_CMD_ENV_PATH/java/versions"
 	mv -f "$___X_CMD_ENV_PATH"/java/tmp/out/* "$___X_CMD_ENV_PATH/java/versions/${version}"
 	rm -rf "$___X_CMD_ENV_PATH/java/tmp/out"

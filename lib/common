@@ -65,7 +65,8 @@ ___x_cmd_env_common_current(){
 
     # After try and no any candidate version and has candidate version in current shell
     if [ -z "$candidate_path" ]; then
-        printf "No version of %s is detected, please install it first!\n" "$candidate"
+        env_log "No version of %s $candidate detected, please install it first! "
+        return 1
     elif [ "$candidate_path" != "$___X_CMD_ENV_PATH/$candidate/shims/$candidate" ]; then
         local try_path="${candidate_path#*"versions/"}"
         try_path="${try_path%%/*}"
@@ -109,19 +110,18 @@ ___x_cmd_env_common_install(){
     local version="${2:?Provide version}"
 
     env_log info "Installing $candidate $version"
-    if ___x_cmd_env_util_is_download_and_unpack "$candidate" "$version"; then
-        env_log error "Version of $candidate $version already installed"
-        return 1
-    fi
+    if ___x_cmd_env_util_is_download_and_unpack "$candidate" "$version" ; then
+        env_log info "Already downloaded and unpacked $candidate $version"
+    else
+        if ! ___x_cmd_env_run_common_if_notfound download "$candidate" "$version"; then
+            env_log info "Fail to download $candidate of version: $version."
+            return 1
+        fi
 
-    if ! ___x_cmd_env_run_common_if_notfound download "$candidate" "$version"; then
-        env_log info "Fail to download $candidate of version: $version."
-        return 1
-    fi
-
-    if ! ___x_cmd_env_run_common_if_notfound unpack "$candidate" "$version"; then
-        env_log info "Fail to unpack $candidate of version: $version."
-        return 1
+        if ! ___x_cmd_env_run_common_if_notfound unpack "$candidate" "$version"; then
+            env_log info "Fail to unpack $candidate of version: $version."
+            return 1
+        fi
     fi
 
     ___x_cmd_env_common_use "$candidate" "$version"

@@ -131,25 +131,25 @@ ___x_cmd_env_install_candidate_version(){
 	mkdir -p "$___X_CMD_ENV_PATH/java/versions"
 
 	rm -rf "$___X_CMD_ENV_PATH/java/tmp/out"
-	unzip -oq "$___X_CMD_ENV_PATH/java/archives/java-${version}.zip" -d "$___X_CMD_ENV_PATH/java/tmp/out"
+	unzip -oq "$___X_CMD_ENV_PATH/java/archive/java-${version}.zip" -d "$___X_CMD_ENV_PATH/java/tmp/out"
 	mv -f "$___X_CMD_ENV_PATH"/java/tmp/out/* "$___X_CMD_ENV_PATH/java/versions/${version}"
 	env_log info "Done installing!"
 }
 
 ___x_cmd_env_download(){
     local version="$1"
-	local archives_folder="$___X_CMD_ENV_PATH/java/archives"
+	local archive_folder="$___X_CMD_ENV_PATH/java/archive"
 	local headers_file
 
 	metadata_folder="$___X_CMD_ENV_PATH/java/var/metadata"
 	mkdir -p "${metadata_folder}"
 
-	if [ ! -f "${archives_folder}/java-${version}.zip" ]; then
+	if [ ! -f "${archive_folder}/java-${version}.zip" ]; then
 		local platform_parameter
 		platform_parameter="$(cat <<<"$ENV_PLATFORM_TMP" | tr '[:upper:]' '[:lower:]')"
 		local download_url="https://api.sdkman.io/2/broker/download/java/${version}/${platform_parameter}"
 		local base_name="java-${version}"
-		local zip_archive_target="$___X_CMD_ENV_PATH/java/archives/${base_name}.zip"
+		local zip_archive_target="$___X_CMD_ENV_PATH/java/archive/${base_name}.zip"
 		headers_file="${metadata_folder}/${base_name}.headers"
 
 		local pre_installation_hook="$___X_CMD_ENV_PATH/java/tmp/hook_pre_java_${version}.sh"
@@ -186,8 +186,8 @@ ___x_cmd_env_download(){
 	else
 		env_log info "Found a previously downloaded java ${version} archive. Not downloading it again..."
 	fi
-	___x_cmd_env_checksum_zip "${archives_folder}/java-${version}.zip" "${headers_file}" || return 1
-	___x_cmd_env_validate_zip "${archives_folder}/java-${version}.zip" || return 1
+	___x_cmd_env_checksum_zip "${archive_folder}/java-${version}.zip" "${headers_file}" || return 1
+	___x_cmd_env_validate_zip "${archive_folder}/java-${version}.zip" || return 1
 }
 
 ___x_cmd_env_checksum_zip(){
@@ -283,7 +283,7 @@ ___x_cmd_env_java_download(){
     local version="${1:-default}"
 
 	mkdir -p "$___X_CMD_ENV_PATH/java/tmp"
-	mkdir -p "$___X_CMD_ENV_PATH/java/archives"
+	mkdir -p "$___X_CMD_ENV_PATH/java/archive"
 	mkdir -p "$___X_CMD_ENV_PATH/java/versions"
 
     ENV_AVAILABLE="true" #availability set up
