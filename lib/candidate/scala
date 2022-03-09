@@ -20,24 +20,6 @@ ___x_cmd_env_scala_download(){
     local version="${1:?Provide a version}"
     env_log info "starting"
 
-	# TODO: Check if it is installed
-	# if ___x_cmd_env_util_is_version_installed java "$full_version"; then
-    #     env_log info "Archieve existed: $full_version"
-    #     return 0
-    # fi
-
-	# TODO: Check if the installation package exists
-	# if ___x_cmd_env_util_is_archieve_cached java "$full_version"; then
-    #     env_log info "Archieve existed: $full_version"
-    #     return 0
-    # fi
-
-	# Reference:
-	# if [ -f "${archives_folder}/java-${version}.zip" ]; then
-	# 	env_log info "Found a previously downloaded java ${version} archive. Not downloading it again..."
-	# 	return 1
-	# else
-
 	mkdir -p "$___X_CMD_ENV_PATH/scala/tmp"
 	mkdir -p "$___X_CMD_ENV_PATH/scala/versions"
 	local archives_folder="$___X_CMD_ENV_PATH/scala/archives"
