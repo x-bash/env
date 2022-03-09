@@ -21,7 +21,7 @@ ___x_cmd_env_common_ls_local(){
             fi
         done
     # TODO: The sorting on the ls side is something we need to fix. Probably use common to call special functions
-    } | sort | uniq
+    } 2>/dev/null | sort | uniq
 }
 
 ___x_cmd_env_common_la(){
@@ -73,7 +73,7 @@ ___x_cmd_env_common_current(){
 
     # After try and no any candidate version and has candidate version in current shell
     if [ -z "$candidate_path" ]; then
-        env_log "No version of %s $candidate detected, please install it first! "
+        env_log error "No version of %s $candidate detected, please install it first! "
         return 1
     elif [ "$candidate_path" != "$___X_CMD_ENV_PATH/$candidate/shims/$candidate" ]; then
         local try_path="${candidate_path#*"versions/"}"
