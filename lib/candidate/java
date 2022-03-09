@@ -51,6 +51,7 @@ ___x_cmd_env_java_ls_remote(){
 ___x_cmd_env_java_download(){
     local version="${1:?Provide a version}"
 
+	# TODO: Should we check unpack_dir?
 	if ___x_cmd_env_util_is_archive_cached node "$version"; then
         env_log info "Archive existed: $version"
         return 0
