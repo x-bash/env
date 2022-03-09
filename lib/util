@@ -34,7 +34,7 @@ ___x_cmd_env_util_if_downloaded_then_unpack(){
     fi
 
     if ! ___x_cmd_env_util_is_archive_cached "$candidate" "$version"; then
-        env_log error "Installation package of $candidate $version does not exist"
+        env_log error "Installation package of $candidate $version does not exist, please download it first."
         return 1
     fi
 

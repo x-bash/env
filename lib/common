@@ -8,12 +8,20 @@ ___x_cmd_env_common_full_version(){
 }
 
 ___x_cmd_env_common_ls_local(){
-    local candidate="${1:?Provide candidate}"
-	if [ -d "$___X_CMD_ENV_PATH/$candidate/versions" ]; then
-		for version in $(find "$___X_CMD_ENV_PATH/$candidate/versions" -maxdepth 1 -mindepth 1 \( -type l -o -type d \) -exec basename '{}' \; | sort -r); do
-			printf "%s\n" "$version"
-		done
-	fi
+    {
+        local candidate="${1:?Provide candidate}"
+        if [ -d "$___X_CMD_ENV_PATH/$candidate/versions" ]; then
+            ls "$___X_CMD_ENV_PATH/$candidate/versions"
+        fi
+        local tmp
+        for version in "$___X_CMD_ENV_PATH/$candidate/archive/"*; do
+            if [ -f "$version" ]; then
+                tmp="${version##*/"${candidate}"-}"
+                printf "%s\n" "${tmp%%.*}"
+            fi
+        done
+    # TODO: The sorting on the ls side is something we need to fix. Probably use common to call special functions
+    } | sort | uniq
 }
 
 ___x_cmd_env_common_la(){
