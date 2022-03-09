@@ -17,7 +17,7 @@ ___x_cmd_env_common_ls_local(){
 }
 
 ___x_cmd_env_common_la(){
-    :
+   :
 }
 # EndSection
 
@@ -26,6 +26,7 @@ ___x_cmd_env_common_la(){
 ___x_cmd_env_common_use(){
     local candidate="${1:?Provide candidate}"
     local version="${2:?Provide version}"
+    
 
     # TODO: Check if the installation package exists
     # TODO: Check whether the installation package is unzipped
@@ -39,7 +40,7 @@ ___x_cmd_env_common_use(){
         env_log error "Failed to add ${candidate} ${version} to $PATH"
         return 1
     fi
-
+    
     x boot rc add "x-env-$candidate" "xrc env/lib/util && ___x_cmd_env_util_add_path \"${___X_CMD_ENV_PATH}/$candidate/shims\"" && \
         printf "%s\n" "$version" > "$___X_CMD_ENV_PATH/$candidate/version" && \
         env_log info "Using $candidate $version . -> $___X_CMD_ENV_PATH/$candidate/version"
@@ -153,7 +154,7 @@ ___x_cmd_env_common_install(){
     local candidate="${1:?Provide canddidate}"
     local version="${2:?Provide version}"
 
-    local full_version
+    local full_version= $(___x_cmd_env_run_common_if_notfound full_version "$candidate" "${version}")
     if ! full_version=$(___x_cmd_env_run_common_if_notfound full_version "$candidate" "${version}"); then
         env_log error "Version of $candidate not found: $version"
         return 1

@@ -49,8 +49,10 @@ ___x_cmd_env_run_common_if_notfound(){
 
     # TODO: It might be better to have one folder for one language.
     xrc "env/lib/candidate/$candidate"
-
     local cmd="___x_cmd_env_${candidate}_${op}"
+    echo "$cmd"
+    # ___x_cmd_env_java_install
+    # ___x_cmd_env_kotlin_install
     if command -v "$cmd" >/dev/null; then
         "$cmd" "$@"
     else
@@ -59,6 +61,46 @@ ___x_cmd_env_run_common_if_notfound(){
     fi
 }
 
+# EndSection
+
+# Section: install, uninstall
+___x_cmd_env_main_install(){
+    # TODO: You can do more better in #2 advise json
+    param:scope "env"
+    param:dsl <<A
+advise:
+    #2        xrc env/latest && ___x_cmd_env_advise_ls_remote_version
+options:
+    #1        "Environment Candidates" <candidates>:candidates_list
+    #2        "Version"                <version>="default"
+A
+    param:run
+
+    if [ -z "$1" ]; then
+        ___x_cmd_env_main_install help
+        return 1
+    fi
+    ___x_cmd_env_run_common_if_notfound install "$@"
+}
+
+___x_cmd_env_main_uninstall(){
+    param:scope "env"
+    param:dsl <<A
+advise:
+    #2        xrc env/latest && ___x_cmd_env_advise_ls_local_version
+options:
+    #1        "Environment Candidates" <candidates>:candidates_list
+    #2        "Version"                <version>
+A
+    param:run
+
+    if [ -z "$1" ]; then
+        ___x_cmd_env_main_uninstall help
+        return 1
+    fi
+
+    ___x_cmd_env_run_common_if_notfound uninstall "$@"
+}
 # EndSection
 
 # Section: ls, la
@@ -106,8 +148,8 @@ options:
     #2        "Version"                <version>="default"
 A
     param:run
-
     ___x_cmd_env_run_common_if_notfound try "$@"
+  
 }
 
 ___x_cmd_env_main_use(){
@@ -147,46 +189,6 @@ A
     ___x_cmd_env_run_common_if_notfound current "$@"
 }
 
-# EndSection
-
-# Section: install, uninstall
-___x_cmd_env_main_install(){
-    # TODO: You can do more better in #2 advise json
-    param:scope "env"
-    param:dsl <<A
-advise:
-    #2        xrc env/latest && ___x_cmd_env_advise_ls_remote_version
-options:
-    #1        "Environment Candidates" <candidates>:candidates_list
-    #2        "Version"                <version>="default"
-A
-    param:run
-
-    if [ -z "$1" ]; then
-        ___x_cmd_env_main_install help
-        return 1
-    fi
-    ___x_cmd_env_run_common_if_notfound install "$@"
-}
-
-___x_cmd_env_main_uninstall(){
-    param:scope "env"
-    param:dsl <<A
-advise:
-    #2        xrc env/latest && ___x_cmd_env_advise_ls_local_version
-options:
-    #1        "Environment Candidates" <candidates>:candidates_list
-    #2        "Version"                <version>
-A
-    param:run
-
-    if [ -z "$1" ]; then
-        ___x_cmd_env_main_uninstall help
-        return 1
-    fi
-
-    ___x_cmd_env_run_common_if_notfound uninstall "$@"
-}
 # EndSection
 
 # Section: download, which, exec
@@ -248,8 +250,9 @@ node
 go
 java
 deno
-perl
 kotlin
+scala
+perl
 "
 
 }

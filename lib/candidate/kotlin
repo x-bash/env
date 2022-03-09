@@ -1,45 +1,105 @@
 # shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263    # xrc
+___X_CMD_ENV_KOTLIN_PLATFORM_TMP="$(xrc os && ___x_cmd_os name && ___x_cmd_os arch)"
+___X_CMD_ENV_KOTLIN_PLATFORM="$(printf "%s" "${___X_CMD_ENV__PLATFORM_TMP}" | tr '[:lower:]' '[:upper:]')"
 
-___x_cmd_env_kotlin_ls(){
-    :
-}
-
-___x_cmd_env_kotlin_la(){
-    :
+___x_cmd_env_kotlin_ls_remote(){
+	local pattern="${1:-""}"
+	local cache_expiration="${2:-1}"
+	local cache_path="$___X_CMD_ENV_PATH/kotlin/cache/version_list"
+	
+	___x_cmd_httpget "https://api.sdkman.io/2/candidates/kotlin/LINUXX64/versions/all" "$cache_path" "$cache_expiration" 2>/dev/null && \
+	awk '{versions=$0 ;gsub(",","\n",versions);print versions}' <"$cache_path"
+	
 }
 
 ___x_cmd_env_kotlin_download(){
-    :
-}
 
-___x_cmd_env_kotlin_install(){
-    :
-}
+    
+    local version="${1:?Provide a version}"
+    env_log info "starting"
 
-___x_cmd_env_kotlin_uninstall(){
-    :
-}
+	# TODO: Check if it is installed
+	# if ___x_cmd_env_util_is_version_installed java "$full_version"; then
+    #     env_log info "Archieve existed: $full_version"
+    #     return 0
+    # fi
 
-___x_cmd_env_kotlin_try(){
-    :
-}
+	# TODO: Check if the installation package exists
+	# if ___x_cmd_env_util_is_archieve_cached java "$full_version"; then
+    #     env_log info "Archieve existed: $full_version"
+    #     return 0
+    # fi
 
-___x_cmd_env_kotlin_use(){
-    :
+	# Reference:
+	# if [ -f "${archives_folder}/java-${version}.zip" ]; then
+	# 	env_log info "Found a previously downloaded java ${version} archive. Not downloading it again..."
+	# 	return 1
+	# else
+
+	mkdir -p "$___X_CMD_ENV_PATH/kotlin/tmp"
+	mkdir -p "$___X_CMD_ENV_PATH/kotlin/versions"
+	local archives_folder="$___X_CMD_ENV_PATH/kotlin/archives"
+	local metadata_folder="$___X_CMD_ENV_PATH/kotlin/var/metadata"
+	mkdir -p "$archives_folder"  "${metadata_folder}"
+    
+    
+	local base_name="kotlin-${version}"
+	local zip_archive_target="$___X_CMD_ENV_PATH/kotlin/archives/${base_name}.zip"
+
+	local pre_installation_hook="$___X_CMD_ENV_PATH/kotlin/tmp/hook_pre_kotlin_${version}.sh"
+	local ___X_CMD_ENV_KOTLIN_PLATFORM="darwinarm64"
+	
+	env_log debug "Get pre-installation hook: https://api.sdkman.io/2/hooks/pre/kotlin/${version}/${___X_CMD_ENV_KOTLIN_PLATFORM}"
+	curl --silent --location "https://api.sdkman.io/2/hooks/pre/kotlin/${version}/${___X_CMD_ENV_KOTLIN_PLATFORM}" >| "$pre_installation_hook"
+	env_log debug "Copy remote pre-installation hook: $pre_installation_hook"
+	. "$pre_installation_hook"
+
+
+
+	export local binary_input="$___X_CMD_ENV_PATH/kotlin/tmp/${base_name}.bin"
+	export local zip_output="$___X_CMD_ENV_PATH/kotlin/tmp/$base_name.zip"
+
+	env_log info "Downloading: kotlin ${version}"
+	env_log info "In progress..."
+
+	# download binary
+	local download_url="https://api.sdkman.io/2/broker/download/kotlin/${version}/${___X_CMD_ENV_KOTLIN_PLATFORM}"
+	local headers_file="${metadata_folder}/${base_name}.headers"
+
+	curl --progress-bar --location --retry-max-time 10 --retry 0 "${download_url}" --output "${binary_input}" --dump-header "${headers_file}"
+	env_log debug "Downloaded binary to: ${binary_input} (HTTP headers written to: ${headers_file})"
+
+	local post_installation_hook="$___X_CMD_ENV_PATH/kotlin/tmp/hook_post_kotlin_${version}.sh"
+	
+	env_log debug "Get post-installation hook: https://api.sdkman.io/2/hooks/post/kotlin/${version}/${___X_CMD_ENV_KOTLIN_PLATFORM}"
+	curl --silent --location "https://api.sdkman.io/2/hooks/post/kotlin/${version}/${___X_CMD_ENV_KOTLIN_PLATFORM}" >| "$post_installation_hook"
+	echo "https://api.sdkman.io/2/hooks/post/kotlin/${version}/${___X_CMD_ENV_KOTLIN_PLATFORM}"
+	env_log debug "Copy remote post-installation hook: ${post_installation_hook}"
+	. "$post_installation_hook"
+	__sdkman_post_installation_hook || return 1
+
+	env_log debug "Processed binary as: $zip_output"
+	env_log debug "Completed post-installation hook..."
+
+	mv -f "$zip_output" "$zip_archive_target"
+	
+	env_log debug "Moved to archive folder: $zip_archive_target"
+	env_log info "Download complete kotlin $version"
+	return 0
+
 }
 
 ___x_cmd_env_kotlin_ws(){
-    :
+  :
 }
 
-___x_cmd_env_kotlin_current(){
-    :
-}
+___x_cmd_env_common_unpack(){
+	env_log info "Unpacking:kotlin_${version}" 
+	unzip -oq "$___X_CMD_ENV_PATH/kotlin/archives/kotlin-${version}.zip" -d "$___X_CMD_ENV_PATH/kotlin/tmp/out"
+	mkdir -p "$___X_CMD_ENV_PATH/kotlin/versions"
+	mv -f "$___X_CMD_ENV_PATH"/kotlin/tmp/out/* "$___X_CMD_ENV_PATH/kotlin/versions/${version}"
+	rm -rf "$___X_CMD_ENV_PATH/kotlin/tmp/out"
+	env_log info "Done unpacking"
+}			
 
-___x_cmd_env_kotlin_which(){
-    :
-}
 
-___x_cmd_env_kotlin_exec(){
-    :
-}

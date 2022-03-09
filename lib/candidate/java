@@ -2,7 +2,12 @@
 
 # Section: sdkman
 
+<<<<<<< Updated upstream
 ___X_CMD_ENV_JAVA_PLATFORM="$(xrc os && printf "%s%s" "$(___x_cmd_os name)" "$(___x_cmd_os arch)" | tr '[:lower:]' '[:upper:]' )"
+=======
+___X_CMD_ENV_KOTLIN_PLATFORM_TMP="$(xrc os && ___x_cmd_os name && ___x_cmd_os arch)"
+___X_CMD_ENV_KOTLIN_PLATFORM="$(printf "%s" "${___X_CMD_ENV_JAVA_PLATFORM_TMP}" | tr '[:lower:]' '[:upper:]')"
+>>>>>>> Stashed changes
 
 __sdkman_echo_debug() {
 	env_log debug "$1"
@@ -40,14 +45,20 @@ ___x_cmd_env_java_ls_remote(){
 	local pattern="${1:-""}"
 	local cache_expiration="${2:-1}"
 	local cache_path="$___X_CMD_ENV_PATH/java/cache/version_list"
+	
 	___x_cmd_httpget "https://api.sdkman.io/2/candidates/java/${___X_CMD_ENV_JAVA_PLATFORM}/versions/all" "$cache_path" "$cache_expiration" 2>/dev/null && \
 	awk '{versions=$0 ;gsub(",","\n",versions);print versions}' <"$cache_path"
+	
 }
 
 # EndSection
+<<<<<<< Updated upstream
 
 # Section: download, unpack
 
+=======
+# Section: download, install
+>>>>>>> Stashed changes
 ___x_cmd_env_java_download(){
     local version="${1:?Provide a version}"
 
@@ -71,20 +82,30 @@ ___x_cmd_env_java_download(){
 
 	mkdir -p "$___X_CMD_ENV_PATH/java/tmp"
 	mkdir -p "$___X_CMD_ENV_PATH/java/versions"
-
 	local archives_folder="$___X_CMD_ENV_PATH/java/archives"
 	local metadata_folder="$___X_CMD_ENV_PATH/java/var/metadata"
 	mkdir -p "$archives_folder"  "${metadata_folder}"
 
+<<<<<<< Updated upstream
+=======
+    local darwinarm64= "${___X_CMD_ENV_JAVA_PLATFORM}"
+>>>>>>> Stashed changes
 	local base_name="java-${version}"
 	local zip_archive_target="$___X_CMD_ENV_PATH/java/archives/${base_name}.zip"
 
 	local pre_installation_hook="$___X_CMD_ENV_PATH/java/tmp/hook_pre_java_${version}.sh"
+
+	
 	env_log debug "Get pre-installation hook: https://api.sdkman.io/2/hooks/pre/java/${version}/${___X_CMD_ENV_JAVA_PLATFORM}"
+<<<<<<< Updated upstream
 	curl --silent --location "https://api.sdkman.io/2/hooks/pre/java/${version}/${___X_CMD_ENV_JAVA_PLATFORM}" > "$pre_installation_hook"
+=======
+	curl --silent --location "https://api.sdkman.io/2/hooks/pre/java/${version}/${___X_CMD_ENV_JAVA_PLATFORM}" >| "$pre_installation_hook"
+>>>>>>> Stashed changes
 	env_log debug "Copy remote pre-installation hook: $pre_installation_hook"
 	. "$pre_installation_hook"
-	env_log debug "Completed pre-installation hook..."
+
+
 
 	export local binary_input="$___X_CMD_ENV_PATH/java/tmp/${base_name}.bin"
 	export local zip_output="$___X_CMD_ENV_PATH/java/tmp/$base_name.zip"
@@ -95,25 +116,27 @@ ___x_cmd_env_java_download(){
 	# download binary
 	local download_url="https://api.sdkman.io/2/broker/download/java/${version}/${___X_CMD_ENV_JAVA_PLATFORM}"
 	local headers_file="${metadata_folder}/${base_name}.headers"
+
 	curl --progress-bar --location --retry-max-time 10 --retry 0 "${download_url}" --output "${binary_input}" --dump-header "${headers_file}"
 	env_log debug "Downloaded binary to: ${binary_input} (HTTP headers written to: ${headers_file})"
 
 	local post_installation_hook="$___X_CMD_ENV_PATH/java/tmp/hook_post_java_${version}.sh"
+	
 	env_log debug "Get post-installation hook: https://api.sdkman.io/2/hooks/post/java/${version}/${___X_CMD_ENV_JAVA_PLATFORM}"
 	curl --silent --location "https://api.sdkman.io/2/hooks/post/java/${version}/${___X_CMD_ENV_JAVA_PLATFORM}" > "$post_installation_hook"
-
+echo "https://api.sdkman.io/2/hooks/post/java/${version}/${___X_CMD_ENV_JAVA_PLATFORM}"
 	env_log debug "Copy remote post-installation hook: ${post_installation_hook}"
 	. "$post_installation_hook"
 	__sdkman_post_installation_hook || return 1
-
 	env_log debug "Processed binary as: $zip_output"
 	env_log debug "Completed post-installation hook..."
 
 	mv -f "$zip_output" "$zip_archive_target"
+	
 	env_log debug "Moved to archive folder: $zip_archive_target"
-
 	env_log info "Download complete Java $version"
 	return 0
+
 }
 
 ___x_cmd_env_java_unpack(){
