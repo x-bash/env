@@ -148,8 +148,16 @@ options:
     #2        "Version"                <version>="default"
 A
     param:run
-    ___x_cmd_env_run_common_if_notfound try "$@"
-  
+
+    local candidate="${1}"
+    local version
+    if ! version="$(___x_cmd_env_run_common_if_notfound full_version "$candidate" "$2")"; then
+        env_log error "Version of $candidate not found: $version"
+        return 1
+    fi
+    shift 2
+
+    ___x_cmd_env_run_common_if_notfound try "$candidate" "$version" "$@"
 }
 
 ___x_cmd_env_main_use(){
@@ -164,7 +172,15 @@ options:
 A
     param:run
 
-    ___x_cmd_env_run_common_if_notfound use "$@"
+    local candidate="${1}"
+    local version
+    if ! version="$(___x_cmd_env_run_common_if_notfound full_version "$candidate" "$2")"; then
+        env_log error "Version of $candidate not found: $version"
+        return 1
+    fi
+    shift 2
+
+    ___x_cmd_env_run_common_if_notfound use "$candidate" "$version" "$@"
 }
 
 ___x_cmd_env_main_ws(){
@@ -191,6 +207,63 @@ A
 
 # EndSection
 
+# Section: install, uninstall
+___x_cmd_env_main_install(){
+    # TODO: You can do more better in #2 advise json
+    param:scope "env"
+    param:dsl <<A
+advise:
+    #2        xrc env/latest && ___x_cmd_env_advise_ls_remote_version
+options:
+    #1        "Environment Candidates" <candidates>:candidates_list
+    #2        "Version"                <version>="default"
+A
+    param:run
+
+    local candidate="${1}"
+    if [ -z "$candidate" ]; then
+        ___x_cmd_env_main_install help
+        return 1
+    fi
+
+    local version
+    if ! version="$(___x_cmd_env_run_common_if_notfound full_version "$candidate" "$2")"; then
+        env_log error "Version of $candidate not found: $version"
+        return 1
+    fi
+    shift 2
+
+    ___x_cmd_env_run_common_if_notfound install "$candidate" "$version" "$@"
+}
+
+___x_cmd_env_main_uninstall(){
+    param:scope "env"
+    param:dsl <<A
+advise:
+    #2        xrc env/latest && ___x_cmd_env_advise_ls_local_version
+options:
+    #1        "Environment Candidates" <candidates>:candidates_list
+    #2        "Version"                <version>
+A
+    param:run
+
+    local candidate="${1}"
+    if [ -z "$candidate" ]; then
+        ___x_cmd_env_main_uninstall help
+        return 1
+    fi
+
+    local version
+    if ! version="$(___x_cmd_env_run_common_if_notfound full_version "$candidate" "$2")"; then
+        env_log error "Version of $candidate not found: $version"
+        return 1
+    fi
+    shift 2
+
+    ___x_cmd_env_run_common_if_notfound uninstall "$candidate" "$version" "$@"
+}
+# EndSection
+
 # Section: download, which, exec
 ___x_cmd_env_main_download(){
 
@@ -204,7 +277,20 @@ options:
 A
     param:run
 
-    ___x_cmd_env_run_common_if_notfound download "$@"
+    local candidate="${1}"
+    if [ -z "$candidate" ]; then
+        ___x_cmd_env_main_download help
+        return 1
+    fi
+
+    local version
+    if ! version="$(___x_cmd_env_run_common_if_notfound full_version "$candidate" "$2")"; then
+        env_log error "Version of $candidate not found: $version"
+        return 1
+    fi
+    shift 2
+
+    ___x_cmd_env_run_common_if_notfound download "$candidate" "$version" "$@"
 }
 
 ___x_cmd_env_main_which(){
@@ -215,7 +301,20 @@ options:
 A
     param:run
 
-    ___x_cmd_env_run_common_if_notfound which "$@"
+    local candidate="${1}"
+    if [ -z "$candidate" ]; then
+        ___x_cmd_env_main_which help
+        return 1
+    fi
+
+    local version
+    if ! version="$(___x_cmd_env_run_common_if_notfound full_version "$candidate" "$2")"; then
+        env_log error "Version of $candidate not found: $version"
+        return 1
+    fi
+    shift 2
+
+    ___x_cmd_env_run_common_if_notfound which "$candidate" "$version" "$@"
 }
 
 
@@ -230,13 +329,20 @@ options:
 A
     param:run
 
-
-    if [ -z "$1" ]; then
+    local candidate="${1}"
+    if [ -z "$candidate" ]; then
         ___x_cmd_env_main_exec help
         return 1
     fi
 
-    ___x_cmd_env_run_common_if_notfound exec "$@"
+    local version
+    if ! version="$(___x_cmd_env_run_common_if_notfound full_version "$candidate" "$2")"; then
+        env_log error "Version of $candidate not found: $version"
+        return 1
+    fi
+    shift 2
+
+    ___x_cmd_env_run_common_if_notfound exec "$candidate" "$version" "$@"
 }
 
 

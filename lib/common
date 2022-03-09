@@ -8,12 +8,20 @@ ___x_cmd_env_common_full_version(){
 }
 
 ___x_cmd_env_common_ls_local(){
-    local candidate="${1:?Provide candidate}"
-	if [ -d "$___X_CMD_ENV_PATH/$candidate/versions" ]; then
-		for version in $(find "$___X_CMD_ENV_PATH/$candidate/versions" -maxdepth 1 -mindepth 1 \( -type l -o -type d \) -exec basename '{}' \; | sort -r); do
-			printf "%s\n" "$version"
-		done
-	fi
+    {
+        local candidate="${1:?Provide candidate}"
+        if [ -d "$___X_CMD_ENV_PATH/$candidate/versions" ]; then
+            ls "$___X_CMD_ENV_PATH/$candidate/versions"
+        fi
+        local tmp
+        for version in "$___X_CMD_ENV_PATH/$candidate/archive/"*; do
+            if [ -f "$version" ]; then
+                tmp="${version##*/"${candidate}"-}"
+                printf "%s\n" "${tmp%%.*}"
+            fi
+        done
+    # TODO: The sorting on the ls side is something we need to fix. Probably use common to call special functions
+    } 2>/dev/null | sort | uniq
 }
 
 ___x_cmd_env_common_la(){
@@ -28,19 +36,10 @@ ___x_cmd_env_common_use(){
     local version="${2:?Provide version}"
     
 
-    # TODO: Check if the installation package exists
-    # TODO: Check whether the installation package is unzipped
-    # if ___x_cmd_env_util_is_archieve_cached "$candidate" "$version"; then
-    #     env_log error "Installation package of $candidate $version does not exist"
-    #     return 1
-    # fi
+    ___x_cmd_env_util_if_downloaded_then_unpack "$candidate" "$version" || return 1
+    ___x_cmd_env_util_make_shim_dir "$candidate" "${version}" || return 1
+    ___x_cmd_env_util_add_path "${___X_CMD_ENV_PATH}/$candidate/shims" || return 1
 
-    ___x_cmd_env_shim_dir "$candidate" "${version}"
-    if ! ___x_cmd_env_util_add_path "${___X_CMD_ENV_PATH}/$candidate/shims" ; then
-        env_log error "Failed to add ${candidate} ${version} to $PATH"
-        return 1
-    fi
-    
     x boot rc add "x-env-$candidate" "xrc env/lib/util && ___x_cmd_env_util_add_path \"${___X_CMD_ENV_PATH}/$candidate/shims\"" && \
         printf "%s\n" "$version" > "$___X_CMD_ENV_PATH/$candidate/version" && \
         env_log info "Using $candidate $version . -> $___X_CMD_ENV_PATH/$candidate/version"
@@ -51,48 +50,9 @@ ___x_cmd_env_common_try(){
     local version="${2:?Provide version}"
     local versions_path="${3:-"$___X_CMD_ENV_PATH/$candidate/versions/$version/bin"}"
 
-    # TODO: Check if it is installed
-    # ___x_cmd_env_util_is_version_installed "${candidate}" "${version}" || return
-
-    env_log info "Setting ${candidate} ${version} in current Shell."
-    if ! ___x_cmd_env_util_add_path "$versions_path" ; then
-        env_log error "Failed to try ${candidate} ${version} in $versions_path"
-    fi
-}
-
-___x_cmd_env_shim_dir(){
-    local candidate="${1:?Provide candidate}"
-    local version="${2:?Provide version}"
-    local version_path=".x-cmd/.env/$candidate/version"
-    local versions_path="$___X_CMD_ENV_PATH/$candidate/versions"
-    rm -rf "${___X_CMD_ENV_PATH}/$candidate/shims"
-    mkdir -p "${___X_CMD_ENV_PATH}/$candidate/shims"
-
-    for name in "${versions_path}/${version}/bin/"* ; do
-        printf "%s\n" "$(cat <<A
-#!/usr/bin/env sh
-set -e
-
-cur=\$(pwd)
-while [ ! "\$cur" = "" ]; do
-    if [ -f "\$cur/$version_path" ]; then
-        version=\$(cat "\$cur/$version_path")
-        exec $versions_path/\$version/bin/${name##*/} "\$@"
-        return 0
-    fi
-    cur=\${cur%/*}
-done
-
-if [ -f $___X_CMD_ENV_PATH/$candidate/version ]; then
-    version=\$(cat $___X_CMD_ENV_PATH/$candidate/version)
-    exec $versions_path/\$version/bin/${name##*/} "\$@"
-    return 0
-fi
-## TODO: no found
-A
-)">"$___X_CMD_ENV_PATH/$candidate/shims/${name##*/}"
-        chmod +x "$___X_CMD_ENV_PATH/$candidate/shims/${name##*/}"
-    done
+    ___x_cmd_env_util_if_downloaded_then_unpack "$candidate" "$version" || return 1
+    ___x_cmd_env_util_add_path "$versions_path" && \
+        env_log info "Setting ${candidate} ${version} in current Shell."
 }
 
 # EndSection
@@ -108,22 +68,26 @@ ___x_cmd_env_common_current(){
     local candidate="${1:?Provide candidate}"
     local candidate_path
     candidate_path="$(command -v "$candidate")"
+    local version_path=".x-cmd/.env/$candidate/version"
+    local cur
+    cur=$(pwd)
+
+    # After try and no any candidate version and has candidate version in current shell
     if [ -z "$candidate_path" ]; then
-        printf "No version of %s is detected, please install it first!\n" "$candidate"
+        env_log error "No version of %s $candidate detected, please install it first! "
+        return 1
     elif [ "$candidate_path" != "$___X_CMD_ENV_PATH/$candidate/shims/$candidate" ]; then
         local try_path="${candidate_path#*"versions/"}"
         try_path="${try_path%%/*}"
         if [ "$try_path" != "$candidate" ] && [ -n "$try_path" ]; then
-            printf "%s\n" "$try_path"   # try
+            printf "%s\n" "$try_path"
         else
             printf "%s\n" "system"
         fi
         return 0
     fi
 
-    local version_path=".x-cmd/.env/$candidate/version"
-    local cur
-    cur=$(pwd)
+    # Use(shims)
     while [ ! "$cur" = "" ]; do
         if [ -f "$cur/$version_path" ]; then
             local vertify_list
@@ -140,7 +104,7 @@ ___x_cmd_env_common_current(){
         cur=${cur%/*}
     done
 
-    # FIXME: If there is no in home directory, that you will get an error.
+    # If there is no in home directory, that you will get an error.
     if [ -f "$___X_CMD_ENV_PATH/$candidate/version" ]; then
         version=$(cat "$___X_CMD_ENV_PATH/$candidate"/version)
         printf "%s\n" "$version"
@@ -154,31 +118,23 @@ ___x_cmd_env_common_install(){
     local candidate="${1:?Provide canddidate}"
     local version="${2:?Provide version}"
 
-    local full_version= $(___x_cmd_env_run_common_if_notfound full_version "$candidate" "${version}")
-    if ! full_version=$(___x_cmd_env_run_common_if_notfound full_version "$candidate" "${version}"); then
-        env_log error "Version of $candidate not found: $version"
-        return 1
-    fi
-    unset version
+    env_log info "Installing $candidate $version"
+    if ___x_cmd_env_util_is_download_and_unpack "$candidate" "$version" ; then
+        env_log info "Already downloaded and unpacked $candidate $version"
+    else
+        if ! ___x_cmd_env_run_common_if_notfound download "$candidate" "$version"; then
+            env_log info "Fail to download $candidate of version: $version."
+            return 1
+        fi
 
-    env_log info "Installing $candidate $full_version"
-    if ___x_cmd_env_util_is_version_installed "$candidate" "$full_version"; then
-        env_log error "Version of $candidate $version already installed"
-        return 1
-    fi
-
-    if ! ___x_cmd_env_run_common_if_notfound download "$candidate" "$full_version"; then
-        env_log info "Fail to download $candidate of version: $full_version."
-        return 1
+        if ! ___x_cmd_env_run_common_if_notfound unpack "$candidate" "$version"; then
+            env_log info "Fail to unpack $candidate of version: $version."
+            return 1
+        fi
     fi
 
-    if ! ___x_cmd_env_run_common_if_notfound unpack "$candidate" "$full_version"; then
-        env_log info "Fail to unpack $candidate of version: $full_version."
-        return 1
-    fi
-
-    ___x_cmd_env_common_use "$candidate" "$full_version"
-    env_log info "Successfully installed $candidate $full_version"
+    ___x_cmd_env_common_use "$candidate" "$version"
+    env_log info "Successfully installed $candidate $version"
 }
 
 ___x_cmd_env_common_uninstall(){
