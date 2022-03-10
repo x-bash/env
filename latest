@@ -5,15 +5,7 @@
 
 # Inject the environment.
 ___x_cmd_env_main() {
-    x log init env
-    xrc env/lib/util
-    xrc env/lib/common
     xrc env/lib/main
-    xrc param
-
-    param_type  env  candidates_list - <<A
-$(___x_cmd_env_candidate_all)
-A
     ___x_cmd_env_main "$@"
 }
 

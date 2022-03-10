@@ -1,5 +1,41 @@
 # shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263    # xrc
 
+# Section: Candidate API
+___x_cmd_env_candidate_all(){
+    printf "%s" "
+python
+node
+go
+java
+deno
+scala
+kotlin
+perl
+"
+
+}
+
+___x_cmd_env_candidate_has(){
+    local target="${1:?Provide target}"
+    local s="$(___x_cmd_env_candidate_all)"
+    if [ "$s" = "${s#*
+$target
+}" ]; then
+        return 1
+    fi
+    return 0
+}
+
+# EndSection
+
+x log init env
+xrc env/lib/util
+xrc env/lib/common
+xrc param
+param_type  env  candidates_list - <<A
+$(___x_cmd_env_candidate_all)
+A
+
 # Section: ENV ___X_CMD_ENV_PATH
 
 ___X_CMD_ENV_PATH="$___X_CMD_ROOT/.env"
@@ -305,30 +341,3 @@ A
 
 # EndSection
 
-# Section: Candidate API
-___x_cmd_env_candidate_all(){
-    printf "%s" "
-python
-node
-go
-java
-deno
-scala
-kotlin
-perl
-"
-
-}
-
-___x_cmd_env_candidate_has(){
-    local target="${1:?Provide target}"
-    local s="$(___x_cmd_env_candidate_all)"
-    if [ "$s" = "${s#*
-$target
-}" ]; then
-        return 1
-    fi
-    return 0
-}
-
-# EndSection
