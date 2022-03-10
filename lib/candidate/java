@@ -3,7 +3,6 @@ xrc env/lib/sdk
 
 # Section: Java ls_remote and la
 
-
 ___x_cmd_env_java_ls_remote(){
 	___x_cmd_env_sdk_ls_remote java "$@"
 }
@@ -13,7 +12,7 @@ ___x_cmd_env_java_ls_remote(){
 # Section: download, unpack
 
 ___x_cmd_env_java_download_archive(){
-   ___x_cmd_env_sdk_download_archive java "$@"  
+   ___x_cmd_env_sdk_download_archive java "$@"
 }
 
 ___x_cmd_env_java_unpack(){

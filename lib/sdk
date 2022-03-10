@@ -82,7 +82,7 @@ ___x_cmd_env_sdk_download_archive(){
 	export local binary_input="$___X_CMD_ENV_PATH/$candidate/tmp/${base_name}.bin"
 	export local zip_output="$___X_CMD_ENV_PATH/$candidate/tmp/$base_name.zip"
 
-	env_log info "Downloading: $candi$candidate ${version}"
+	env_log info "Downloading: $candidate ${version}"
 	env_log info "In progress..."
 
 	# download binary
@@ -95,7 +95,7 @@ ___x_cmd_env_sdk_download_archive(){
 	local post_installation_hook="$___X_CMD_ENV_PATH/$candidate/tmp/hook_post_${candidate}_${version}.sh"
 
 	env_log debug "Get post-installation hook: https://api.sdkman.io/2/hooks/post/$candidate/${version}/${___X_CMD_ENV_SDK_PLATFORM}"
-	curl --silent --location "https://api.sdkman.io/2/hooks/po$candidate/${version}/${___X_CMD_ENV_SDK_PLATFORM}" > "$post_installation_hook"
+	curl --silent --location "https://api.sdkman.io/2/hooks/post/$candidate/${version}/${___X_CMD_ENV_SDK_PLATFORM}" > "$post_installation_hook"
 	env_log debug "Copy remote post-installation hook: ${post_installation_hook}"
 	. "$post_installation_hook"
 	__sdkman_post_installation_hook || return 1
@@ -109,7 +109,8 @@ ___x_cmd_env_sdk_download_archive(){
 }
 
 ___x_cmd_env_sdk_unpack(){
-	local version="${1:?Provide a version}"
+	local candidate="${1:?Provide canddidate}"
+	local version="${2:?Provide a version}"
 	env_log info "Unpacking: $candidate ${version}"
 	unzip -oq "$___X_CMD_ENV_PATH/$candidate/archive/$candidate-${version}.zip" -d "$___X_CMD_ENV_PATH/$candidate/tmp/out"
 	mkdir -p "$___X_CMD_ENV_PATH/$candidate/versions"

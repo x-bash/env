@@ -7,9 +7,7 @@ ___x_cmd_env_kotlin_ls_remote(){
 }
 
 ___x_cmd_env_kotlin_download_archive(){
-
-	___x_cmd_env_sdk_download_archive kotlin "$@" 
-
+	___x_cmd_env_sdk_download_archive kotlin "$@"
 }
 
 ___x_cmd_env_kotlin_ws(){
@@ -17,7 +15,7 @@ ___x_cmd_env_kotlin_ws(){
 }
 
 ___x_cmd_env_kotlin_unpack(){
-___x_cmd_env_sdk_unpack kotlin "$@"
-}			
+	___x_cmd_env_sdk_unpack kotlin "$@"
+}
 
 

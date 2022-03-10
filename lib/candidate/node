@@ -58,10 +58,6 @@ ___x_cmd_env_node_try(){
 
 # EndSection
 
-# Section: use
-
-# EndSection
-
 # Section: download
 
 ___x_cmd_env_node_download_archive(){

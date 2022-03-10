@@ -62,18 +62,6 @@ ___x_cmd_env_deno_download(){
     fi
 }
 
-___x_cmd_env_deno_use(){
-    :
-}
-
 ___x_cmd_env_deno_ws(){
-    :
-}
-
-___x_cmd_env_deno_which(){
-    :
-}
-
-___x_cmd_env_deno_exec(){
     :
 }
