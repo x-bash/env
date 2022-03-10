@@ -19,17 +19,16 @@ A
 
 # Section: advise ls_version
 
-# TODO: define the function when x-cmd start
 ___x_cmd_env_advise_ls_remote_version(){
     local candidate_idx="${1:-2}"
     [ -n "$ZSH_VERSION" ] && candidate_idx=$((candidate_idx+1))
-    ___x_cmd_env_main_ls -r "${COMP_WORDS[candidate_idx]}"
+    x env ls -r "${COMP_WORDS[candidate_idx]}"
 }
 
 ___x_cmd_env_advise_ls_local_version(){
     local candidate_idx="${1:-2}"
     [ -n "$ZSH_VERSION" ] && candidate_idx=$((candidate_idx+1))
-    ___x_cmd_env_main_ls "${COMP_WORDS[candidate_idx]}"
+    x env ls -r "${COMP_WORDS[candidate_idx]}"
 }
 
 # EndSection
