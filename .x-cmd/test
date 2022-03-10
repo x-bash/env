@@ -67,17 +67,14 @@ case $1 in
         x env ls java
         env_log info "Testing java ls -r."
         x env ls -r java
-        env_log info "Testing java la."
-        x env la java
+        # env_log info "Testing java la."
+        # x env la java
         env_log info "Testing java current."
         x env current java
-        echo ""
         env_log info "Testing java download."
         x env download java 17.0.2.8.1-amzn
-        # env_log info "Testing java install."
-        # x env install java 17.0.2.8.1-amzn
-
-        # x env install java 17.0.2-zulu
+        env_log info "Testing java install."
+        x env install java 17.0.2-zulu
         # x env install java 21.3.0.0-mandrel
         # x env use java 17.0.2.8.1-amzn
         # x env la java
@@ -85,8 +82,8 @@ case $1 in
         # x env install java 17.0.2.8.1-amzn
         # x env uninstall java 17.0.2.8.1-amzn
         # # x env use java 17.0.2.8.1-amzn
-        # x env ls java
-        # x env current java
+        x env ls java
+        x env current java
         # echo ""
         # x env exec java 17.0.2.8.1-amzn -version
         ;;

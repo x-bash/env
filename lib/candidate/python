@@ -71,7 +71,7 @@ ___x_cmd_env_python_ls_remote(){
 
 # Section: download, unpack
 
-___x_cmd_env_python_download()(
+___x_cmd_env_python_download_archive()(
     local miniconda_name
     local miniconda_filename
     local archive_name
@@ -99,11 +99,6 @@ ___x_cmd_env_python_download()(
             return 1
         fi
     fi
-
-    if ! ___x_cmd_env_python_unpack "$version"; then
-		env_log info "Fail to unpack python of version: $version."
-		return 1
-	fi
 )
 
 ___x_cmd_env_python_unpack(){

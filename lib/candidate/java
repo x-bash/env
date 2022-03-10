@@ -48,10 +48,8 @@ ___x_cmd_env_java_ls_remote(){
 
 # Section: download, unpack
 
-___x_cmd_env_java_download(){
+___x_cmd_env_java_download_archive(){
     local version="${1:?Provide a version}"
-
-	# TODO: Should we check unpack_dir?
 	if ___x_cmd_env_util_is_archive_cached node "$version"; then
         env_log info "Archive existed: $version"
         return 0
@@ -101,11 +99,6 @@ ___x_cmd_env_java_download(){
 	env_log debug "Moved to archive folder: $zip_archive_target"
 
 	env_log info "Download complete Java $version"
-
-	if ! ___x_cmd_env_java_unpack "$version"; then
-		env_log info "Fail to unpack java of version: $version."
-		return 1
-	fi
 }
 
 ___x_cmd_env_java_unpack(){
