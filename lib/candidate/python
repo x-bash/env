@@ -71,7 +71,7 @@ ___x_cmd_env_python_ls_remote(){
 
 # Section: download, unpack
 
-___x_cmd_env_python_download()(
+___x_cmd_env_python_download_archive()(
     local miniconda_name
     local miniconda_filename
     local archive_name
@@ -79,26 +79,25 @@ ___x_cmd_env_python_download()(
 
     if ___x_cmd_env_util_is_archive_cached python "$version"; then
         env_log info "Archive existed: $version"
-        return 0
-    fi
-
-    ___x_cmd_env_python_get_miniconda_name_and_filename "$version"
-
-    local candidate_path="$___X_CMD_ENV_PATH/python/archive"
-    mkdir -p "${candidate_path}"
-    cd "${candidate_path}" || return 1
-    local url="https://repo.anaconda.com/miniconda"
-    if [ "${___X_CMD_IN_CHINA_NET:-0}" -eq 1 ]; then
-        url="https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda"
-    fi
-
-    env_log info "Downloading $url/$miniconda_filename"
-    if curl --fail --output "$archive_name" "$url/$miniconda_filename"; then
-        env_log info "Download completed python $miniconda_name"
-        return
     else
-        env_log error "Download failure from $url/${miniconda_filename}"
-        return 1
+        ___x_cmd_env_python_get_miniconda_name_and_filename "$version"
+
+        local candidate_path="$___X_CMD_ENV_PATH/python/archive"
+        mkdir -p "${candidate_path}"
+        cd "${candidate_path}" || return 1
+        local url="https://repo.anaconda.com/miniconda"
+        if [ "${___X_CMD_IN_CHINA_NET:-0}" -eq 1 ]; then
+            url="https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda"
+        fi
+
+        env_log info "Downloading $url/$miniconda_filename"
+        if curl --fail --output "$archive_name" "$url/$miniconda_filename"; then
+            env_log info "Download completed python $miniconda_name"
+            return
+        else
+            env_log error "Download failure from $url/${miniconda_filename}"
+            return 1
+        fi
     fi
 )
 
