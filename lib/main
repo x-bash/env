@@ -269,7 +269,7 @@ A
         env_log error "Version of $candidate not found: $version"
         return 1
     fi
-    shift 2
+    shift 1
 
     ___x_cmd_env_run_common_if_notfound which "$candidate" "$version" "$@"
 }
@@ -313,8 +313,9 @@ node
 go
 java
 deno
-perl
+scala
 kotlin
+perl
 "
 
 }

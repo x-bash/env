@@ -1,45 +1,23 @@
 # shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263    # xrc
 
-___x_cmd_env_kotlin_ls(){
-    :
+xrc env/lib/sdk
+
+___x_cmd_env_kotlin_ls_remote(){
+	___x_cmd_env_sdk_ls_remote kotlin "$@"
 }
 
-___x_cmd_env_kotlin_la(){
-    :
-}
+___x_cmd_env_kotlin_download_archive(){
 
-___x_cmd_env_kotlin_download(){
-    :
-}
+	___x_cmd_env_sdk_download_archive kotlin "$@" 
 
-___x_cmd_env_kotlin_install(){
-    :
-}
-
-___x_cmd_env_kotlin_uninstall(){
-    :
-}
-
-___x_cmd_env_kotlin_try(){
-    :
-}
-
-___x_cmd_env_kotlin_use(){
-    :
 }
 
 ___x_cmd_env_kotlin_ws(){
-    :
+  :
 }
 
-___x_cmd_env_kotlin_current(){
-    :
-}
+___x_cmd_env_kotlin_unpack(){
+___x_cmd_env_sdk_unpack kotlin "$@"
+}			
 
-___x_cmd_env_kotlin_which(){
-    :
-}
 
-___x_cmd_env_kotlin_exec(){
-    :
-}

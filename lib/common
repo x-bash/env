@@ -168,7 +168,7 @@ ___x_cmd_env_common_which(){
         while [ ! "$cur" = "" ]; do
             if [ -f "$cur/.x-cmd/.env/$candidate/version" ]; then
                 version=$(cat "$cur/.x-cmd/.env/$candidate/version")
-                printf "%s\n" "$___X_CMD_ENV_PATH/$candidate/versions/$version/bin/node"
+                printf "%s\n" "$___X_CMD_ENV_PATH/$candidate/versions/$version/bin/$candidate"
                 return 0
             fi
             cur=${cur%/*}
