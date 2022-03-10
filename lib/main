@@ -300,14 +300,8 @@ A
         return 1
     fi
 
-    local version
-    if ! version="$(___x_cmd_env_run_common_if_notfound full_version "$candidate" "$2")"; then
-        env_log error "Version of $candidate not found: $version"
-        return 1
-    fi
-    shift 1
-
-    ___x_cmd_env_run_common_if_notfound which "$candidate" "$version" "$@"
+    # TODO: can which specific versions
+    ___x_cmd_env_run_common_if_notfound which "$candidate" "$@"
 }
 
 
