@@ -1,5 +1,5 @@
 > PR 命令规范：【{模块名}】| {修复或优化的功能点} | {deadline} <br/>
-> @example: style | 新增 rgb256 颜色支持 | deadline:2021-12-16
+> @example: param | Param sub function enhancement | 2022-3-1
 
 ### 关联 issue
 
@@ -43,5 +43,5 @@
 ### 其他
 
 - 备注: xxx
-- reviewer @xxx
-- review dealine 2021/xx/xx
+- reviewer @[李庭辉](https://e.gitee.com/lteam18/members/trend/padparadsayc)
+- review dealine 2022-xx-xx
