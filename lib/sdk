@@ -54,7 +54,7 @@ ___x_cmd_env_sdk_ls_remote(){
 ___x_cmd_env_sdk_download_archive(){
 	local candidate="${1:?Provide canddidate}"
     local version="${2:?Provide a version}"
-	if ___x_cmd_env_util_is_archive_cached "$candidate" "$version"; then
+	if ___x_cmd_env_util_is_archive_cached "$candidate" "$version" 2>/dev/null; then
         env_log info "Archive existed: $version"
         return 0
     fi

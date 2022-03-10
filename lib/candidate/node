@@ -78,7 +78,7 @@ ___x_cmd_env_node_download_archive(){
 
     local version="${1:?Provide node version}"
 
-    if ___x_cmd_env_util_is_archive_cached node "$version"; then
+    if ___x_cmd_env_util_is_archive_cached node "$version" 2>/dev/null; then
         env_log info "Archive existed: $version"
         return 0
     fi

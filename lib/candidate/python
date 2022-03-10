@@ -77,7 +77,7 @@ ___x_cmd_env_python_download_archive()(
     local archive_name
     local version="${1:?Provide python version}"
 
-    if ___x_cmd_env_util_is_archive_cached python "$version"; then
+    if ___x_cmd_env_util_is_archive_cached python "$version" 2>/dev/null; then
         env_log info "Archive existed: $version"
     else
         ___x_cmd_env_python_get_miniconda_name_and_filename "$version"

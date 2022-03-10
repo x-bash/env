@@ -25,7 +25,7 @@ ___x_cmd_env_common_use(){
     local candidate="${1:?Provide candidate}"
     local version="${2:?Provide version}"
 
-    ___x_cmd_env_util_is_download "$candidate" "$version" || return 1
+    ___x_cmd_env_util_is_downloaded "$candidate" "$version" || return 1
     ___x_cmd_env_util_make_shim_dir "$candidate" "${version}" || return 1
     ___x_cmd_env_util_add_path "${___X_CMD_ENV_PATH}/$candidate/shims" || return 1
 
@@ -108,7 +108,7 @@ ___x_cmd_env_common_download(){
     local candidate="${1:?Provide canddidate}"
     local version="${2:?Provide version}"
 
-    if ___x_cmd_env_util_is_download "$candidate" "$version" ; then
+    if ___x_cmd_env_util_is_downloaded "$candidate" "$version" 2>/dev/null ; then
         env_log info "Already downloaded $candidate $version"
         return 0
     fi
@@ -181,7 +181,7 @@ ___x_cmd_env_common_which(){
 ___x_cmd_env_common_exec(){
     local candidate="${1:?Provide candidate}"
     local version="${2:?Provide version}" ; shift 2
-    ___x_cmd_env_util_is_download "${candidate}" "${version}" || return
+    ___x_cmd_env_util_is_downloaded "${candidate}" "${version}" || return
     local PATH="${___X_CMD_ENV_PATH}/${candidate}/versions/${version}/bin:$PATH"
     "${candidate}" "$@"
 }

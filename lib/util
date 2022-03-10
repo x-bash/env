@@ -21,13 +21,14 @@ ___x_cmd_env_util_add_path(){
     PATH="$path_target"
 }
 
-___x_cmd_env_util_is_download(){
+___x_cmd_env_util_is_downloaded(){
     local candidate="${1:?Provide candidate}"
     local version="${2:?Provide version}"
 
     # Check the candidate version in general way.
     local candidate_path="$___X_CMD_ENV_PATH/${candidate}/versions/${version}"
     if [ ! -d "${candidate_path}" ]; then
+        env_log error "${candidate} of ${version} does not exist !"
         return 1
     fi
     return 0
@@ -44,6 +45,7 @@ ___x_cmd_env_util_is_archive_cached(){
     local dir_list
     dir_list="$(ls "$___X_CMD_ENV_PATH/$candidate/archive" 2>/dev/null)"
     if [ "${dir_list#*"$candidate-$version"}" = "$dir_list" ]; then
+        env_log error "The archive of ${candidate} ${version} does not exist !"
         return 1
     fi
 
