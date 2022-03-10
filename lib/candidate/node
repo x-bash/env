@@ -110,7 +110,9 @@ A
 
     local slug="node-${version}-${platform}-${arch}"
     local compression='tar.gz'; [ "${platform}" = 'win' ] && compression='zip' # TODO: tar.xz support
-    local archive_path="$___X_CMD_ENV_PATH/node/archive/node-${version}.${compression}"
+    local archive_dir="$___X_CMD_ENV_PATH/node/archive"
+    mkdir -p "${archive_dir}"
+    local archive_path="${archive_dir}/node-${version}.${compression}"
 
     # TODO: node <= 0.1.13 does not have a directory
     local archive_url="${___X_CMD_ENV_NODE_MIRROR}/${version}/${slug}.${compression}"
@@ -128,8 +130,7 @@ A
 
 # Section: unpack
 ___x_cmd_env_node_unpack_win(){
-    local version_path
-    version_path="${___X_CMD_ENV_PATH}/node/versions/${version}/bin"
+    local version_path="${___X_CMD_ENV_PATH}/node/versions/${version}/bin"
 
     unzip -q "${archive_path}" -d "${archive_dir_files}" || return 1
 
