@@ -40,7 +40,6 @@ case $1 in
 
         env_log info "Testing node current."
         x env current node
-        echo ""
 
         env_log info "Testing node ls -r."
         x env ls -r node
@@ -48,10 +47,19 @@ case $1 in
         # x env install node v14.19.0
         env_log info "Testing node install."
         x env install node v17.5.0
-        x env la node
+
+        env_log info "Testing node uninstall."
+        x env uninstall node v17.5.0
+
+        env_log info "Testing node install."
+        x env install node v17.4.0
+
+        # x env la node
         # x env use node v17.5.0
-        # x env current node
-        # x env exec node v14.19.0
+        env_log info "Testing node current."
+        x env current node
+        env_log info "Testing node exec."
+        x env exec node v17.4.0 --version
         ;;
     java)
         # . "$(x wsroot)/.x-cmd/testcases/java"

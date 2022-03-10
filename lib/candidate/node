@@ -64,15 +64,14 @@ ___x_cmd_env_node_try(){
 
 # Section: download
 
-___x_cmd_env_node_download(){
+___x_cmd_env_node_download_archive(){
+    # TODO: Handle bsd, sunos ..
     local version="${1:?Provide node version}"
 
     if ___x_cmd_env_util_is_archive_cached node "$version"; then
         env_log info "Archive existed: $version"
         return 0
     fi
-
-    # TODO: Handle bsd, sunos ..
 
     local platform
     local arch
@@ -89,22 +88,20 @@ A
 
     local slug="node-${version}-${platform}-${arch}"
     local compression='tar.gz'; [ "${platform}" = 'win' ] && compression='zip' # TODO: tar.xz support
-    local candidate_path="$___X_CMD_ENV_PATH/node/archive"
-    archive_dir_files="${candidate_path}/files"
-    mkdir -p "$archive_dir_files"
-
-    tarball="$candidate_path/node-${version}.${compression}"
+    local archive_path="$___X_CMD_ENV_PATH/node/archive/node-${version}.${compression}"
 
     # TODO: node <= 0.1.13 does not have a directory
-    local tarball_url="${___X_CMD_ENV_NODE_MIRROR}/${version}/${slug}.${compression}"
+    local archive_url="${___X_CMD_ENV_NODE_MIRROR}/${version}/${slug}.${compression}"
 
-    if ! curl -L -C - --progress-bar "${tarball_url}" -o "${tarball}"; then
-        rm -rf "${tarball}" "${candidate_path}"
-        # TODO: Prompt message to modify
-        env_log error "Binary download from ${tarball_url} failed, trying source."
+    if ! curl -L -C - --progress-bar "${archive_url}" -o "${archive_path}"; then
+        rm -rf "${archive_path}"
+        env_log error "Binary download from ${archive_url} failed, trying source."
         return 1
     fi
-    env_log info "Downloaded ${tarball_url} to ${tarball}"
+
+    # TODO: checksum
+
+    env_log info "Downloaded ${archive_url} to ${archive_path}"
 }
 # EndSection
 
@@ -113,7 +110,7 @@ ___x_cmd_env_node_unpack_win(){
     local version_path
     version_path="${___X_CMD_ENV_PATH}/node/versions/${version}/bin"
 
-    unzip -q "${tarball}" -d "${archive_dir_files}" || return 1
+    unzip -q "${archive_path}" -d "${archive_dir_files}" || return 1
 
     mkdir -p "${version_path}" && (
         mv "${archive_dir_files}/"*/* "${version_path}" || return 1
@@ -124,14 +121,19 @@ ___x_cmd_env_node_unpack_win(){
 
 ___x_cmd_env_node_unpack_other(){
     local version_path="${___X_CMD_ENV_PATH}/node/versions/${version}"
-    tar -xzf "${tarball}" -C "${archive_dir_files}" --strip-components 1 || return 1
+    tar -xzf "${archive_path}" -C "${archive_dir_files}" --strip-components 1 || return 1
 
     mkdir -p "${version_path}" && mv "${archive_dir_files}/"* "${version_path}"
 }
 
 ___x_cmd_env_node_unpack(){
     local version="${1:?Provide node version}"
-    # TODO: checksum
+
+    local compression='tar.gz'; [ "${platform}" = 'win' ] && compression='zip' # TODO: tar.xz support
+    local archive_path="$___X_CMD_ENV_PATH/node/archive/node-${version}.${compression}"
+    local archive_dir_files
+    archive_dir_files="$(dirname "$archive_path")/files"
+    mkdir -p "$archive_dir_files"
 
     case "$platform" in
         win)    ___x_cmd_env_node_unpack_win    ;;

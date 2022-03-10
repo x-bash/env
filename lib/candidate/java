@@ -34,7 +34,7 @@ __sdkman_echo_cyan() {
 
 # EndSection
 
-# Section: Java ls and la
+# Section: Java ls_remote and la
 
 ___x_cmd_env_java_ls_remote(){
 	local pattern="${1:-""}"
@@ -101,7 +101,11 @@ ___x_cmd_env_java_download(){
 	env_log debug "Moved to archive folder: $zip_archive_target"
 
 	env_log info "Download complete Java $version"
-	return 0
+
+	if ! ___x_cmd_env_java_unpack "$version"; then
+		env_log info "Fail to unpack java of version: $version."
+		return 1
+	fi
 }
 
 ___x_cmd_env_java_unpack(){

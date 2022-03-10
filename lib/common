@@ -8,20 +8,10 @@ ___x_cmd_env_common_full_version(){
 }
 
 ___x_cmd_env_common_ls_local(){
-    {
-        local candidate="${1:?Provide candidate}"
-        if [ -d "$___X_CMD_ENV_PATH/$candidate/versions" ]; then
-            ls "$___X_CMD_ENV_PATH/$candidate/versions"
-        fi
-        local tmp
-        for version in "$___X_CMD_ENV_PATH/$candidate/archive/"*; do
-            if [ -f "$version" ]; then
-                tmp="${version##*/"${candidate}"-}"
-                printf "%s\n" "${tmp%%.*}"
-            fi
-        done
-    # TODO: The sorting on the ls side is something we need to fix. Probably use common to call special functions
-    } 2>/dev/null | sort | uniq
+    local candidate="${1:?Provide candidate}"
+    if [ -d "$___X_CMD_ENV_PATH/$candidate/versions" ]; then
+        ls "$___X_CMD_ENV_PATH/$candidate/versions"
+    fi
 }
 
 ___x_cmd_env_common_la(){
@@ -35,7 +25,7 @@ ___x_cmd_env_common_use(){
     local candidate="${1:?Provide candidate}"
     local version="${2:?Provide version}"
 
-    ___x_cmd_env_util_if_downloaded_then_unpack "$candidate" "$version" || return 1
+    ___x_cmd_env_util_is_download "$candidate" "$version" || return 1
     ___x_cmd_env_util_make_shim_dir "$candidate" "${version}" || return 1
     ___x_cmd_env_util_add_path "${___X_CMD_ENV_PATH}/$candidate/shims" || return 1
 
@@ -49,7 +39,7 @@ ___x_cmd_env_common_try(){
     local version="${2:?Provide version}"
     local versions_path="${3:-"$___X_CMD_ENV_PATH/$candidate/versions/$version/bin"}"
 
-    ___x_cmd_env_util_if_downloaded_then_unpack "$candidate" "$version" || return 1
+    ___x_cmd_env_util_is_downloaded "$candidate" "$version" || return 1
     ___x_cmd_env_util_add_path "$versions_path" && \
         env_log info "Setting ${candidate} ${version} in current Shell."
 }
@@ -112,24 +102,39 @@ ___x_cmd_env_common_current(){
 }
 # EndSection
 
+# Section: download
+
+___x_cmd_env_common_download(){
+    local candidate="${1:?Provide canddidate}"
+    local version="${2:?Provide version}"
+
+    if ___x_cmd_env_util_is_download "$candidate" "$version" ; then
+        env_log info "Already downloaded $candidate $version"
+        return 0
+    fi
+
+    if ! ___x_cmd_env_run_common_if_notfound download_archive "$candidate" "$version"; then
+        env_log info "Failed to download $candidate $version"
+        return 1
+    fi
+
+    if ! ___x_cmd_env_run_common_if_notfound unpack "$candidate" "$version"; then
+		env_log info "Fail to unpack $candidate of version: $version."
+		return 1
+	fi
+}
+
+# EndSection
+
 # Section: install, uninstall
 ___x_cmd_env_common_install(){
     local candidate="${1:?Provide canddidate}"
     local version="${2:?Provide version}"
 
     env_log info "Installing $candidate $version"
-    if ___x_cmd_env_util_is_download_and_unpack "$candidate" "$version" ; then
-        env_log info "Already downloaded and unpacked $candidate $version"
-    else
-        if ! ___x_cmd_env_run_common_if_notfound download "$candidate" "$version"; then
-            env_log info "Fail to download $candidate of version: $version."
-            return 1
-        fi
-
-        if ! ___x_cmd_env_run_common_if_notfound unpack "$candidate" "$version"; then
-            env_log info "Fail to unpack $candidate of version: $version."
-            return 1
-        fi
+    if ! ___x_cmd_env_run_common_if_notfound download "$candidate" "$version"; then
+        env_log info "Fail to download $candidate of version: $version."
+        return 1
     fi
 
     ___x_cmd_env_common_use "$candidate" "$version"
@@ -153,7 +158,7 @@ ___x_cmd_env_common_uninstall(){
 }
 # EndSection
 
-# Section: which
+# Section: which, exec
 ___x_cmd_env_common_which(){
     local candidate="${1:?Provide candidate}"
     local candidate_path
@@ -176,7 +181,7 @@ ___x_cmd_env_common_which(){
 ___x_cmd_env_common_exec(){
     local candidate="${1:?Provide candidate}"
     local version="${2:?Provide version}" ; shift 2
-    ___x_cmd_env_util_is_version_installed "${candidate}" "${version}" || return
+    ___x_cmd_env_util_is_download "${candidate}" "${version}" || return
     local PATH="${___X_CMD_ENV_PATH}/${candidate}/versions/${version}/bin:$PATH"
     "${candidate}" "$@"
 }

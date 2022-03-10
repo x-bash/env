@@ -21,27 +21,7 @@ ___x_cmd_env_util_add_path(){
     PATH="$path_target"
 }
 
-
-
-# Section: if_downloaded_then_unpack, is version download and unpack, is archive cached
-
-___x_cmd_env_util_if_downloaded_then_unpack(){
-    local candidate="${1:?Provide candidate}"
-    local version="${2:?Provide version}"
-
-    if ___x_cmd_env_util_is_download_and_unpack "$candidate" "$version"; then
-        return 0
-    fi
-
-    if ! ___x_cmd_env_util_is_archive_cached "$candidate" "$version"; then
-        env_log error "Installation package of $candidate $version does not exist, please download it first."
-        return 1
-    fi
-
-    ___x_cmd_env_run_common_if_notfound unpack "$candidate" "$version"
-}
-
-___x_cmd_env_util_is_download_and_unpack(){
+___x_cmd_env_util_is_download(){
     local candidate="${1:?Provide candidate}"
     local version="${2:?Provide version}"
 
