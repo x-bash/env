@@ -12,29 +12,15 @@ ___x_cmd_env_kotlin_ls_remote(){
 	
 }
 
-___x_cmd_env_kotlin_download(){
+___x_cmd_env_kotlin_download_archive(){
 
     
     local version="${1:?Provide a version}"
     env_log info "starting"
-
-	# TODO: Check if it is installed
-	# if ___x_cmd_env_util_is_version_installed java "$full_version"; then
-    #     env_log info "Archieve existed: $full_version"
-    #     return 0
-    # fi
-
-	# TODO: Check if the installation package exists
-	# if ___x_cmd_env_util_is_archieve_cached java "$full_version"; then
-    #     env_log info "Archieve existed: $full_version"
-    #     return 0
-    # fi
-
-	# Reference:
-	# if [ -f "${archives_folder}/java-${version}.zip" ]; then
-	# 	env_log info "Found a previously downloaded java ${version} archive. Not downloading it again..."
-	# 	return 1
-	# else
+	if ___x_cmd_env_util_is_archive_cached kotlin "$version"; then
+        env_log info "Archive existed: $version"
+        return 0
+    fi
 
 	mkdir -p "$___X_CMD_ENV_PATH/kotlin/tmp"
 	mkdir -p "$___X_CMD_ENV_PATH/kotlin/versions"

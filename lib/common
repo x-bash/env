@@ -15,7 +15,7 @@ ___x_cmd_env_common_ls_local(){
 }
 
 ___x_cmd_env_common_la(){
-   :
+    :
 }
 # EndSection
 
@@ -24,7 +24,6 @@ ___x_cmd_env_common_la(){
 ___x_cmd_env_common_use(){
     local candidate="${1:?Provide candidate}"
     local version="${2:?Provide version}"
-    
 
     ___x_cmd_env_util_is_download "$candidate" "$version" || return 1
     ___x_cmd_env_util_make_shim_dir "$candidate" "${version}" || return 1
@@ -169,7 +168,7 @@ ___x_cmd_env_common_which(){
         while [ ! "$cur" = "" ]; do
             if [ -f "$cur/.x-cmd/.env/$candidate/version" ]; then
                 version=$(cat "$cur/.x-cmd/.env/$candidate/version")
-                printf "%s\n" "$___X_CMD_ENV_PATH/$candidate/versions/$version/bin/node"
+                printf "%s\n" "$___X_CMD_ENV_PATH/$candidate/versions/$version/bin/$candidate"
                 return 0
             fi
             cur=${cur%/*}
