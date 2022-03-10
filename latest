@@ -1,4 +1,4 @@
-# shellcheck shell=sh disable=SC3043,SC2164     # xrc
+# shellcheck shell=sh disable=SC3043,SC2164,SC3000-SC4000     # xrc
 
 # author:       Li Junhao           l@x-cmd.com
 # license:      GPLv3
@@ -20,7 +20,7 @@ ___x_cmd_env_advise_ls_remote_version(){
 ___x_cmd_env_advise_ls_local_version(){
     local candidate_idx="${1:-2}"
     [ -n "$ZSH_VERSION" ] && candidate_idx=$((candidate_idx+1))
-    x env ls -r "${COMP_WORDS[candidate_idx]}"
+    x env ls "${COMP_WORDS[candidate_idx]}"
 }
 
 # EndSection
