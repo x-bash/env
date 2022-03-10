@@ -1,82 +1,21 @@
 # shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263    # xrc
-___X_CMD_ENV_KOTLIN_PLATFORM_TMP="$(xrc os && ___x_cmd_os name && ___x_cmd_os arch)"
-___X_CMD_ENV_KOTLIN_PLATFORM="$(printf "%s" "${___X_CMD_ENV_SCALA_PLATFORM_TMP}" | tr '[:lower:]' '[:upper:]')"
+xrc env/lib/sdk
 
 ___x_cmd_env_scala_ls_remote(){
-	local pattern="${1:-""}"
-	local cache_expiration="${2:-1}"
-	local cache_path="$___X_CMD_ENV_PATH/scala/cache/version_list"
-	
-	___x_cmd_httpget "https://api.sdkman.io/2/candidates/scala/LINUXX64/versions/all" "$cache_path" "$cache_expiration" 2>/dev/null && \
-	awk '{versions=$0 ;gsub(",","\n",versions);print versions}' <"$cache_path"
-	
+	___x_cmd_env_sdk_ls_remote scala "$@"
 }
 
-___x_cmd_env_scala_la(){
-    :
+___x_cmd_env_scala_download_archive(){
+
+	___x_cmd_env_sdk_download_archive scala "$@" 
+
 }
 
-___x_cmd_env_scala_download(){
-    local version="${1:?Provide a version}"
-    env_log info "starting"
-
-	mkdir -p "$___X_CMD_ENV_PATH/scala/tmp"
-	mkdir -p "$___X_CMD_ENV_PATH/scala/versions"
-	local archives_folder="$___X_CMD_ENV_PATH/scala/archives"
-	local metadata_folder="$___X_CMD_ENV_PATH/scala/var/metadata"
-	mkdir -p "$archives_folder"  "${metadata_folder}"
-    
-    
-	local base_name="scala-${version}"
-	local zip_archive_target="$___X_CMD_ENV_PATH/scala/archives/${base_name}.zip"
-
-	local pre_installation_hook="$___X_CMD_ENV_PATH/scala/tmp/hook_pre_scala_${version}.sh"
-	local ___X_CMD_ENV_SCALA_PLATFORM="darwinarm64"
-	
-	env_log debug "Get pre-installation hook: https://api.sdkman.io/2/hooks/pre/scala/${version}/${___X_CMD_ENV_SCALA_PLATFORM}"
-	curl --silent --location "https://api.sdkman.io/2/hooks/pre/scala/${version}/${___X_CMD_ENV_SCALA_PLATFORM}" >| "$pre_installation_hook"
-	env_log debug "Copy remote pre-installation hook: $pre_installation_hook"
-	. "$pre_installation_hook"
-
-
-
-	export local binary_input="$___X_CMD_ENV_PATH/scala/tmp/${base_name}.bin"
-	export local zip_output="$___X_CMD_ENV_PATH/scala/tmp/$base_name.zip"
-
-	env_log info "Downloading: scala ${version}"
-	env_log info "In progress..."
-
-	# download binary
-	local download_url="https://api.sdkman.io/2/broker/download/scala/${version}/${___X_CMD_ENV_SCALA_PLATFORM}"
-	local headers_file="${metadata_folder}/${base_name}.headers"
-
-	curl --progress-bar --location --retry-max-time 10 --retry 0 "${download_url}" --output "${binary_input}" --dump-header "${headers_file}"
-	env_log debug "Downloaded binary to: ${binary_input} (HTTP headers written to: ${headers_file})"
-
-	local post_installation_hook="$___X_CMD_ENV_PATH/scala/tmp/hook_post_scala_${version}.sh"
-	
-	env_log debug "Get post-installation hook: https://api.sdkman.io/2/hooks/post/scala/${version}/${___X_CMD_ENV_SCALA_PLATFORM}"
-	curl --silent --location "https://api.sdkman.io/2/hooks/post/scala/${version}/${___X_CMD_ENV_SCALA_PLATFORM}" >| "$post_installation_hook"
-	echo "https://api.sdkman.io/2/hooks/post/scala/${version}/${___X_CMD_ENV_KOTLIN_PLATFORM}"
-	env_log debug "Copy remote post-installation hook: ${post_installation_hook}"
-	. "$post_installation_hook"
-	__sdkman_post_installation_hook || return 1
-
-	env_log debug "Processed binary as: $zip_output"
-	env_log debug "Completed post-installation hook..."
-
-	mv -f "$zip_output" "$zip_archive_target"
-	
-	env_log debug "Moved to archive folder: $zip_archive_target"
-	env_log info "Download complete scala $version"
-	return 0
+___x_cmd_env_scala_ws(){
+  :
 }
 
-___x_cmd_env_common_unpack(){
-	env_log info "Unpacking:scala_${version}" 
-	unzip -oq "$___X_CMD_ENV_PATH/scala/archives/scala-${version}.zip" -d "$___X_CMD_ENV_PATH/scala/tmp/out"
-	mkdir -p "$___X_CMD_ENV_PATH/scala/versions"
-	mv -f "$___X_CMD_ENV_PATH"/scala/tmp/out/* "$___X_CMD_ENV_PATH/scala/versions/${version}"
-	rm -rf "$___X_CMD_ENV_PATH/scala/tmp/out"
-	env_log info "Done unpacking"
-} 
+___x_cmd_env_scala_unpack(){
+___x_cmd_env_sdk_unpack scala "$@"
+}			
+
