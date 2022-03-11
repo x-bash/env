@@ -48,23 +48,19 @@ ___x_cmd_env_common_try(){
 
 # Section: current
 
-# There are four cases in current:
-#   1. After try.
-#   2. Use(shims).
-#   3. No candidate version in xenv, but has candidate version in current shell.
-#   4. No any candidate version.
 ___x_cmd_env_common_current(){
     local candidate="${1:?Provide candidate}"
+    local version_path=".x-cmd/.env/$candidate/version"
     local candidate_path
     candidate_path="$(command -v "$candidate")"
-    local version_path=".x-cmd/.env/$candidate/version"
     local cur
     cur=$(pwd)
 
-    # After try and no any candidate version and has candidate version in current shell
+    # No any candidate version
     if [ -z "$candidate_path" ]; then
         env_log error "No version of %s $candidate detected, please install it first! "
         return 1
+    # After try and no candidate version in xenv, but has candidate version in current shell.
     elif [ "$candidate_path" != "$___X_CMD_ENV_PATH/$candidate/shims/$candidate" ]; then
         local try_path="${candidate_path#*"versions/"}"
         try_path="${try_path%%/*}"
@@ -74,30 +70,28 @@ ___x_cmd_env_common_current(){
             printf "%s\n" "system"
         fi
         return 0
-    fi
-
     # Use(shims)
-    while [ ! "$cur" = "" ]; do
-        if [ -f "$cur/$version_path" ]; then
-            local vertify_list
-            vertify_list="$(___x_cmd_env_common_ls_local "$candidate")"
-            local version
-            version="$(cat "$cur/$version_path")"
-            if [ "$vertify_list" = "${vertify_list#*"$version"}" ]; then
-                env_log error "There is currently no version in use, please use a version first!"
-                return 1
+    else
+        while [ ! "$cur" = "" ]; do
+            if [ -f "$cur/$version_path" ]; then
+                local vertify_list
+                vertify_list="$(___x_cmd_env_common_ls_local "$candidate")"
+                local version
+                version="$(cat "$cur/$version_path")"
+                if [ "$vertify_list" = "${vertify_list#*"$version"}" ]; then
+                    env_log error "There is currently no version in use, please use a version first!"
+                    return 1
+                fi
+                printf "%s\n" "$version"
+                return 0
             fi
-            printf "%s\n" "$version"
+            cur=${cur%/*}
+        done
+        # Not in home directory
+        if [ -f "$___X_CMD_ENV_PATH/$candidate/version" ]; then
+            printf "%s\n" "$(cat "$___X_CMD_ENV_PATH/$candidate"/version)"
             return 0
         fi
-        cur=${cur%/*}
-    done
-
-    # If there is no in home directory, that you will get an error.
-    if [ -f "$___X_CMD_ENV_PATH/$candidate/version" ]; then
-        version=$(cat "$___X_CMD_ENV_PATH/$candidate"/version)
-        printf "%s\n" "$version"
-        return 0
     fi
 }
 # EndSection
