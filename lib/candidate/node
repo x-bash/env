@@ -74,6 +74,9 @@ ___x_cmd_env_node_use(){
         # TODO: Version is written in, but system is still displayed in current
         printf "%s\n" "$version" > "$___X_CMD_ENV_PATH/node/version" && \
         env_log info "Using node $version -> $___X_CMD_ENV_PATH/node/version"
+    # TODO: can be better
+    elif ! ___x_cmd_env_common_use node "$version" 2>/dev/null && [ ! -d "$NVM_DIR"/versions/node/"$version" ]; then
+        env_log error "Version of node not found: $version"
     fi
 }
 
