@@ -191,6 +191,20 @@ ___x_cmd_env_node_unpack(){
 
 # EndSection
 
+# Section: exec
+
+___x_cmd_env_node_exec(){
+    local version="${1:?Provide a version}"; shift 1
+    # ___x_cmd_env_common_exec node "$version" "$@"
+    if ! ___x_cmd_env_common_exec node "$version" "$@" && [ -d "$NVM_DIR"/versions/node/"$version" ]; then
+        local PATH="$NVM_DIR/versions/node/$version/bin:$PATH"
+        node "$@"
+    elif ! ___x_cmd_env_common_exec node "$version" "$@" >/dev/null && [ ! -d "$NVM_DIR"/versions/node/"$version" ]; then
+        env_log error "Version of node not found: $version"
+    fi
+}
+# EndSection
+
 ___x_cmd_env_node_ws(){
     :
 }

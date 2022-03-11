@@ -175,11 +175,10 @@ ___x_cmd_env_common_which(){
     fi
 }
 
-
 ___x_cmd_env_common_exec(){
     local candidate="${1:?Provide candidate}"
-    local version="${2:?Provide version}" ; shift 2
-    ___x_cmd_env_util_is_downloaded "${candidate}" "${version}" || return
+    local version="${2:?Provide version}"; shift 2
+    ___x_cmd_env_util_is_downloaded "${candidate}" "${version}" 2>/dev/null || return 1
     local PATH="${___X_CMD_ENV_PATH}/${candidate}/versions/${version}/bin:$PATH"
     "${candidate}" "$@"
 }
