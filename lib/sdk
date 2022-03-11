@@ -38,7 +38,7 @@ __sdkman_echo_cyan() {
 
 ___x_cmd_env_sdk_ls_remote(){
     local candidate="${1:?Provide canddidate}"
-	local pattern="${2:-""}"
+	# local pattern="${2:-""}"	# TODO: ls remote filter
 	local cache_expiration="${3:-1}"
 	local cache_path="$___X_CMD_ENV_PATH/$candidate/cache/version_list"
 
