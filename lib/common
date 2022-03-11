@@ -3,8 +3,9 @@
 # Section: full_version ls_local ls_remote
 
 ___x_cmd_env_common_full_version(){
-    printf "%s\n" "$2"
-    return
+    local candidate="${1:?Provide candidate}"
+    local version="${2:?Provide version}"
+    printf "%s\n" "$version"
 }
 
 ___x_cmd_env_common_ls_local(){
@@ -58,16 +59,14 @@ ___x_cmd_env_common_try(){
 
 ___x_cmd_env_common_current(){
     local candidate="${1:?Provide candidate}"
-    local version_path=".x-cmd/.env/$candidate/version"
     local candidate_path
     candidate_path="$(command -v "$candidate")"
-    local cur
-    cur=$(pwd)
 
     # No any candidate version
     if [ -z "$candidate_path" ]; then
         env_log error "No version of %s $candidate detected, please install it first! "
         return 1
+
     # After try and no candidate version in xenv, but has candidate version in current shell.
     elif [ "$candidate_path" != "$___X_CMD_ENV_PATH/$candidate/shims/$candidate" ]; then
         local try_path="${candidate_path#*"versions/"}"
@@ -78,28 +77,22 @@ ___x_cmd_env_common_current(){
             printf "%s\n" "system"
         fi
         return 0
+
     # Use(shims)
     else
-        while [ ! "$cur" = "" ]; do
-            if [ -f "$cur/$version_path" ]; then
-                local vertify_list
-                vertify_list="$(___x_cmd_env_common_ls_local "$candidate")"
-                local version
-                version="$(cat "$cur/$version_path")"
-                if [ "$vertify_list" = "${vertify_list#*"$version"}" ]; then
-                    env_log error "There is currently no version in use, please use a version first!"
-                    return 1
-                fi
-                printf "%s\n" "$version"
-                return 0
-            fi
-            cur=${cur%/*}
-        done
-        # Not in home directory
-        if [ -f "$___X_CMD_ENV_PATH/$candidate/version" ]; then
-            printf "%s\n" "$(cat "$___X_CMD_ENV_PATH/$candidate"/version)"
-            return 0
+        local version
+        if ! version=$(___x_cmd_env_util_shims_which_version "$candidate"); then
+            env_log error "No version of %s $candidate detected, please download it first! "
+            return 1
         fi
+
+        local exactly_path="$___X_CMD_ENV_PATH/$candidate/versions/$version/bin/$candidate"
+        if [ ! -f "$exactly_path" ]; then
+            env_log error "No such file: $exactly_path"
+            return 1
+        fi
+
+        printf "%s\n" "$version"
     fi
 }
 # EndSection
@@ -132,6 +125,7 @@ ___x_cmd_env_common_download(){
 ___x_cmd_env_common_install(){
     local candidate="${1:?Provide canddidate}"
     local version="${2:?Provide version}"
+    local shims="${3:-""}"
 
     env_log info "Installing $candidate $version"
     if ! ___x_cmd_env_run_common_if_notfound download "$candidate" "$version"; then
@@ -139,7 +133,7 @@ ___x_cmd_env_common_install(){
         return 1
     fi
 
-    ___x_cmd_env_common_use "$candidate" "$version"
+    ___x_cmd_env_common_use "$candidate" "$version" "$shims" || return 1
     env_log info "Successfully installed $candidate $version"
 }
 
@@ -165,18 +159,20 @@ ___x_cmd_env_common_which(){
     local candidate="${1:?Provide candidate}"
     local candidate_path
     candidate_path="$(command -v "$candidate")"
-    if [ "$candidate_path" = "$___X_CMD_ENV_PATH/$candidate/shims/$candidate" ]; then
-        cur=$(pwd)
-        while [ ! "$cur" = "" ]; do
-            if [ -f "$cur/.x-cmd/.env/$candidate/version" ]; then
-                version=$(cat "$cur/.x-cmd/.env/$candidate/version")
-                printf "%s\n" "$___X_CMD_ENV_PATH/$candidate/versions/$version/bin/$candidate"
-                return 0
-            fi
-            cur=${cur%/*}
-        done
+
+    if [ "$candidate_path" != "$___X_CMD_ENV_PATH/$candidate/shims/$candidate" ]; then
+        command -v "$candidate"
     fi
-    command -v "$candidate"
+
+    local version
+    if version=$(___x_cmd_env_util_shims_which_version "$candidate"); then
+        local exactly_path="$___X_CMD_ENV_PATH/$candidate/versions/$version/bin/$candidate"
+        if [ ! -f "$exactly_path" ]; then
+            env_log error "No such file: $exactly_path"
+            return 1
+        fi
+        printf "%s\n" "$exactly_path"
+    fi
 }
 
 

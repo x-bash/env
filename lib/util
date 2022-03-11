@@ -1,41 +1,34 @@
 # shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263    # xrc
 
 ___x_cmd_env_util_add_path(){
-    local dir="$1"
-    local path_tmp="$PATH:"
-    local path_target="$dir"
+    local dir="${1:?Provide a directory}"
+    local tmp="$PATH:"
 
     if [ ! -d "$dir" ] ; then
-        env_log error "util_add_path: Directory not found: $dir"
+        env_log error "Failed to add path: $dir, not a directory"
         return 1
     fi
 
+    PATH="$dir"
     local cur
-    while [ ! "$path_tmp" = "" ]; do
-        cur=${path_tmp%%:*}
-        path_tmp=${path_tmp#*:}
+    while [ ! "$tmp" = "" ]; do
+        cur=${tmp%%:*}
+        tmp=${tmp#*:}
         if [ "$cur" != "$dir" ]; then
-            path_target="$path_target:$cur"
+            PATH="$PATH:$cur"
         fi
     done
-    PATH="$path_target"
 }
 
 ___x_cmd_env_util_is_downloaded(){
     local candidate="${1:?Provide candidate}"
     local version="${2:?Provide version}"
 
-    # Check the candidate version in general way.
-    local candidate_path="$___X_CMD_ENV_PATH/${candidate}/versions/${version}"
-    if [ ! -d "${candidate_path}" ]; then
+    if [ ! -d "$___X_CMD_ENV_PATH/${candidate}/versions/${version}" ]; then
         env_log error "${candidate} of ${version} does not exist !"
         return 1
     fi
     return 0
-
-    # TODO: Is command -v also used to check?
-    # TODO: If the user has a local command, there will be conflicts.
-    # TODO: If there is no use or a new environment, command -v is displayed natively.
 }
 
 ___x_cmd_env_util_is_archive_cached(){
@@ -44,12 +37,36 @@ ___x_cmd_env_util_is_archive_cached(){
 
     local dir_list
     dir_list="$(ls "$___X_CMD_ENV_PATH/$candidate/archive" 2>/dev/null)"
-    if [ "${dir_list#*"$candidate-$version"}" = "$dir_list" ]; then
+    if [ "$dir_list" = "${dir_list#*"$candidate-$version"}" ]; then
         env_log error "The archive of ${candidate} ${version} does not exist !"
         return 1
     fi
 
     return 0
+}
+
+# Section(shims): make_shim_dir
+
+___x_cmd_env_util_shims_which_version(){
+    local candidate="${1:?Provide candidate}"
+
+    cur=$(pwd)
+    while [ ! "$cur" = "" ]; do
+        if [ -f "$cur/.x-cmd/.env/$candidate/version" ]; then
+            version=$(cat "$cur/.x-cmd/.env/$candidate/version")
+            printf "%s\n" "$version"
+            return 0
+        fi
+        cur=${cur%/*}
+    done
+
+    # Not in home directory
+    if [ -f "$___X_CMD_ENV_PATH/$candidate/version" ]; then
+        cat "$___X_CMD_ENV_PATH/$candidate/version"
+        return 0
+    fi
+
+    return 1
 }
 
 ___x_cmd_env_util_make_shim_dir(){
@@ -92,3 +109,4 @@ A
         chmod +x "$___X_CMD_ENV_PATH/$candidate/shims/${name##*/}"
     done
 }
+# EndSection
