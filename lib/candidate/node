@@ -33,17 +33,6 @@ ___x_cmd_env_node_full_version(){
     ___x_cmd_env_node_ls_remote "${1:?Provide node version pattern}" "$2" | awk 'END{ if (NR<=0) { exit(1) } else print $1;}'
 }
 
-___x_cmd_env_node_ls_local(){
-    {
-        ___x_cmd_env_common_ls_local node
-        # Compatible node version in nvm.
-        if [ -n "$NVM_DIR" ] && [ -d "$NVM_DIR"/versions/node ] ; then
-            ls "$NVM_DIR"/versions/node
-        fi
-    # TODO: Do all environments have sort and uniq?
-    } | ___x_cmd_env_node_sort_versions | uniq
-}
-
 ___x_cmd_env_node_ls_remote(){
     local pattern="${1:-""}"
     local cache_expiration="${2:-1}"
@@ -62,34 +51,6 @@ ___x_cmd_env_node_ls_remote(){
             prev_codename=codename
         }' <"$cache_path" | ___x_cmd_env_node_sort_versions
 }
-# EndSection
-
-# Section: use try
-
-___x_cmd_env_node_use(){
-    # TODO: can be better
-    local version="${1:?Provide a version}"
-    if ! ___x_cmd_env_common_use node "$version" && [ -d "$NVM_DIR"/versions/node/"$version" ]; then
-        ___x_cmd_env_util_add_path "$NVM_DIR/versions/node/$version/bin" || return 1
-        x boot rc add "x-env-node" "xrc env/lib/util && ___x_cmd_env_util_add_path \"$NVM_DIR/versions/node/$version/bin\"" && \
-        # TODO: Version is written in, but system is still displayed in current
-        printf "%s\n" "$version" > "$___X_CMD_ENV_PATH/node/version" && \
-        env_log info "Using node $version -> $___X_CMD_ENV_PATH/node/version"
-    elif ! ___x_cmd_env_common_use node "$version" 2>/dev/null && [ ! -d "$NVM_DIR"/versions/node/"$version" ]; then
-        env_log error "Version of node not found: $version"
-    fi
-}
-
-___x_cmd_env_node_try(){
-    local version="${1:?Provide a version}"
-    local versions_path="$NVM_DIR/versions/node/$version/bin"
-    if ___x_cmd_env_util_is_downloaded node "$version" 2>/dev/null; then
-        ___x_cmd_env_common_try node "$version"
-    elif [ -d "$NVM_DIR"/versions/node/"$version" ]; then
-        ___x_cmd_env_common_try node "$version" "$versions_path"
-    fi
-}
-
 # EndSection
 
 # Section: download
@@ -197,21 +158,6 @@ A
     return $code
 }
 
-# EndSection
-
-# Section: exec
-
-___x_cmd_env_node_exec(){
-    # TODO: can be better
-    local version="${1:?Provide a version}"; shift 1
-    # ___x_cmd_env_common_exec node "$version" "$@"
-    if ! ___x_cmd_env_common_exec node "$version" "$@" && [ -d "$NVM_DIR"/versions/node/"$version" ]; then
-        local PATH="$NVM_DIR/versions/node/$version/bin:$PATH"
-        node "$@"
-    elif ! ___x_cmd_env_common_exec node "$version" "$@" >/dev/null && [ ! -d "$NVM_DIR"/versions/node/"$version" ]; then
-        env_log error "Version of node not found: $version"
-    fi
-}
 # EndSection
 
 ___x_cmd_env_node_ws(){

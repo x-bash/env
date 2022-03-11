@@ -40,16 +40,6 @@ ___x_cmd_env_python_get_miniconda_name_and_filename(){
 
 # Section: ls, la
 
-___x_cmd_env_python_ls_local(){
-    {
-        ___x_cmd_env_common_ls_local python
-        # Compatible node version in pyenv.
-        if [ -n "$PYENV_ROOT" ] && [ -d "$PYENV_ROOT"/versions ] ; then
-            ls "$PYENV_ROOT"/versions
-        fi
-    } | uniq
-}
-
 ___x_cmd_env_python_ls_remote(){
 	local cache_path="$___X_CMD_ENV_PATH/python/cache/version_list"
 
