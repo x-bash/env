@@ -116,9 +116,7 @@ ___x_cmd_env_sdk_unpack(){
 	mkdir -p "$___X_CMD_ENV_PATH/$candidate/versions"
 	mv -f "$___X_CMD_ENV_PATH/$candidate/tmp/out/"* "$___X_CMD_ENV_PATH/$candidate/versions/${version}"
 	rm -rf "$___X_CMD_ENV_PATH/$candidate/tmp/out"
-	env_log info "Done unpacking!"
 }
-
 
 # EndSection
 

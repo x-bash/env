@@ -154,7 +154,6 @@ A
     local code=$?
 
     rm -rf "${archive_dir_files}"
-    env_log info "Done unpacking!"
     return $code
 }
 
