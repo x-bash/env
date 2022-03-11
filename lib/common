@@ -48,7 +48,9 @@ ___x_cmd_env_common_try(){
     local version="${2:?Provide version}"
     local versions_path="${3:-"$___X_CMD_ENV_PATH/$candidate/versions/$version/bin"}"
 
-    ___x_cmd_env_util_is_downloaded "$candidate" "$version" 2>/dev/null || return 1
+    if [ "$versions_path" = "$___X_CMD_ENV_PATH/$candidate/versions/$version/bin" ]; then
+        ___x_cmd_env_util_is_downloaded "$candidate" "$version" 2>/dev/null || return 1
+    fi
     ___x_cmd_env_util_add_path "$versions_path" && \
         env_log info "Setting ${candidate} ${version} in current Shell."
 }
