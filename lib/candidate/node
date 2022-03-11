@@ -171,10 +171,19 @@ ___x_cmd_env_node_unpack_other(){
 
 ___x_cmd_env_node_unpack(){
     local version="${1:?Provide node version}"
-
+    local platform
+    local arch
+    {
+        read -r platform
+        read -r arch
+    } <<A
+$(x os name; x os arch)
+A
     local compression='tar.gz'; [ "${platform}" = 'win' ] && compression='zip' # TODO: tar.xz support
     local archive_path="$___X_CMD_ENV_PATH/node/archive/node-${version}.${compression}"
     local archive_dir_files
+
+
     archive_dir_files="$(dirname "$archive_path")/files"
     mkdir -p "$archive_dir_files"
 
