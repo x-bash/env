@@ -71,6 +71,7 @@ ___x_cmd_env_node_use(){
     if ! ___x_cmd_env_common_use node "$version" && [ -d "$NVM_DIR"/versions/node/"$version" ]; then
         ___x_cmd_env_util_add_path "$NVM_DIR/versions/node/$version/bin" || return 1
         x boot rc add "x-env-node" "xrc env/lib/util && ___x_cmd_env_util_add_path \"$NVM_DIR/versions/node/$version/bin\"" && \
+        # TODO: Version is written in, but system is still displayed in current
         printf "%s\n" "$version" > "$___X_CMD_ENV_PATH/node/version" && \
         env_log info "Using node $version -> $___X_CMD_ENV_PATH/node/version"
     fi
