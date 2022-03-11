@@ -64,10 +64,31 @@ ___x_cmd_env_node_ls_remote(){
 }
 # EndSection
 
-# Section: try
+# Section: use try
+
+___x_cmd_env_node_use(){
+    local version="${1:?Provide a version}"
+    if ! ___x_cmd_env_common_use node "$version" && [ -d "$NVM_DIR"/versions/node/"$version" ]; then
+        ___x_cmd_env_util_add_path "$NVM_DIR/versions/node/$version/bin" || return 1
+        x boot rc add "x-env-node" "xrc env/lib/util && ___x_cmd_env_util_add_path \"$NVM_DIR/versions/node/$version/bin\"" && \
+        # TODO: Version is written in, but system is still displayed in current
+        printf "%s\n" "$version" > "$___X_CMD_ENV_PATH/node/version" && \
+        env_log info "Using node $version -> $___X_CMD_ENV_PATH/node/version"
+    # TODO: can be better
+    elif ! ___x_cmd_env_common_use node "$version" 2>/dev/null && [ ! -d "$NVM_DIR"/versions/node/"$version" ]; then
+        env_log error "Version of node not found: $version"
+    fi
+}
+
 ___x_cmd_env_node_try(){
     local version="${1:?Provide a version}"
-    ___x_cmd_env_common_try node "$version"
+    local versions_path="$NVM_DIR/versions/node/$version/bin"
+    if ! ___x_cmd_env_common_try node "$version" && [ -d "$NVM_DIR"/versions/node/"$version" ]; then
+        ___x_cmd_env_util_add_path "$versions_path" && \
+        env_log info "Setting node ${version} in current Shell."
+    elif ! ___x_cmd_env_common_try node "$version" 2>/dev/null && [ ! -d "$NVM_DIR"/versions/node/"$version" ]; then
+        env_log error "Version of node not found: $version"
+    fi
 }
 
 # EndSection
