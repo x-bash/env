@@ -1,14 +1,38 @@
 # shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263    # xrc
 
-# Section: mirror
+# Section: ENV mirror
 
 ___X_CMD_ENV_NODE_MIRROR="https://nodejs.org/dist"
 
 # EndSection
 
-# Section: full_version, ls_remote
+# Section: utils sort_versions
+
+___x_cmd_env_node_sort_versions(){
+    sort -t. -u -k 1.2,1n -k 2,2n -k 3,3n
+}
+
+___x_cmd_env_node_version_greater_than_or_equal_to() {
+    local version1="${1#v}"
+    local version2="${2#v}"
+    command awk 'BEGIN {
+        if (ARGV[1] == "" || ARGV[2] == "") exit(1)
+        split(ARGV[1], a, /\./);
+        split(ARGV[2], b, /\./);
+        for (i=1; i<=3; i++) {
+        if (a[i] && a[i] !~ /^[0-9]+$/) exit(2);
+        if (a[i] < b[i]) exit(3);
+        else if (a[i] > b[i]) exit(0);
+        }
+        exit(0)
+    }' "${version1}" "${version2}"
+}
+
+# EndSection
+
+# Section: full_version, ls_local, ls_remote
 ___x_cmd_env_node_full_version(){
-    ___x_cmd_env_node_ls_remote "${1:?Provide node version pattern}" "$2" | awk 'END{ if (NR<=0) { exit(1) } else print $1;   }'
+    ___x_cmd_env_node_ls_remote "${1:?Provide node version pattern}" "$2" | awk 'END{ if (NR<=0) { exit(1) } else print $1;}'
 }
 
 ___x_cmd_env_node_ls_remote(){
@@ -27,27 +51,20 @@ ___x_cmd_env_node_ls_remote(){
                 else                                                    print version, codename
             }
             prev_codename=codename
-        }' <"$cache_path" | sort -t. -u -k 1.2,1n -k 2,2n -k 3,3n
+        }' <"$cache_path" | ___x_cmd_env_node_sort_versions
 }
 # EndSection
 
 # Section: download
 
-___x_cmd_env_node_download(){
-    local version="${1:?Provide node version}"
-    local full_version
-    if full_version=$(___x_cmd_env_node_full_version "${version}" -); then
-        env_log error "Version '${version}' not found $full_version. "
-        return 1
-    fi
+___x_cmd_env_node_download_archive(){
 
-    if ___x_cmd_env_common_util_is_archieve_cached node "$full_version"; then
-        env_log info "Archieve existed: $full_version"
+    local version="${1:?Provide node version}"
+
+    if ___x_cmd_env_util_is_archive_cached node "$version" 2>/dev/null; then
+        env_log info "Archive existed: $version"
         return 0
     fi
-
-    # TODO: Check if version is already downloaded
-    # TODO: Handle bsd, sunos ..
 
     local platform
     local arch
@@ -59,52 +76,70 @@ ___x_cmd_env_node_download(){
         read -r platform
         read -r arch
     } <<A
-$(x os name; printf "\n"; x os arch)
+$(x os name; x os arch)
 A
 
-    local archieve_dir="$___X_CMD_ENV_PATH/node/cache/bin/${slug}"
-    local slug="node-${full_version}-${platform}-${arch}"
-    local compression='tar.gz'; [ "${platform}" = 'win' ] && compression='zip' # TODO: tar.xz support
+    # TODO: Handle bsd, sunos ..
+    if [ "$platform-$arch" = "darwin-arm64" ] && ! ___x_cmd_env_node_version_greater_than_or_equal_to "$version" 16 ; then
+        env_log warn "You are using darwin arm64, but node $version is not available for this platform. (node < 16.x)"
+        env_log warn "Use x86_64 instead."
+        arch="x64"
+    fi
 
-    local tarball="${archieve_dir}/${slug}.${compression}"
+    local slug="node-${version}-${platform}-${arch}"
+    local compression='tar.gz'; [ "${platform}" = 'win' ] && compression='zip' # TODO: tar.xz support
+    local archive_path="$___X_CMD_ENV_PATH/node/archive/node-${version}.${compression}"
+    mkdir -p "$(dirname "$archive_path")"
 
     # TODO: node <= 0.1.13 does not have a directory
-    local tarball_url="${___X_CMD_ENV_NODE_MIRROR}/${full_version}/${slug}.${compression}"
-
-    if ! curl -L -C - --progress-bar "${tarball_url}" -o "${tarball}"; then
-        rm -rf "${tarball}" "${archieve_dir}"
-        env_log error "Binary download from ${tarball_url} failed, trying source."
+    local archive_url="${___X_CMD_ENV_NODE_MIRROR}/${version}/${slug}.${compression}"
+    if ! curl -L -C - --progress-bar "${archive_url}" -o "${archive_path}"; then
+        rm -rf "${archive_path}"
+        env_log error "Download from ${archive_url} failed."
         return 1
     fi
-    env_log info "Downloaded ${tarball_url} to ${tarball}"
+
+    # TODO: checksum
+
+    env_log info "Downloaded ${archive_url} to ${archive_path}"
 }
 # EndSection
 
 # Section: unpack
 ___x_cmd_env_node_unpack_win(){
-    local version_path
-    version_path="${___X_CMD_ENV_PATH}/node/versions/${full_version}/bin"
+    local version_path="${___X_CMD_ENV_PATH}/node/versions/${version}/bin"
 
-    unzip -q "${tarball}" -d "${archieve_dir_files}" || return 1
+    unzip -q "${archive_path}" -d "${archive_unpack_files}" || return 1
 
     mkdir -p "${version_path}" && (
-        mv "${archieve_dir_files}/"*/* "${version_path}" || return 1
+        mv "${archive_unpack_files}/"*/* "${version_path}" || return 1
         cd "${version_path}" && chmod +x node.exe npm npx
         # chmod +x "${version_path}"/npx 2>/dev/null
     )
 }
 
 ___x_cmd_env_node_unpack_other(){
-    tar -xzf "${tarball}" -C "${archieve_dir_files}" --strip-components 1 || return 1
-
-    local version_path="${___X_CMD_ENV_PATH}/node/versions/${full_version}"
-    mkdir -p "${version_path}" && mv "${archieve_dir_files}/"* "${version_path}"
+    local version_path="${___X_CMD_ENV_PATH}/node/versions/${version}"
+    tar -xzf "${archive_path}" -C "${archive_unpack_files}" --strip-components 1 || return 1
+    mkdir -p "${version_path}" && mv "${archive_unpack_files}/"* "${version_path}"
 }
 
 ___x_cmd_env_node_unpack(){
-    # TODO: checksum
-    local archieve_dir_files="${archieve_dir}/files"
-    mkdir -p "${archieve_dir_files}"
+    local version="${1:?Provide node version}"
+    local platform
+    local arch
+    {
+        read -r platform
+        read -r arch
+    } <<A
+$(x os name; x os arch)
+A
+    local compression='tar.gz'; [ "${platform}" = 'win' ] && compression='zip' # TODO: tar.xz support
+    local archive_path="$___X_CMD_ENV_PATH/node/archive/node-${version}.${compression}"
+
+    local archive_unpack_files
+    archive_unpack_files="$(dirname "$archive_path")/files"
+    mkdir -p "$archive_unpack_files"
 
     case "$platform" in
         win)    ___x_cmd_env_node_unpack_win    ;;
@@ -112,7 +147,8 @@ ___x_cmd_env_node_unpack(){
     esac
     local code=$?
 
-    rm -rf "${archieve_dir_files}"
+    rm -rf "${archive_unpack_files}"
+    env_log info "Done unpacking!"
     return $code
 }
 

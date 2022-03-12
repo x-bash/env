@@ -1,58 +1,27 @@
-# shellcheck shell=sh disable=SC3043,SC2164     # xrc
+# shellcheck shell=sh disable=SC3043,SC2164,SC3000-SC4000     # xrc
 
 # author:       Li Junhao           l@x-cmd.com
 # license:      GPLv3
 
 # Inject the environment.
 ___x_cmd_env_main() {
-    x log init env
-    xrc env/lib/util
-    xrc env/lib/common
     xrc env/lib/main
-    xrc param
-
-    # TODO: candidates list should be automatically generated
-    param_type  env  candidates_list  = "python" "java" "node"
     ___x_cmd_env_main "$@"
 }
 
-# Section: utils
-
-___x_cmd_env_add_path(){
-    local dir="$1"
-    local path_tmp="$PATH:"
-    local path_target="$dir"
-
-    if [ ! -d "$dir" ] ; then
-        return
-    fi
-
-    local cur
-    while [ ! "$path_tmp" = "" ]; do
-        cur=${path_tmp%%:*}
-        path_tmp=${path_tmp#*:}
-        if [ "$cur" != "$dir" ]; then
-            path_target="$path_target:$cur"
-        fi
-    done
-    PATH="$path_target"
-}
-
-# EndSection
-
 # Section: advise ls_version
 
-# TODO: define the function when x-cmd start
 ___x_cmd_env_advise_ls_remote_version(){
     local candidate_idx="${1:-2}"
     [ -n "$ZSH_VERSION" ] && candidate_idx=$((candidate_idx+1))
-    ___x_cmd_env_main_ls -r "${COMP_WORDS[candidate_idx]}"
+    # TODO:Here, the previous argument should be obtained through the interface provided by advise
+    x env ls -r "${COMP_WORDS[candidate_idx]}"
 }
 
 ___x_cmd_env_advise_ls_local_version(){
     local candidate_idx="${1:-2}"
     [ -n "$ZSH_VERSION" ] && candidate_idx=$((candidate_idx+1))
-    ___x_cmd_env_main_ls "${COMP_WORDS[candidate_idx]}"
+    x env ls "${COMP_WORDS[candidate_idx]}"
 }
 
 # EndSection
