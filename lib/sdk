@@ -71,13 +71,10 @@ ___x_cmd_env_sdk_download_archive(){
 
 	local pre_installation_hook="$___X_CMD_ENV_PATH/$candidate/tmp/hook_pre_${candidate}_${version}.sh"
 
-
 	env_log debug "Get pre-installation hook: https://api.sdkman.io/2/hooks/pre/$candidate/${version}/${___X_CMD_ENV_SDK_PLATFORM}"
 	curl --silent --location "https://api.sdkman.io/2/hooks/pre/$candidate/${version}/${___X_CMD_ENV_SDK_PLATFORM}" > "$pre_installation_hook"
 	env_log debug "Copy remote pre-installation hook: $pre_installation_hook"
 	. "$pre_installation_hook"
-
-
 
 	export local binary_input="$___X_CMD_ENV_PATH/$candidate/tmp/${base_name}.bin"
 	export local zip_output="$___X_CMD_ENV_PATH/$candidate/tmp/$base_name.zip"
@@ -118,7 +115,6 @@ ___x_cmd_env_sdk_unpack(){
 	rm -rf "$___X_CMD_ENV_PATH/$candidate/tmp/out"
 	env_log info "Done unpacking!"
 }
-
 
 # EndSection
 
