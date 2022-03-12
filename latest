@@ -14,6 +14,7 @@ ___x_cmd_env_main() {
 ___x_cmd_env_advise_ls_remote_version(){
     local candidate_idx="${1:-2}"
     [ -n "$ZSH_VERSION" ] && candidate_idx=$((candidate_idx+1))
+    # TODO:Here, the previous argument should be obtained through the interface provided by advise
     x env ls -r "${COMP_WORDS[candidate_idx]}"
 }
 
