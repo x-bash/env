@@ -83,12 +83,7 @@ A
     if [ "$platform-$arch" = "darwin-arm64" ] && ! ___x_cmd_env_node_version_greater_than_or_equal_to "$version" 16 ; then
         env_log warn "You are using darwin arm64, but node $version is not available for this platform. (node < 16.x)"
         env_log warn "Use x86_64 instead."
-        arch -x86_64 /bin/bash <<A
-. $___X_CMD_ROOT/xrc/latest
-xrc env/lib/main env/lib/candidate/node
-___x_cmd_env_node_download_archive $version
-A
-        return
+        arch="x64"
     fi
 
     local slug="node-${version}-${platform}-${arch}"
