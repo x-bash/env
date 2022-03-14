@@ -162,6 +162,7 @@ ___x_cmd_env_common_which(){
 
     if [ "$candidate_path" != "$___X_CMD_ENV_PATH/$candidate/shims/$candidate" ]; then
         command -v "$candidate"
+        return 0
     fi
 
     local version
