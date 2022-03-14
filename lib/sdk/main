@@ -44,7 +44,6 @@ ___x_cmd_env_sdk_ls_remote(){
 
 	___x_cmd_httpget "https://api.sdkman.io/2/candidates/$candidate/${___X_CMD_ENV_SDK_PLATFORM}/versions/all" "$cache_path" "$cache_expiration" 2>/dev/null && \
 	awk '{versions=$0 ;gsub(",","\n",versions);print versions}' <"$cache_path"
-
 }
 
 # EndSection

@@ -1,6 +1,6 @@
 # shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263    # xrc
 
-xrc env/lib/sdk
+xrc env/lib/sdk/main
 
 ___x_cmd_env_kotlin_ls_remote(){
 	___x_cmd_env_sdk_ls_remote kotlin "$@"

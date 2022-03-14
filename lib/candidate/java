@@ -1,5 +1,5 @@
 # shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263    # xrc
-xrc env/lib/sdk
+xrc env/lib/sdk/main
 
 # Section: Java ls_remote and la
 
