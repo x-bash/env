@@ -25,25 +25,29 @@ ___x_cmd_env_gradle_download_archive(){
 
     local archive_path="$___X_CMD_ENV_PATH/gradle/archive/gradle-$version.zip"
     mkdir -p "$(dirname "$archive_path")"
-    local url="https://services.gradle.org/distributions"
+    local download_url="https://services.gradle.org/distributions/gradle-$version-all.zip"
 
-    env_log info "Downloading $url/gradle-$version-all.zip"
-    if curl --progress-bar --location --retry-max-time 10 --retry 0 "$url/gradle-$version-all.zip" --output "$archive_path" ; then
-        env_log info "Download completed gradle-$version-all.zip"
-        return
-    else
-        env_log error "Download failure from $url/gradle-$version-all.zip"
+    env_log info "Downloading $download_url"
+    if ! curl --progress-bar --location --retry-max-time 10 --retry 0 "$download_url" --output "$archive_path" ; then
+        env_log error "Download failure from $download_url"
         return 1
     fi
+
+    env_log info "Download completed $download_url"
 }
 
 ___x_cmd_env_gradle_unpack(){
 	local version="${1:?Provide a version}"
-	env_log info "Unpacking: gradle ${version}"
-	unzip -oq "$___X_CMD_ENV_PATH/gradle/archive/gradle-${version}.zip" -d "$___X_CMD_ENV_PATH/gradle/tmp/out"
-	mkdir -p "$___X_CMD_ENV_PATH/gradle/versions"
-	mv -f "$___X_CMD_ENV_PATH/gradle/tmp/out/"* "$___X_CMD_ENV_PATH/gradle/versions/${version}"
-	rm -rf "$___X_CMD_ENV_PATH/gradle/tmp/out"
+    env_log info "Unpacking: gradle ${version}"
+
+    local archive_path="$___X_CMD_ENV_PATH/gradle/archive/gradle-$version.zip"
+    local tmp_path="$___X_CMD_ENV_PATH/gradle/tmp/out"
+	unzip -oq "$archive_path" -d "$tmp_path"
+
+    local versions_path="$___X_CMD_ENV_PATH/gradle/versions"
+	mkdir -p "$versions_path"
+	mv -f "$tmp_path/"* "$versions_path/${version}"
+	rm -rf "$tmp_path"
 }
 
 # EndSection
