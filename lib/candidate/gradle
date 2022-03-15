@@ -1,5 +1,4 @@
 # shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263    # xrc
-xrc env/lib/sdk
 
 # Section: gradle ls_remote and la
 
@@ -47,9 +46,4 @@ ___x_cmd_env_gradle_unpack(){
 	rm -rf "$___X_CMD_ENV_PATH/gradle/tmp/out"
 }
 
-
 # EndSection
-
-___x_cmd_env_gradle_ws(){
-    :
-}
