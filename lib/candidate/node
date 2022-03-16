@@ -68,10 +68,6 @@ ___x_cmd_env_node_download_archive(){
 
     local platform
     local arch
-#     x readline platform arch <<A
-# $(x os name; x os arch)
-# A
-
     {
         read -r platform
         read -r arch
@@ -107,10 +103,9 @@ A
 
 # Section: unpack
 ___x_cmd_env_node_unpack_win(){
+    x uz "$archive_path" "$(dirname "$archive_path")" || return 1
+
     local version_path="${___X_CMD_ENV_PATH}/node/versions/${version}/bin"
-
-    unzip -q "${archive_path}" -d "${archive_unpack_files}" || return 1
-
     mkdir -p "${version_path}" && (
         mv "${archive_unpack_files}/"*/* "${version_path}" || return 1
         cd "${version_path}" && chmod +x node.exe npm npx
@@ -138,7 +133,7 @@ A
     local archive_path="$___X_CMD_ENV_PATH/node/archive/node-${version}.${compression}"
 
     local archive_unpack_files
-    archive_unpack_files="$(dirname "$archive_path")/files"
+    archive_unpack_files="$(dirname "$archive_path")/node-${version}"
     mkdir -p "$archive_unpack_files"
 
     case "$platform" in

@@ -7,15 +7,15 @@ ___x_cmd_env_scala_ls_remote(){
 
 ___x_cmd_env_scala_download_archive(){
 
-	___x_cmd_env_sdk_download_archive scala "$@" 
+	___x_cmd_env_sdk_download_archive scala "$@"
 
 }
 
 ___x_cmd_env_scala_ws(){
-  :
+	:
 }
 
 ___x_cmd_env_scala_unpack(){
-___x_cmd_env_sdk_unpack scala "$@"
-}			
+	___x_cmd_env_sdk_unpack scala "$@"
+}
 

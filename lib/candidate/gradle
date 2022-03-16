@@ -41,13 +41,15 @@ ___x_cmd_env_gradle_unpack(){
     env_log info "Unpacking: gradle ${version}"
 
     local archive_path="$___X_CMD_ENV_PATH/gradle/archive/gradle-$version.zip"
-    local tmp_path="$___X_CMD_ENV_PATH/gradle/tmp"
-	x uz "$archive_path" "$tmp_path"
+	x uz "$archive_path" "$(dirname "$archive_path")" || return 1
+
+    local archive_unpack_files
+    archive_unpack_files="$(dirname "$archive_path")/gradle-$version"
 
     local versions_path="$___X_CMD_ENV_PATH/gradle/versions"
 	mkdir -p "$versions_path/${version}"
-	mv -f "$tmp_path/gradle-$version/"* "$versions_path/${version}"
-	rm -rf "$tmp_path/gradle-$version"
+	mv -f "$archive_unpack_files/"* "$versions_path/${version}"
+	rm -rf "$archive_unpack_files"
 }
 
 # EndSection
