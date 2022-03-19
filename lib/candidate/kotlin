@@ -2,12 +2,42 @@
 
 xrc env/lib/sdk
 
+___X_CMD_ENV_SDK_PLATFORM="$(xrc os && printf "%s%s" "$(___x_cmd_os name)" "$(___x_cmd_os arch)" | tr '[:lower:]' '[:upper:]' )"
+case $___X_CMD_ENV_SDK_PLATFORM in
+	WIN*)  ___X_CMD_ENV_SDK_PLATFORM=$(uname -s)         ;;
+esac
+
 ___x_cmd_env_kotlin_ls_remote(){
-	___x_cmd_env_sdk_ls_remote kotlin "$@"
+	local cache_path=$___X_CMD_ENV_PATH/kotlin/cache/version_list
+	local cache_expiration=${2:-1}
+	echo "111"
+
+	___x_cmd_httpget "https://api.sdkman.io/2/candidates/kotlin/LINUX64/versions/all" "$cache_path" - && \
+	awk 'BEGIN{ RS=","} { print $0 }' < "$cache_path"
 }
 
+
 ___x_cmd_env_kotlin_download_archive(){
-	___x_cmd_env_sdk_download_archive kotlin "$@"
+	local version="${1:? Provide a version}"
+
+	if ___x_cmd_env_util_is_archive_cached kotlin "$version" 2>dev/null; then
+	env_log info  "Archive existed: $version"
+	return 0
+	fi
+
+	local archive_path="$___X_CMD_ENV_PATH/kotlin/archive/archive-{version}.zip"
+	mkdir -p "$(dirname $archive_path)"
+
+	download_url="https://github.com/JetBrains/kotlin/releases/download/v${version}/kotlin-compiler-${version}.zip"
+	env_log info "Downloading kotlin ${version}"
+
+	if ! curl --progress bar --location --retry-max-time 10 --retry 0 "download_url" --output "archive_path"; then
+	env_log info "Download failure"
+	retuen 1
+	fi
+
+	env_log info "Download completed $download_url"
+
 }
 
 ___x_cmd_env_kotlin_ws(){
@@ -15,7 +45,18 @@ ___x_cmd_env_kotlin_ws(){
 }
 
 ___x_cmd_env_kotlin_unpack(){
-	___x_cmd_env_sdk_unpack kotlin "$@"
-}
+	local version="${1:?Provide a version}"
+	env_log info "unpack beginning kotlin-${version}"
+	local archive_path="$___X_CMD_ENV_PATH/kotlin/archive/kotlin-${version}.zip"
 
+	x uz "$archive_path" "$(dirname "${archive_path}")" || return 1
+
+	local archive_unpack_files="$(dirname "${archive_path}")/kotlin-${version}"
+	local versions_path="$___X_CMD_ENV_PATH/kotlin/versions"
+	mkdir -p "$versions_path/${version}"
+
+	mv -f "$archive_unpack_files/"* "$versions_path/${version}"
+	rm -rf "$archive_unpack_files"
+
+}
 

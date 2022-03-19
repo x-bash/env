@@ -3,7 +3,7 @@
 # download
 ___x_cmd_env_maven_unpack(){
     local version="${1:?Provide a version}"
-
+    env_log info "Unpacking: maven ${version}"
     local archive_path="$___X_CMD_ENV_PATH/maven/archive/maven-$version.zip"
     x uz "$archive_path" "$(dirname "$archive_path")" || return 1
 
@@ -15,21 +15,6 @@ ___x_cmd_env_maven_unpack(){
     mv -f "$archive_unpack_files/"* "$versions_path/${version}"
     rm -rf "$archive_unpack_files"
 
-
-    # local version="${1:?Provide a version}"
-    # env_log info "Unpacking: gradle ${version}"
-
-    # local archive_path="$___X_CMD_ENV_PATH/gradle/archive/gradle-$version.zip"
-	# x uz "$archive_path" "$(dirname "$archive_path")" || return 1
-
-    # local archive_unpack_files
-    # archive_unpack_files="$(dirname "$archive_path")/gradle-$version"
-
-    # local versions_path="$___X_CMD_ENV_PATH/gradle/versions"
-	# mkdir -p "$versions_path/${version}"
-	# mv -f "$archive_unpack_files/"* "$versions_path/${version}"
-	# rm -rf "$archive_unpack_files"
-
 }
 
 ___x_cmd_env_maven_ls_remote(){
@@ -37,24 +22,20 @@ ___x_cmd_env_maven_ls_remote(){
     local cache_expiration=${2:-1}
 
       ___x_cmd_httpget "https://archive.apache.org/dist/maven/maven-3/" "$cache_path" -  && \
-    awk 'match($0, /href="([0-9.]+)\/"/){ print $0} ' <"$cache_path"
-
-    # env_log info "aaa"
-    #  ___x_cmd_httpget "https://archive.apache.org/dist/maven/maven-3/" "$cache_path" -  && \
-    # awk '{if ($1~/<img/){print substr($0,52,5)};gensub(/ef="?/,"",52,$0) } ' <"$cache_path"
+    awk 'match($0, /href="([0-9.]+)\/"/){print(substr($0,52,5))} ' <"$cache_path"
 
 }
 
 ___x_cmd_env_maven_download_archive(){
-    local version=${1:?Provide a version}
-    local archive_path=$___X_CMD_ENV_PATH/maven/archive/maven-${version}.zip
+    local version="${1:?Provide a version}"
+    local archive_path="$___X_CMD_ENV_PATH/maven/archive/maven-${version}.zip"
 
-    if ___x_cmd_env_util_is_archive_cached maven $version; then
+    if ___x_cmd_env_util_is_archive_cached maven $version 2>dev>null; then
     env_log "Maven-$version have existed,download failed "
     return 0
     fi
 
-    mkdir -p "$(dirname $archive_path)"
+    mkdir -p "$(dirname "${archive_path}")"
     download_url="http://mirrors.ukfast.co.uk/sites/ftp.apache.org/maven/maven-3/${version}/binaries/apache-maven-3.3.9-bin.zip"
     env_log info "Downloading $download_url"
 
@@ -62,7 +43,6 @@ ___x_cmd_env_maven_download_archive(){
         env_log error "Download failure from $download_url"
         return 1
     fi
-env_log info "Download Successfully"
-
+        env_log info "Download Successfully"
 
 }
