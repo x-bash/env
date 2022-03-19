@@ -11,7 +11,7 @@ ___x_cmd_env_springboot_ls_remote(){
 
 ___x_cmd_env_springboot_download_archive(){
     local version="${1:?Provide a version}"
-    local archive_path="___X_CMD_ENV_PATH/springboot/archive/springboot-${version}.zip"
+    local archive_path="$___X_CMD_ENV_PATH/springboot/archive/springboot-${version}.zip"
 
    if ___x_cmd_env_util_is_archive_cached springboot "$version" 2>/dev/null; then
         env_log info "Archive existed: $version"
