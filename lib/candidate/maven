@@ -4,6 +4,7 @@
 ___x_cmd_env_maven_unpack(){
     local version="${1:?Provide a version}"
     env_log info "Unpacking: maven ${version}"
+
     local archive_path="$___X_CMD_ENV_PATH/maven/archive/maven-$version.zip"
     x uz "$archive_path" "$(dirname "$archive_path")" || return 1
 
