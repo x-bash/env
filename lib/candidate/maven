@@ -5,7 +5,7 @@ ___x_cmd_env_maven_unpack(){
     local version="${1:?Provide a version}"
     env_log info "Unpacking: maven ${version}"
 
-    local archive_path="$___X_CMD_ENV_PATH/maven/archive/maven-$version.zip"
+    local archive_path="$___X_CMD_ENV_PATH/maven/archive/maven-${version}-src.zip"
     x uz "$archive_path" "$(dirname "$archive_path")" || return 1
 
     local archive_unpack_files
@@ -29,7 +29,7 @@ ___x_cmd_env_maven_ls_remote(){
 
 ___x_cmd_env_maven_download_archive(){
     local version="${1:?Provide a version}"
-    local archive_path="$___X_CMD_ENV_PATH/maven/archive/maven-${version}.zip"
+    local archive_path="$___X_CMD_ENV_PATH/maven/archive/maven-${version}-src.zip"
 
     if ___x_cmd_env_util_is_archive_cached maven $version 2>dev>null; then
     env_log "Maven-$version have existed,download failed "
@@ -37,7 +37,8 @@ ___x_cmd_env_maven_download_archive(){
     fi
 
     mkdir -p "$(dirname "${archive_path}")"
-    download_url="http://mirrors.ukfast.co.uk/sites/ftp.apache.org/maven/maven-3/${version}/binaries/apache-maven-3.3.9-bin.zip"
+    download_url="https://archive.apache.org/dist/maven/maven-3/${version}/source/apache-maven-${version}-src.zip"
+
     env_log info "Downloading $download_url"
 
     if ! curl --progress-bar --location --retry-max-time 10 --retry 0 "$download_url" --output "$archive_path" ; then

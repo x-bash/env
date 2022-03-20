@@ -31,7 +31,7 @@ ___x_cmd_env_common_use(){
 
     local versions_path
     if [ -z "$shims" ]; then
-        versions_path="${___X_CMD_ENV_PATH}/$candidate/versions/$version/bin"
+        versions_path="${___X_CMD_ENV_PATH}/$candidate/versions/$version"
     else
         versions_path="${___X_CMD_ENV_PATH}/$candidate/shims"
         ___x_cmd_env_util_make_shim_dir "$candidate" "${version}" || return 1
