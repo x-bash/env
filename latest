@@ -9,6 +9,15 @@ ___x_cmd_env_main() {
     ___x_cmd_env_main "$@"
 }
 
+___x_cmd_env_main_init(){
+    mkdir -p "$___X_CMD_ROOT/.env/env"
+    PATH="$(___x_cmd_modfile_ls "$___X_CMD_ROOT/.env/env/use" | tr "\n" ":"):$PATH"
+    PATH="${PATH#:}"
+    PATH="${PATH%:}"
+}
+
+___x_cmd_env_main_init
+
 # Section: advise ls_version
 
 ___x_cmd_env_advise_ls_remote_version(){
