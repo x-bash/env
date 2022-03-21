@@ -1,6 +1,6 @@
-# shellcheck shell=sh disable=SC3043,SC2164,SC3000-SC4000     # xrc
+# Author:       Li Junhao           l@x-cmd.com     # xrc
+# shellcheck    shell=sh            disable=SC3043,SC2164,SC3000-SC4000
 
-# author:       Li Junhao           l@x-cmd.com
 # license:      GPLv3
 
 # Inject the environment.
