@@ -25,12 +25,12 @@ ___x_cmd_env_common_la(){
 ___x_cmd_env_common_use(){
     local candidate="${1:?Provide candidate}"
     local version="${2:?Provide version}"
-    local shims="${3:-""}"
+    local use_shims="${3:-""}"
 
     ___x_cmd_env_util_is_downloaded "$candidate" "$version" 2>/dev/null || return 1
 
     local versions_path
-    if [ -z "$shims" ]; then
+    if [ -z "$use_shims" ]; then
         versions_path="${___X_CMD_ENV_PATH}/$candidate/versions/$version/bin"
     else
         versions_path="${___X_CMD_ENV_PATH}/$candidate/shims"
@@ -125,7 +125,7 @@ ___x_cmd_env_common_download(){
 ___x_cmd_env_common_install(){
     local candidate="${1:?Provide canddidate}"
     local version="${2:?Provide version}"
-    local shims="${3:-""}"
+    local use_shims="${3:-""}"
 
     env_log info "Installing $candidate $version"
     if ! ___x_cmd_env_run_common_if_notfound download "$candidate" "$version"; then
@@ -133,7 +133,7 @@ ___x_cmd_env_common_install(){
         return 1
     fi
 
-    ___x_cmd_env_common_use "$candidate" "$version" "$shims" || return 1
+    ___x_cmd_env_common_use "$candidate" "$version" "$use_shims" || return 1
     env_log info "Successfully installed $candidate $version"
 }
 
