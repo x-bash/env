@@ -9,9 +9,10 @@ ___x_cmd_env_maven_unpack(){
     x uz "$archive_path" "$(dirname "$archive_path")" || return 1
 
     local archive_unpack_files
-    archive_unpack_files="$(dirname "$archive_path")/maven-$version"
+    archive_unpack_files="$(dirname "$archive_path")/apache-maven-$version"
 
     local versions_path="$___X_CMD_ENV_PATH/maven/versions"
+    mv -f "$archive_unpack_files" "$___X_CMD_ENV_PATH/maven/versions/apache-maven-${version}"
     mkdir -p "$versions_path/${version}"
     mv -f "$archive_unpack_files/"* "$versions_path/${version}"
     rm -rf "$archive_unpack_files"
@@ -24,7 +25,6 @@ ___x_cmd_env_maven_ls_remote(){
 
       ___x_cmd_httpget "https://archive.apache.org/dist/maven/maven-3/" "$cache_path" -  && \
     awk 'match($0, /href="([0-9.]+)\/"/){print(substr($0,52,5))} ' <"$cache_path"
-
 }
 
 ___x_cmd_env_maven_download_archive(){
@@ -37,8 +37,7 @@ ___x_cmd_env_maven_download_archive(){
     fi
 
     mkdir -p "$(dirname "${archive_path}")"
-    download_url="https://archive.apache.org/dist/maven/maven-3/${version}/source/apache-maven-${version}-src.zip"
-
+    download_url="https://archive.apache.org/dist/maven/maven-3/${version}/binaries/apache-maven-${version}-bin.zip"
     env_log info "Downloading $download_url"
 
     if ! curl --progress-bar --location --retry-max-time 10 --retry 0 "$download_url" --output "$archive_path" ; then
