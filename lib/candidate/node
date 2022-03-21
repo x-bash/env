@@ -77,7 +77,10 @@ $(x os name; x os arch)
 A
 
     # TODO: Handle bsd, sunos ..
-    if [ "$platform-$arch" = "darwin-arm64" ] && ! ___x_cmd_env_node_version_greater_than_or_equal_to "$version" 16 ; then
+    # ___x_cmd_env_node_version_greater_than_or_equal_to "$version" 16
+
+    local version_without_v="${version#v}"
+    if [ "$platform-$arch" = "darwin-arm64" ] && ! [ "${version_without_v%%.*.*}" -gt 16 ]; then
         env_log warn "You are using darwin arm64, but node $version is not available for this platform. (node < 16.x)"
         env_log warn "Use x86_64 instead."
         arch="x64"
