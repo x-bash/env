@@ -36,7 +36,7 @@ ___x_cmd_env_scala_unpack(){
     env_log info "Unpacking: scala ${version}"
 
     local archive_path="$___X_CMD_ENV_PATH/scala/archive/scala-${version}.zip"
-	x uz "$archive_path" "$(dirname "$archive_path")" || return 1
+	x uz "$___X_CMD_ENV_PATH/scala/archive/scala-${version}.zip" "$(dirname "$archive_path")" || return 1
 
     local archive_unpack_files
     archive_unpack_files="$(dirname "$archive_path")/scala-$version"
