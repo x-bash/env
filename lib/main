@@ -159,7 +159,7 @@ ___x_cmd_env_main_use(){
 advise:
     #2        xrc env/latest && ___x_cmd_env_advise_ls_local_version
 options:
-    --shims       "Use shims"
+    --use_shims       "Use shims"
     #1            "Environment Candidates" <candidates>:candidates_list
     #2            "Version"                <version>="default"
 A
@@ -208,7 +208,7 @@ ___x_cmd_env_main_install(){
 advise:
     #2        xrc env/latest && ___x_cmd_env_advise_ls_remote_version
 options:
-    --shims   "Use shims"
+    --use_shims   "Use shims"
     #1        "Environment Candidates" <candidates>:candidates_list
     #2        "Version"                <version>="default"
 A
