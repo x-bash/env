@@ -51,11 +51,11 @@ ___x_cmd_env_kotlin_unpack(){
 
 	x uz "$archive_path" "$(dirname "${archive_path}")" || return 1
 
-	local archive_unpack_files="$(dirname "${archive_path}")/kotlin-${version}"
+	local archive_unpack_files="$(dirname "${archive_path}")/kotlinc"
 	local versions_path="$___X_CMD_ENV_PATH/kotlin/versions"
 	mkdir -p "$versions_path/${version}"
-
-	mv -f "$archive_unpack_files/"* "$versions_path/${version}"
+    mv -f "$archive_unpack_files"/* "$___X_CMD_ENV_PATH/kotlin/versions/${version}"
+	# mv -f "$archive_unpack_files/"* "$versions_path/${version}"
 	rm -rf "$archive_unpack_files"
 
 }
