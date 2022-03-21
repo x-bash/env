@@ -5,16 +5,15 @@ ___x_cmd_env_maven_unpack(){
     local version="${1:?Provide a version}"
     env_log info "Unpacking: maven ${version}"
 
-    local archive_path="$___X_CMD_ENV_PATH/maven/archive/maven-${version}-src.zip"
+    local archive_path="$___X_CMD_ENV_PATH/maven/archive/maven-${version}-bin.zip"
     x uz "$archive_path" "$(dirname "$archive_path")" || return 1
 
     local archive_unpack_files
     archive_unpack_files="$(dirname "$archive_path")/apache-maven-$version"
 
     local versions_path="$___X_CMD_ENV_PATH/maven/versions"
-    mv -f "$archive_unpack_files" "$___X_CMD_ENV_PATH/maven/versions/apache-maven-${version}"
     mkdir -p "$versions_path/${version}"
-    mv -f "$archive_unpack_files/"* "$versions_path/${version}"
+    mv -f "$archive_unpack_files/"* "$versions_path/apache_${version}"
     rm -rf "$archive_unpack_files"
 
 }
@@ -29,9 +28,9 @@ ___x_cmd_env_maven_ls_remote(){
 
 ___x_cmd_env_maven_download_archive(){
     local version="${1:?Provide a version}"
-    local archive_path="$___X_CMD_ENV_PATH/maven/archive/maven-${version}-src.zip"
+    local archive_path="$___X_CMD_ENV_PATH/maven/archive/maven-${version}-bin.zip"
 
-    if ___x_cmd_env_util_is_archive_cached maven $version 2>dev>null; then
+    if ___x_cmd_env_util_is_archive_cached maven $version 2>/dev/null; then
     env_log "Maven-$version have existed,download failed "
     return 0
     fi
