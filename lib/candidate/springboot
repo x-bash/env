@@ -21,7 +21,6 @@ ___x_cmd_env_springboot_download_archive(){
     mkdir -p "$(dirname "${archive_path}")"
     download_url="https://repo.spring.io/simple/release/org/springframework/boot/spring-boot-cli/${version}/spring-boot-cli-${version}-bin.zip"
         env_log info "Downloading"
-        echo "$download_url"
 
      if ! curl --progress-bar --location --retry-max-time 10 --retry 0 "$download_url" --output "$archive_path" ; then
         env_log error "Download failure from $download_url"
@@ -31,7 +30,7 @@ ___x_cmd_env_springboot_download_archive(){
 }
 
 ___x_cmd_env_springboot_unpack(){
-     echo "222"
+
 	local version="${1:?Provide a version}"
     env_log info "Unpacking: springboot ${version}"
 
@@ -40,7 +39,7 @@ ___x_cmd_env_springboot_unpack(){
 
     local archive_unpack_files
     archive_unpack_files="$(dirname "$archive_path")/spring-$version"
-    echo "$___X_CMD_ENV_PATH"
+
     local versions_path="$___X_CMD_ENV_PATH/springboot/versions"
     mv -f "$archive_unpack_files/spring-${version}/spring-${version}" "$archive_unpack_files/spring-${version}"
 	mkdir -p "${versions_path}/${version}"
