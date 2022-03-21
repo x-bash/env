@@ -173,7 +173,7 @@ A
     fi
     shift 2
 
-    ___x_cmd_env_run_common_if_notfound use "$candidate" "$version" "$shims" "$@"
+    ___x_cmd_env_run_common_if_notfound use "$candidate" "$version" "$use_shims" "$@"
 }
 
 ___x_cmd_env_main_ws(){
@@ -227,7 +227,7 @@ A
     fi
     shift 2
 
-    ___x_cmd_env_run_common_if_notfound install "$candidate" "$version" "$shims" "$@"
+    ___x_cmd_env_run_common_if_notfound install "$candidate" "$version" "$use_shims" "$@"
 }
 
 ___x_cmd_env_main_uninstall(){
