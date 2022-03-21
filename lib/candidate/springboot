@@ -5,7 +5,7 @@ ___x_cmd_env_springboot_ls_remote(){
     local cache_path="$___X_CMD_ENV_PATH/springboot/cache/version_list"
     local cache_expiration="${2:-1}"
 
-    ___x_cmd_httpget "https://repo.spring.io/ui/api/v1/ui/nativeBrowser/release/org/springframework/boot/spring-boot-cli" "$cache_path" - 2>dev>null &&\
+    ___x_cmd_httpget "https://repo.spring.io/ui/api/v1/ui/nativeBrowser/release/org/springframework/boot/spring-boot-cli" "$cache_path" - 2>/dev/null &&\
     awk ' match($0,/name/){gsub(/^[ ]+/,"",$0);gsub(/"name" : "maven-[a-z0-9.", ]+/," ",$0);gsub(/",{1,5}/," ",$0);print(substr($0,11,50))} ' < "$cache_path"
 }
 
@@ -36,7 +36,7 @@ ___x_cmd_env_springboot_unpack(){
     env_log info "Unpacking: springboot ${version}"
 
     local archive_path="$___X_CMD_ENV_PATH/springboot/archive/springboot-$version.zip"
-	x uz "$archive_path" "$(dirname "$archive_path")" || return 1
+	x uz "$___X_CMD_ENV_PATH/springboot/archive/springboot-$version.zip" "$(dirname "$archive_path")" || return 1
 
     local archive_unpack_files
     archive_unpack_files="$(dirname "$archive_path")/spring-$version"
