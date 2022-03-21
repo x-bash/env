@@ -1,3 +1,5 @@
+# shellcheck shell=sh disable=SC3043,SC2164,SC3000-SC4000
+
 xrc ui/lib/region
 xrc ui/lib/varctl
 
