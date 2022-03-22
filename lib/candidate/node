@@ -134,14 +134,14 @@ A
 ___x_cmd_env_node_ui_catsel(){
     case "$#" in
         0)
-            x env ls -r node \
+            ___x_cmd_env_node_ls_remote \
                 | awk '{  split($0,arr," "); if(arr[2]!=""){ vmap[arr[2]]=1 }} END{ for(key in vmap){print key}  }'
             ;;
         1)
-            x env ls -r node | grep "$1" | awk '{  split($0,arr,"."); vmap[arr[1]]=1 } END{ for(key in vmap){print key}  }'
+            ___x_cmd_env_node_ls_remote | grep "$1" | awk '{  split($0,arr,"."); vmap[arr[1]]=1 } END{ for(key in vmap){print key}  }'
             ;;
         2)
-            x env ls -r node | grep "$2" | awk '{  print $1 }'
+            ___x_cmd_env_node_ls_remote | grep "$2" | awk '{  print $1 }'
             ;;
     esac
 }
