@@ -15,13 +15,7 @@ ___x_cmd_env_util_is_archive_cached(){
     local candidate="${1:?Provide candidate}"
     local version="${2:?Provide version}"
 
-    # Returns 0 whether found or not
-    # find "/home/zjq/.x-cmd/.env/node/cache" -name "aaa.*"
-    # if ! find "$___X_CMD_ENV_PATH/$candidate/archive" -name "$candidate-$version.*"; then
-
-    local dir_list
-    dir_list="$(ls "$___X_CMD_ENV_PATH/$candidate/archive" 2>/dev/null)"
-    if [ "$dir_list" = "${dir_list#*"$candidate-$version"}" ]; then
+    if [ -z "$(find "$___X_CMD_ENV_PATH/$candidate/archive" -name "$candidate-$version.*")" ]; then
         env_log error "The archive of ${candidate} ${version} does not exist !"
         return 1
     fi
