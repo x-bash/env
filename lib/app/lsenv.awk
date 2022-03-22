@@ -156,6 +156,7 @@ NR==1{
     try_update_width_height( $0 )
 
     cur_keypath = "."
+    ( CANDIDATE != "" ) && cur_keypath = cur_keypath S CANDIDATE
     get_data( cur_keypath )
     stack_push( treectrl, cur_keypath )
     prepare_selected_item_data()
@@ -195,7 +196,7 @@ function get_data( curkp,            cmd_format, _curkp_arrl, _curkp_arr, _line,
     # cmd_format = "cd ~/.x-cmd/env/lib/app/candidate/sdk; ls; cd - >/dev/null"
     if (curkp != ".") {
         _curkp_arrl  = split( curkp, _curkp_arr, S)
-        cmd_format = "cat ~/.env/candidate/sdk/%s/%s.json"
+        cmd_format = "cat ~/.x-cmd/.env/%s/cache/%s.json"
 
         cmd_format = sprintf(cmd_format, _curkp_arr[2], _curkp_arr[2])
         cmd_format = ". ~/.x-cmd/xrc/latest; xrc env/lib/app/lsenv;" cmd_format "| ___x_cmd_ui_get_env_ls %s"

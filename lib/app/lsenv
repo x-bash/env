@@ -9,6 +9,7 @@ ___x_cmd_ui_lsenv(){
 
 ___x_cmd_ui_lsenv_mainloop_awk_(){
     command awk "$@" \
+        -v CANDIDATE="$CANDIDATE" \
         -f "$___X_CMD_ROOT/awk/lib/default.awk" \
         -f "$___X_CMD_ROOT/awk/lib/str.awk" \
         -f "$___X_CMD_ROOT/awk/lib/wcwidth.awk" \
