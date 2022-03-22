@@ -67,6 +67,13 @@ A
     # TODO: la---"list all available environments"
     # TODO: ws---"Set workspace default environment"
 
+    #TODO: Should be optimized
+    if [ "${1}" = "___x_cmd_ui_catsel" ]; then
+        shift
+        ___x_cmd_env_ui_catsel "$@"
+        return
+    fi
+
     if [ -z "$PARAM_SUBCMD" ]; then
         ___x_cmd_env_main help
         return 1
@@ -121,6 +128,7 @@ A
     # TODO: V8 -> V8.2   --> (Remote) V8.6
     if [ -n "$remote" ] ; then
 		___x_cmd_env_run_common_if_notfound ls_remote "$@"
+        ___x_cmd_env_run_common_if_notfound gen "$@"
         return
     fi
 
@@ -336,6 +344,19 @@ A
     ___x_cmd_env_run_common_if_notfound exec "$candidate" "$version" "$@"
 }
 
-
 # EndSection
 
+# Section: ui_catsel
+
+___x_cmd_env_ui_catsel() {
+    if [ $# -eq 0 ]; then
+        ___x_cmd_env_candidate_all | awk '($0!=""){
+            print $0 " info has"
+        }'
+        return
+    fi
+
+    ___x_cmd_env_run_common_if_notfound ui_catsel "$@"
+}
+
+# EndSection

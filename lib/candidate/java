@@ -19,6 +19,25 @@ ___x_cmd_env_java_unpack(){
 	___x_cmd_env_sdk_unpack java "$@"
 }
 
+# EndSection
+
+# Section: ui_catsel
+
+#TODO: Should be optimized
+___x_cmd_env_java_ui_catsel(){
+    case "$#" in
+        0)
+            x env ls -r java \
+                | awk '{  split($0,arr,"-"); if(arr[2]!=""){ vmap[arr[2]]=1 }} END{ for(key in vmap){print key}  }'
+            ;;
+        1)
+            x env ls -r java | grep "$1" | awk '{  split($0,arr,"."); vmap[arr[1]]=1 } END{ for(key in vmap){print key}  }'
+            ;;
+        2)
+            x env ls -r java | grep "$1" | grep ^"$2" | awk '{  print $1 }'
+            ;;
+    esac
+}
 
 # EndSection
 
