@@ -1,24 +1,6 @@
 # shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263    # xrc
 
 # download
-___x_cmd_env_maven_unpack(){
-    local version="${1:?Provide a version}"
-    env_log info "Unpacking: maven ${version}"
-
-    local archive_path="$___X_CMD_ENV_PATH/maven/archive/maven-${version}.zip"
-    x uz "$archive_path" "$(dirname "$archive_path")" || return 1
-
-
-    local archive_unpack_files
-    archive_unpack_files="$(dirname "$archive_path")/apache-maven-$version"
-
-    local versions_path="$___X_CMD_ENV_PATH/maven/versions"
-    mkdir -p "$versions_path/${version}"
-    mv -f "$archive_unpack_files/"* "$versions_path/${version}"
-    rm -rf "$archive_unpack_files"
-
-}
-
 ___x_cmd_env_maven_ls_remote(){
     local cache_path="$___X_CMD_ENV_PATH/maven/cache/version_list"
     local cache_expiration=${2:-1}
@@ -46,4 +28,21 @@ ___x_cmd_env_maven_download_archive(){
         return 1
     fi
         env_log info "Download Successfully"
+}
+___x_cmd_env_maven_unpack(){
+    local version="${1:?Provide a version}"
+    env_log info "Unpacking: maven ${version}"
+
+    local archive_path="$___X_CMD_ENV_PATH/maven/archive/maven-${version}.zip"
+    x uz "$archive_path" "$(dirname "$archive_path")" || return 1
+
+
+    local archive_unpack_files
+    archive_unpack_files="$(dirname "$archive_path")/apache-maven-$version"
+
+    local versions_path="$___X_CMD_ENV_PATH/maven/versions"
+    mkdir -p "$versions_path/${version}"
+    mv -f "$archive_unpack_files/"* "$versions_path/${version}"
+    rm -rf "$archive_unpack_files"
+
 }
