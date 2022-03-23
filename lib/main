@@ -220,25 +220,32 @@ advise:
     #2        xrc env/latest && ___x_cmd_env_advise_ls_remote_version
 options:
     --use_shims     "Use shims"
-    #1              "Environment Candidates" <candidates>:candidates_list
+    #1              "Environment Candidates" <candidates>:candidates_list=""
     #2              "Version"                <version>="default"
 A
     param:run
 
-    local candidate="${1}"
-    if [ -z "$candidate" ]; then
-        ___x_cmd_env_main_install help
-        return 1
-    fi
+    # local candidate="${1}"
+    # if [ -z "$candidate" ]; then
+    #     ___x_cmd_env_main_install help
+    #     return 1
+    # fi
 
+    local candidate
     local version
-    if ! version="$(___x_cmd_env_run_common_if_notfound full_version "$candidate" "$2")"; then
-        env_log error "Version of $candidate not found: $version"
-        return 1
-    fi
-    shift 2
+    xrc env/lib/app/lsenv && ___x_cmd_ui_lsenv
 
-    ___x_cmd_env_run_common_if_notfound install "$candidate" "$version" "$use_shims" "$@"
+    echo "___X_CMD_UI_LSENV_FINAL_COMMAND:" "$___X_CMD_UI_LSENV_FINAL_COMMAND"
+    echo "___X_CMD_UI_LSENV_CURRENT_ITEM:" "$___X_CMD_UI_LSENV_CURRENT_ITEM"
+    # xrc env/lib/app/lsenv && ___x_cmd_ui_lsenv
+    # local version
+    # if ! version="$(___x_cmd_env_run_common_if_notfound full_version "$candidate" "$2")"; then
+    #     env_log error "Version of $candidate not found: $version"
+    #     return 1
+    # fi
+    # shift 2
+
+    # ___x_cmd_env_run_common_if_notfound install "$candidate" "$version" "$use_shims" "$@"
 }
 
 ___x_cmd_env_main_uninstall(){
