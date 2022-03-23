@@ -48,7 +48,7 @@ ___x_cmd_env_gradle_unpack(){
 
     local versions_path="$___X_CMD_ENV_PATH/gradle/versions"
 	mkdir -p "$versions_path/${version}"
-	mv -f "$archive_unpack_files/"* "$versions_path/${version}"
+	mv -p "$archive_unpack_files/"* "${versions_path}/${version}"
 	rm -rf "$archive_unpack_files"
 }
 

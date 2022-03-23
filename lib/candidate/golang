@@ -1,0 +1,84 @@
+# shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263    # xrc
+# __X_CMD_ENV_GO_PLATFORM="$(xrc os && printf "%s%s" "$(___x_cmd_os name)" "$(___x_cmd_os arch)" | tr '[:lower:]' '[:upper:]' )"
+# case $___X_CMD_ENV_SDK_PLATFORM in
+# 	WIN*)  ___X_CMD_ENV_GO_PLATFORM=$(uname -s)         ;;
+#     linux) ___X_CMD_ENV_GO_PLATFORM=$(uname -s)         ;;
+#     macOS)  ___X_CMD_ENV_SDK_PLATFORM=$(uname -s)       ;;
+
+# esac_
+
+___x_cmd_env_golang_ls_remote(){
+    local cache_path=$___X_CMD_ENV_PATH/go/archive/cache_list
+    local cache_expiration=${2:-1}
+
+    ___x_cmd_httpget "https://go.dev/project" "$cache_path" "$cache_expiration" 2>/dev/null && \
+        awk 'match($0,/<li><a href="\/doc\/go[0-9.]{1,4}/){gsub(/^[\t]{1,}/,"",$0);
+        gsub(/<li><a href="\/doc\/go[0-9.">]{1,}/,"",$0);
+        gsub(/<\/a> /,"      ",$0);
+        print (substr($0,3,6))}' < "$cache_path"
+}
+
+
+___x_cmd_env_golang_download_archive(){
+    local version=${1:?Provide a version}
+    if ___x_cmd_env_util_is_archive_cached "$candidate" "$version" 2>/dev/null; then
+        env_log info "Archive existed: $version"
+        return 0
+    fi
+
+   if [ "$(xrc os; ___x_cmd_os name)"="windows" ] && [ "$(xrc os; ___x_cmd_os arch)"="x86" ]         ;   then
+        download_url="https://golang.google.cn/dl/go${version}.windows-386.zip"
+        file_suffix="zip"
+   elif [ "$(xrc os;___x_cmd_os name)"="windows" ] && [ "$(xrc os;___x_cmd_os arch)"="x86-64" ]      ;   then
+        download_url="https://golang.google.cn/dl/go${version}.windows-amd64.zip"
+        file_suffix="zip"
+   elif [ "$(xrc os; ___x_cmd_os name)"="linux" ] && [ "$(xrc os; ___x_cmd_os arch)"="x86" ]         ;   then
+        download_url="https://golang.google.cn/dl/go${version}.linux-386.tar.gz"
+        file_suffix="tar.gz"
+   elif [ "$(xrc os; ___x_cmd_os name)"="linux" ] && [ "$(xrc os; ___x_cmd_os arch)"="x86-64" ]      ;   then
+        download_url="https://golang.google.cn/dl/go${version}.linux-amd64.tar.gz"
+        file_suffix="tar.gz"
+   elif [ "$(xrc os; ___x_cmd_os name)"="linux" ] && [ "$(xrc os; ___x_cmd_os arch)"="ARM64" ]       ;   then
+        download_url="https://golang.google.cn/dl/go${version}.linux-arm64.tar.gz"
+        file_suffix="tar.gz"
+   elif [ "$(xrc os; ___x_cmd_os name)"= "linux" ] && [ "$(xrc os; ___x_cmd_os arch)" ="ARMv6"  ]  ;   then
+        download_url="https://golang.google.cn/dl/go${version}.linux-armv6l.tar.gz"
+        file_suffix="tar.gz"
+     else env_log error "your OS or Arch are not matched"
+    fi
+
+   local archive_path="$___X_CMD_ENV_PATH/go/archive/go-${version}.${file_suffix}"
+    mkdir -p "$(dirname "$archive_path")"
+
+    env_log info "Downloading golang ${version}"
+
+
+    if ! curl --progress-bar --location --retry-max-time 10 --retry 0 "${download_url}" --output "${archive_path}"; then
+	    env_log info "Download failure"
+	    return 1
+	fi
+
+   env_log info "Download Done"
+}
+
+___x_cmd_env_golang_unpack(){
+   local version="${1:?Provide a version}"
+   local archive_path="$___X_CMD_ENV_PATH/go/archive/go-${version}.${file_suffix}"
+      env_log info "Unpacking: go ${version}"
+
+   if   [ "${file_suffix}"="zip" ]  ; then
+       x uz "$archive_path" "$(dirname "$archive_path")" || return 1
+   elif [ "${file_suffix}"="tar.gz" ]  ; then
+       tar -zxvf "$archive_path" "$(dirname "$archive_path")" || return 1
+   fi
+
+
+   local archive_unpack_files
+   archive_unpack_files="$(dirname "$archive_path")/go"
+
+   local versions_path="$___X_CMD_ENV_PATH/go/versions"
+	mkdir -p "$versions_path/${version}"
+   mv -f "$archive_unpack_files/"* "$versions_path/${version}"
+   rm -rf "$archive_unpack_files/"*
+   env_log info "success unpack"
+}

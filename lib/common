@@ -132,7 +132,7 @@ ___x_cmd_env_common_install(){
         env_log info "Failed to installed $candidate of version: $version."
         return 1
     fi
-
+echo "ssss"
     ___x_cmd_env_common_use "$candidate" "$version" "$shims" || return 1
     env_log info "Successfully installed $candidate $version"
 }
