@@ -4,7 +4,7 @@ xrc ui/lib/region
 xrc ui/lib/varctl
 
 ___x_cmd_ui_lsenv(){
-    ___x_cmd_ui_region_update_with_keyboard ___x_cmd_ui_lsenv_mainloop_awk
+    ___x_cmd_ui_region_autorefresh_with_keyboard ___x_cmd_ui_lsenv_mainloop_awk
 }
 
 ___x_cmd_ui_lsenv_mainloop_awk_(){
@@ -57,14 +57,6 @@ NR>1{
 '
 }
 
-# ___x_cmd_ui_lsenv_fetch_info(){
-#     local IFS
-#     xrc env
-#     while read -r line; do
-#         case "$line" in
-#             quit)           return ;;
-#             *)              eval "$line" ;;
-#         esac
-#         print "%s\n" "---"
-#     done
-# }
+# echo "___X_CMD_UI_LSENV_FINAL_COMMAND: $___X_CMD_UI_LSENV_FINAL_COMMAND"
+# echo "___X_CMD_UI_LSENV_CURRENT_CANDIDATE: $___X_CMD_UI_LSENV_CURRENT_CANDIDATE"
+# echo "___X_CMD_UI_LSENV_CURRENT_VERSION: $___X_CMD_UI_LSENV_CURRENT_VERSION"

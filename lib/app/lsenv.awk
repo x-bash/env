@@ -223,9 +223,10 @@ function get_data( curkp,            cmd_format, _curkp_arrl, _curkp_arr, _line,
 END {
     if ( exit_is_with_cmd() == true ) {
         _selected = data[ cur_keypath L ctrl_win_val( treectrl, cur_keypath ) ]
-        _selected_keypath = cur_keypath S _selected
+        split(  cur_keypath, cur_arr, S)
         send_env( "___X_CMD_UI_LSENV_FINAL_COMMAND",    exit_get_cmd() )
-        send_env( "___X_CMD_UI_LSENV_CURRENT_ITEM",  _selected_keypath )
+        send_env( "___X_CMD_UI_LSENV_CURRENT_CANDIDATE",  cur_arr[2] )
+        send_env( "___X_CMD_UI_LSENV_CURRENT_VERSION",  _selected )
     }
 }
 # EndSection
