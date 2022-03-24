@@ -92,7 +92,7 @@ ___x_cmd_env_common_current(){
 
     # No any candidate version
     if [ -z "$candidate_path" ]; then
-        env_log error "No version of %s $candidate detected, please install it first! "
+        env_log error "No version of $candidate detected, please install it first! "
         return 1
 
     # After try and no candidate version in xenv, but has candidate version in current shell.
@@ -110,7 +110,7 @@ ___x_cmd_env_common_current(){
     else
         local version
         if ! version=$(___x_cmd_env_util_shims_which_version "$candidate"); then
-            env_log error "No version of %s $candidate detected, please download it first! "
+            env_log error "No version of $candidate detected, please download it first! "
             return 1
         fi
 
