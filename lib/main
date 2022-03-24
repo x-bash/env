@@ -4,16 +4,16 @@
 ___x_cmd_env_candidate_all(){
     printf "%s" "
 python
-node
-golang
 java
 deno
+go
 scala
 maven
 ruby
 kotlin
 gradle
 perl
+node
 "
 
 }
