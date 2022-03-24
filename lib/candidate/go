@@ -36,16 +36,15 @@ ___x_cmd_env_go_download_archive(){
    elif [ "$(xrc os; ___x_cmd_os name)"="linux" ] && [ "$(xrc os; ___x_cmd_os arch)"="ARM64" ]       ;   then
         download_url="https://golang.google.cn/dl/go${version}.linux-arm64.tar.gz"
         file_suffix="tar.gz"
-   elif [ "$(xrc os; ___x_cmd_os name)"= "linux" ] && [ "$(xrc os; ___x_cmd_os arch)" ="ARMv6"  ]  ;   then
+   elif [ "$(xrc os; ___x_cmd_os name)"= "linux" ] && [ "$(xrc os; ___x_cmd_os arch)" ="ARMv6"  ]    ;   then
         download_url="https://golang.google.cn/dl/go${version}.linux-armv6l.tar.gz"
         file_suffix="tar.gz"
-   elif [ "$(xrc os; ___x_cmd_os name)"= "macOS" ] && [ "$(xrc os; ___x_cmd_os arch)" ="x86-64" ]   ;  then
+   elif [ "$(xrc os; ___x_cmd_os name)"= "macOS" ] && [ "$(xrc os; ___x_cmd_os arch)" ="x86-64" ]    ;   then
         download_url="https://golang.google.cn/dl/go${version}.darwin-amd64.tar.gz"
         file_suffix="tar.gz"
-   elif [ "$(xrc os; ___x_cmd_os name)"= "macOS" ] && [ "$(xrc os; ___x_cmd_os arch)" ="ARM64" ]   ;   then
+   elif [ "$(xrc os; ___x_cmd_os name)"= "macOS" ] && [ "$(xrc os; ___x_cmd_os arch)" ="ARM64" ]     ;   then
          download_url="https://golang.google.cn/dl/go${version}.darwin-arm64.tar.gz"
-
-     else env_log error "your OS or Arch are not matched"
+   else  env_log error "your OS or Arch are not matched"
     fi
 
    local archive_path="$___X_CMD_ENV_PATH/go/archive/go-${version}.${file_suffix}"
@@ -65,7 +64,7 @@ ___x_cmd_env_go_download_archive(){
 ___x_cmd_env_go_unpack(){
    local version="${1:?Provide a version}"
    local archive_path="$___X_CMD_ENV_PATH/go/archive/go-${version}.${file_suffix}"
-      env_log info "Unpacking: go ${version}"
+       env_log info "Unpacking: go ${version}"
 
    if   [ "${file_suffix}"="zip" ]  ; then
        x uz "$archive_path" "$(dirname "$archive_path")" || return 1
@@ -78,8 +77,10 @@ ___x_cmd_env_go_unpack(){
    archive_unpack_files="$(dirname "$archive_path")/go"
 
    local versions_path="$___X_CMD_ENV_PATH/go/versions"
-	mkdir -p "$versions_path/${version}"
+
+   mkdir -p "$versions_path/${version}"
    mv -f "$archive_unpack_files/"* "$versions_path/${version}"
    rm -rf "$archive_unpack_files"
+
    env_log info " unpack done"
 }
