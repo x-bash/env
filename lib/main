@@ -227,14 +227,7 @@ A
 
     local candidate="${1}"
     if [ -z "$candidate" ]; then
-        # ___x_cmd_env_main_install help
-        # return 1
         xrc env/lib/app/lsenv && ___x_cmd_ui_lsenv
-
-        # echo "___X_CMD_UI_LSENV_FINAL_COMMAND: $___X_CMD_UI_LSENV_FINAL_COMMAND"
-        # echo "___X_CMD_UI_LSENV_CURRENT_CANDIDATE: $___X_CMD_UI_LSENV_CURRENT_CANDIDATE"
-        # echo "___X_CMD_UI_LSENV_CURRENT_VERSION: $___X_CMD_UI_LSENV_CURRENT_VERSION"
-
         # TODO: how to use shims
         if [ "$___X_CMD_UI_LSENV_FINAL_COMMAND" = "ENTER" ]; then
             candidate="$___X_CMD_UI_LSENV_CURRENT_CANDIDATE"
@@ -242,7 +235,6 @@ A
             ___x_cmd_env_run_common_if_notfound install "$candidate" "$version" "$@"
         fi
         return 0
-
     fi
 
     local version
@@ -291,31 +283,31 @@ ___x_cmd_env_main_download(){
 advise:
     #2        xrc env/latest && ___x_cmd_env_advise_ls_remote_version
 options:
-    #1        "Environment Candidates" <candidates>:candidates_list
+    #1        "Environment Candidates" <candidates>:candidates_list=""
     #2        "Version"                <version>="default"
 A
     param:run
 
-    # local candidate="${1}"
-    # if [ -z "$candidate" ]; then
-    #     ___x_cmd_env_main_download help
-    #     return 1
-    # fi
+    local candidate="${1}"
+    if [ -z "$candidate" ]; then
+        xrc env/lib/app/lsenv && ___x_cmd_ui_lsenv
+        # TODO: how to use shims
+        if [ "$___X_CMD_UI_LSENV_FINAL_COMMAND" = "ENTER" ]; then
+            candidate="$___X_CMD_UI_LSENV_CURRENT_CANDIDATE"
+            local version="$___X_CMD_UI_LSENV_CURRENT_VERSION"
+            ___x_cmd_env_run_common_if_notfound download "$candidate" "$version" "$@"
+        fi
+        return 0
+    fi
 
-    # local version
-    # if ! version="$(___x_cmd_env_run_common_if_notfound full_version "$candidate" "$2")"; then
-    #     env_log error "Version of $candidate not found: $version"
-    #     return 1
-    # fi
-    # shift 2
+    local version
+    if ! version="$(___x_cmd_env_run_common_if_notfound full_version "$candidate" "$2")"; then
+        env_log error "Version of $candidate not found: $version"
+        return 1
+    fi
+    shift 2
 
-    xrc env/lib/app/lsenv && ___x_cmd_ui_lsenv
-
-    echo "___X_CMD_UI_LSENV_FINAL_COMMAND: $___X_CMD_UI_LSENV_FINAL_COMMAND"
-    echo "___X_CMD_UI_LSENV_CURRENT_CANDIDATE: $___X_CMD_UI_LSENV_CURRENT_CANDIDATE"
-    echo "___X_CMD_UI_LSENV_CURRENT_VERSION: $___X_CMD_UI_LSENV_CURRENT_VERSION"
-
-    # ___x_cmd_env_run_common_if_notfound download "$candidate" "$version" "$@"
+    ___x_cmd_env_run_common_if_notfound download "$candidate" "$version" "$@"
 }
 
 ___x_cmd_env_main_which(){
