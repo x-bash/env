@@ -48,9 +48,11 @@ ___x_cmd_env_go_download_archive(){
     fi
 
    local archive_path="$___X_CMD_ENV_PATH/go/archive/go-${version}.${file_suffix}"
-    mkdir -p "$(dirname "$archive_path")"
 
-    env_log info "Downloading golang ${version}"
+
+     mkdir -p "$(dirname "$archive_path")"
+
+     env_log info "Downloading go ${version}"
 
 
     if ! curl --progress-bar --location --retry-max-time 10 --retry 0 "${download_url}" --output "${archive_path}"; then
@@ -82,5 +84,6 @@ ___x_cmd_env_go_unpack(){
    mv -f "$archive_unpack_files/"* "$versions_path/${version}"
    rm -rf "$archive_unpack_files"
 
-   env_log info " unpack done"
+   env_log info " Successfully unpacked"
+
 }
