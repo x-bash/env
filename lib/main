@@ -2,8 +2,7 @@
 
 # Section: Candidate API
 ___x_cmd_env_candidate_all(){
-    printf "%s" "
-python
+    printf "%s" "python
 node
 go
 java
@@ -13,8 +12,7 @@ kotlin
 maven
 springboot
 gradle
-perl
-"
+perl"
 
 }
 
