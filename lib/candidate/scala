@@ -15,18 +15,18 @@ ___x_cmd_env_scala_download_archive(){
 	local version=${1:?Provide a version}
     local archive_path=$___X_CMD_ENV_PATH/scala/archive/scala-${version}.zip
     local download_url
-    env_log info "Downloading ${version}"
+    env_log info "Downloading scala ${version}"
 
     case ${version} in
         2.10*) download_url="https://downloads.lightbend.com/scala/${version}/scala-${version}.zip"               ;;
         2.11*) download_url="http://downloads.typesafe.com/scala/${version}/scala-${version}.zip"                 ;;
         2.12*) download_url="http://downloads.lightbend.com/scala/${version}/scala-${version}.zip"                ;;
         2.13*) download_url="https://downloads.lightbend.com/scala/${version}/scala-${version}.zip"               ;;
-        3.* ) download_url="https://github.com/lampepfl/dotty/releases/download/${version}/scala${version}.zip"   ;;
+        3.* ) download_url="https://github.com/lampepfl/dotty/releases/download/${version}/scala3-${version}.zip" ;;
 
     esac
 
-    if [ "${version}" == "2.11.11" ] || [ "${version}" == "2.11.12" ] ; then
+    if [ "${version}" = "2.11.11" ] || [ "${version}" = "2.11.12" ] ; then
         download_url="https://downloads.lightbend.com/scala/${version}/scala-${version}.zip"
     fi
 
@@ -45,14 +45,23 @@ ___x_cmd_env_scala_download_archive(){
 
 }
 ___x_cmd_env_scala_unpack(){
-	local version="${1:?Provide a version}"
+	local version=${1:?Provide a version}
     env_log info "Unpacking: scala ${version}"
 
     local archive_path="$___X_CMD_ENV_PATH/scala/archive/scala-${version}.zip"
 	x uz "$___X_CMD_ENV_PATH/scala/archive/scala-${version}.zip" "$(dirname "$archive_path")" || return 1
+    local t_version
+    case ${version} in
+        3*) t_version=3  ;;
+    esac
+
 
     local archive_unpack_files
-    archive_unpack_files="$(dirname "$archive_path")/scala-$version"
+    if [ ${t_version} -ge 3 ] ; then
+        local archive_unpack_files= "$(dirname "$archive_path")/scala3-$version"
+    else
+       local archive_unpack_files="$(dirname "$archive_path")/scala-$version"
+    fi
 
     local versions_path="$___X_CMD_ENV_PATH/scala/versions"
 	mkdir -p "$versions_path/${version}"
