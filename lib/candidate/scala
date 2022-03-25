@@ -57,9 +57,9 @@ ___x_cmd_env_scala_unpack(){
         3*) t_version=3  ;;
     esac
 
-
     local archive_unpack_files
-    if [ ${t_version} -ge 3 ] ; then
+
+    if [ "${t_version}" = "3" ] ; then
         local archive_unpack_files= "$(dirname "$archive_path")/scala3-$version"
     else
        local archive_unpack_files="$(dirname "$archive_path")/scala-$version"
