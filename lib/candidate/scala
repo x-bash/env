@@ -14,6 +14,21 @@ ___x_cmd_env_scala_download_archive(){
 
 	local version=${1:?Provide a version}
     local archive_path=$___X_CMD_ENV_PATH/scala/archive/scala-${version}.zip
+    local download_url
+    env_log info "Downloading ${version}"
+
+    case ${version} in
+        2.10*) download_url="https://downloads.lightbend.com/scala/${version}/scala-${version}.zip"               ;;
+        2.11*) download_url="http://downloads.typesafe.com/scala/${version}/scala-${version}.zip"                 ;;
+        2.12*) download_url="http://downloads.lightbend.com/scala/${version}/scala-${version}.zip"                ;;
+        2.13*) download_url="https://downloads.lightbend.com/scala/${version}/scala-${version}.zip"               ;;
+        3.* ) download_url="https://github.com/lampepfl/dotty/releases/download/${version}/scala${version}.zip"   ;;
+
+    esac
+
+    if [ "${version}" == "2.11.11" ] || [ "${version}" == "2.11.12" ] ; then
+        download_url="https://downloads.lightbend.com/scala/${version}/scala-${version}.zip"
+    fi
 
     if ___x_cmd_env_util_is_archive_cached scala "$version" 2>/dev/null; then
         env_log info "Archive existed: $version"
@@ -21,7 +36,6 @@ ___x_cmd_env_scala_download_archive(){
     fi
 
     mkdir -p "$(dirname $archive_path)"
-    download_url="https://downloads.lightbend.com/scala/${version}/scala-${version}.zip"
     env_log info "Downloading $download_url"
 
     if ! curl --progress-bar --location --retry-max-time 10 --retry 0 "$download_url" --output "$archive_path" ; then
