@@ -4,15 +4,7 @@
 ___x_cmd_env_candidate_all(){
     printf "%s" "python
 node
-go
-java
-deno
-scala
-kotlin
-maven
-springboot
-gradle
-perl"
+java"
 
 }
 
