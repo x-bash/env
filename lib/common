@@ -6,6 +6,11 @@
 ___x_cmd_env_common_full_version(){
     local candidate="${1:?Provide candidate}"
     local version="${2:?Provide version}"
+
+    if [ "$version" = "default" ]; then
+        ___x_cmd_env_"$candidate"_ls_remote "$version" "$3" | awk 'END{ if (NR<=0) { exit(1) } else print $1;}'
+        return 0
+    fi
     printf "%s\n" "$version"
 }
 
