@@ -58,7 +58,7 @@ ___x_cmd_env_python_ls_remote(){
                 split($2, a, /-/)
                 print a[2]
             }
-        }' <"$cache_path" | ___x_cmd_env_python_sort_versions
+        }' <"$cache_path" | ___x_cmd_env_python_sort_versions | uniq
 }
 
 # EndSection
