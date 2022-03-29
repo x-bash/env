@@ -39,6 +39,10 @@ __sdkman_echo_cyan() {
 
 # Section: sdk ls_remote and la
 
+___x_cmd_env_sdk_sort_versions(){
+	sort -t . -n
+}
+
 ___x_cmd_env_sdk_ls_remote(){
     local candidate="${1:?Provide canddidate}"
 	# local pattern="${2:-""}"	# TODO: ls remote filter
@@ -46,7 +50,7 @@ ___x_cmd_env_sdk_ls_remote(){
 	local cache_path="$___X_CMD_ENV_PATH/$candidate/cache/version_list"
 
 	___x_cmd_httpget "https://api.sdkman.io/2/candidates/$candidate/${___X_CMD_ENV_SDK_PLATFORM}/versions/all" "$cache_path" "$cache_expiration" 2>/dev/null && \
-	awk 'BEGIN{ RS=","} { print $0 }' <"$cache_path"
+	awk 'BEGIN{ RS=","} { print $0 }' <"$cache_path" | ___x_cmd_env_sdk_sort_versions | uniq
 }
 
 # EndSection
@@ -113,14 +117,14 @@ ___x_cmd_env_sdk_unpack(){
     env_log info "Unpacking: $candidate ${version}"
 
     local archive_path="$___X_CMD_ENV_PATH/$candidate/archive/$candidate-$version.zip"
-	x uz "$archive_path" "$(dirname "$archive_path")" || return 1
-
     local archive_unpack_files
     archive_unpack_files="$(dirname "$archive_path")/$candidate-$version"
 
+	x uz "$archive_path" "$archive_unpack_files" || return 1
+
     local versions_path="$___X_CMD_ENV_PATH/$candidate/versions"
 	mkdir -p "$versions_path/${version}"
-	mv -f "$archive_unpack_files/"* "$versions_path/${version}"
+	mv -f "$archive_unpack_files"/*/* "$versions_path/${version}"
 	rm -rf "$archive_unpack_files"
 	env_log info "Done unpacking!"
 }

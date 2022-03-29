@@ -8,6 +8,8 @@ x log init env
 x log env
 
 case $1 in
+    docker)
+        docker run -it --rm -v "$(pwd):/root/env" xcmd/centos-dev bash -i -c "cd /root/env && bash" ;;
     python)
         # TODO: Check if this version is available in your system
         env_log info "Testing python ls."
@@ -134,6 +136,6 @@ case $1 in
         done
         ;;
     *)
-        echo "Usage: x test python|node|java|deno|perl|kotlin|golang"
+        echo "Usage: x test python|node|java|deno|go|gradle|kotlin|maven|perl|scala|springboot"
         ;;
 esac

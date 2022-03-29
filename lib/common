@@ -2,9 +2,15 @@
 
 # Section: full_version ls_local ls_remote
 
+# TODO: Not proper implemented
 ___x_cmd_env_common_full_version(){
     local candidate="${1:?Provide candidate}"
     local version="${2:?Provide version}"
+
+    if [ "$version" = "default" ]; then
+        ___x_cmd_env_"$candidate"_ls_remote "$version" "$3" | awk 'END{ if (NR<=0) { exit(1) } else print $1;}'
+        return 0
+    fi
     printf "%s\n" "$version"
 }
 
@@ -20,36 +26,63 @@ ___x_cmd_env_common_la(){
 }
 # EndSection
 
+# Section: use file
+___x_cmd_env_common_init_file_add(){
+    local version="$1"
+    local version_path="$2"
+
+    if [ ! -f "$___X_CMD_ROOT/.env/env/use" ]; then
+        printf "%s\n" "$version_path" > "$___X_CMD_ROOT/.env/env/use"
+    fi
+
+    ___x_cmd_env_common_init_file_rm "$version"
+    printf "%s\n" "$version_path" >> "$___X_CMD_ROOT/.env/env/use"
+}
+
+___x_cmd_env_common_init_file_rm(){
+    local version="$1"
+    local content
+    content="$(grep -v "/$version/" < "$___X_CMD_ROOT/.env/env/use")"
+    printf "%s\n" "$content" > "$___X_CMD_ROOT/.env/env/use"
+}
+# EndSection
+
 # Section: use, try, ws
 
 ___x_cmd_env_common_use(){
     local candidate="${1:?Provide candidate}"
     local version="${2:?Provide version}"
-    local shims="${3:-""}"
+    local use_shims="${3:-""}"
 
-    ___x_cmd_env_util_is_downloaded "$candidate" "$version" 2>/dev/null || return 1
+    if ! ___x_cmd_env_util_is_downloaded "$candidate" "$version" 2>/dev/null; then
+        # TODO: Add prompt: download from the website.
+        printf "%s" "Not downloaded" >&2
+        return 0
+    fi
 
-    local versions_path
-    if [ -z "$shims" ]; then
-        versions_path="${___X_CMD_ENV_PATH}/$candidate/versions/$version/bin"
+    local version_path
+    if [ -z "$use_shims" ]; then
+        version_path="${___X_CMD_ENV_PATH}/$candidate/versions/$version/bin"
     else
-        versions_path="${___X_CMD_ENV_PATH}/$candidate/shims"
+        version_path="${___X_CMD_ENV_PATH}/$candidate/shims"
         ___x_cmd_env_util_make_shim_dir "$candidate" "${version}" || return 1
     fi
 
-    ___x_cmd_env_util_add_path "$versions_path" || return 1
-    x boot rc add "x-env-$candidate" "xrc env/lib/util && ___x_cmd_env_util_add_path \"$versions_path\"" && \
-        printf "%s\n" "$version" > "$___X_CMD_ENV_PATH/$candidate/version" && \
-        env_log info "Using $candidate $version -> $___X_CMD_ENV_PATH/$candidate/version"
+    ___x_cmd_env_util_add_path "$version_path" || return 1
+
+    ___x_cmd_env_common_init_file_add "$version" "$version_path" && \
+        # ___x_cmd_modfile_add "$___X_CMD_ROOT/.env/env/use" "$version_path" && \
+            printf "%s\n" "$version" > "$___X_CMD_ENV_PATH/$candidate/version" && \
+                env_log info "Using $candidate $version -> $___X_CMD_ENV_PATH/$candidate/version"
 }
 
 ___x_cmd_env_common_try(){
     local candidate="${1:?Provide candidate}"
     local version="${2:?Provide version}"
-    local versions_path="${3:-"$___X_CMD_ENV_PATH/$candidate/versions/$version/bin"}"
+    local version_path="${3:-"$___X_CMD_ENV_PATH/$candidate/versions/$version/bin"}"
 
     ___x_cmd_env_util_is_downloaded "$candidate" "$version" 2>/dev/null || return 1
-    ___x_cmd_env_util_add_path "$versions_path" && \
+    ___x_cmd_env_util_add_path "$version_path" && \
         env_log info "Setting ${candidate} ${version} in current Shell."
 }
 
@@ -64,7 +97,7 @@ ___x_cmd_env_common_current(){
 
     # No any candidate version
     if [ -z "$candidate_path" ]; then
-        env_log error "No version of %s $candidate detected, please install it first! "
+        env_log error "No version of $candidate detected, please install it first! "
         return 1
 
     # After try and no candidate version in xenv, but has candidate version in current shell.
@@ -82,7 +115,7 @@ ___x_cmd_env_common_current(){
     else
         local version
         if ! version=$(___x_cmd_env_util_shims_which_version "$candidate"); then
-            env_log error "No version of %s $candidate detected, please download it first! "
+            env_log error "No version of $candidate detected, please download it first! "
             return 1
         fi
 
@@ -125,15 +158,15 @@ ___x_cmd_env_common_download(){
 ___x_cmd_env_common_install(){
     local candidate="${1:?Provide canddidate}"
     local version="${2:?Provide version}"
-    local shims="${3:-""}"
+    local use_shims="${3:-""}"
 
     env_log info "Installing $candidate $version"
     if ! ___x_cmd_env_run_common_if_notfound download "$candidate" "$version"; then
         env_log info "Failed to installed $candidate of version: $version."
         return 1
     fi
-echo "ssss"
-    ___x_cmd_env_common_use "$candidate" "$version" "$shims" || return 1
+
+    ___x_cmd_env_common_use "$candidate" "$version" "$use_shims" || return 1
     env_log info "Successfully installed $candidate $version"
 }
 
@@ -149,7 +182,7 @@ ___x_cmd_env_common_uninstall(){
         env_log  warn "This ${candidate} ${version} is no exist."
         return 1
     fi
-    x boot rc del "x-env-$candidate"
+    ___x_cmd_env_common_init_file_rm "$version"
     # TODO: remove the shims from $PATH
 }
 # EndSection
@@ -182,5 +215,36 @@ ___x_cmd_env_common_exec(){
     ___x_cmd_env_util_is_downloaded "${candidate}" "${version}" 2>/dev/null || return 1
     local PATH="${___X_CMD_ENV_PATH}/${candidate}/versions/${version}/bin:$PATH"
     "${candidate}" "$@"
+}
+# EndSection
+
+# Section: ui_catsel
+
+___x_cmd_env_common_rec(){
+    local cmd="$1"
+    local space="${2:-""}"
+    eval "$cmd" | while read -r line ; do
+        if [ -n "$line" ] ; then
+            CODE="${CODE}
+${space}  \"$line\":{"
+
+            ___x_cmd_env_common_rec "$cmd $line" "$space  "
+
+            CODE="${CODE%,}
+${space}  },"
+        fi
+    done
+}
+
+___x_cmd_env_common_gen(){
+    if [ -f "${___X_CMD_ENV_PATH}/${candidate}/cache/${candidate}.json" ]; then
+        return 0
+    fi
+    local CODE="{"
+    local candidate="$1"
+    cmd="x env ___x_cmd_ui_catsel $candidate"
+    ___x_cmd_env_common_rec "$cmd"
+    printf "%s" "${CODE%,}
+}" > "${___X_CMD_ENV_PATH}/${candidate}/cache/${candidate}.json"
 }
 # EndSection
