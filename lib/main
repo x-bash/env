@@ -113,7 +113,7 @@ A
     # TODO: 增加 本地简写版本对应关系 和 全局简写版本对应关系
     # TODO: V8 -> V8.2   --> (Remote) V8.6
     if [ -n "$remote" ] ; then
-		___x_cmd_env_run_common_if_notfound ls_remote "$candidate" "$@"
+        ___x_cmd_env_run_common_if_notfound ls_remote "$@"
         ___x_cmd_env_run_common_if_notfound gen "$candidate" "$@"
         return
     fi
@@ -135,7 +135,7 @@ advise:
     #2        xrc env/latest && ___x_cmd_env_advise_ls_local_version
 options:
     #1        "Environment Candidates" <candidates>:candidates_list
-    #2        "Version"                <version>="default"
+    #2        "Version"                <version>=""
 A
     param:run
 
@@ -158,7 +158,7 @@ advise:
 options:
     --use_shims   "Use shims"
     #1            "Environment Candidates" <candidates>:candidates_list
-    #2            "Version"                <version>="default"
+    #2            "Version"                <version>=""
 A
     param:run
 
@@ -207,7 +207,7 @@ advise:
 options:
     --use_shims     "Use shims"
     #1              "Environment Candidates" <candidates>:candidates_list=""
-    #2              "Version"                <version>="default"
+    #2              "Version"                <version>=""
 A
     param:run
 
@@ -270,7 +270,7 @@ advise:
     #2        xrc env/latest && ___x_cmd_env_advise_ls_remote_version
 options:
     #1        "Environment Candidates" <candidates>:candidates_list=""
-    #2        "Version"                <version>="default"
+    #2        "Version"                <version>=""
 A
     param:run
 

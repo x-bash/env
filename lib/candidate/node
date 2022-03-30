@@ -5,7 +5,7 @@ ___X_CMD_ENV_NODE_MIRROR="https://nodejs.org/dist"
 # Section: full_version, ls_local, ls_remote
 
 ___x_cmd_env_node_full_version(){
-    ___x_cmd_env_node_ls_remote "${1:?Provide node version pattern}" "$2" | awk 'END{ if (NR<=0) { exit(1) } else print $1;}'
+    ___x_cmd_env_node_ls_remote "$1" "$2" | awk 'END{ if (NR<=0) { exit(1) } else print $1;}'
 }
 
 ___x_cmd_env_node_sort_versions(){
@@ -16,9 +16,6 @@ ___x_cmd_env_node_ls_remote(){
     local pattern="${1:-""}"
     local cache_expiration="${2:-1}"
     local cache_path="$___X_CMD_ENV_PATH/node/cache/version_list"
-    if [ "$pattern" = "default" ]; then
-        pattern=""
-    fi
 
 	___x_cmd_httpget "$___X_CMD_ENV_NODE_MIRROR/index.tab" "$cache_path" "$cache_expiration" 2>/dev/null && \
     awk -v pattern="$pattern" -v prev_codename="x-cmd" '
