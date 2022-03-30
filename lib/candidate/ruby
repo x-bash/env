@@ -10,9 +10,15 @@ ___x_cmd_env_ruby_ls_remote(){
 
 ___x_cmd_env_ruby_download_archive(){
     local version=${1:?Provide a version}
-    local archive_path="$___X_CMD_ENV_PATH/ruby/archive/ruby-${version}.zip"
-
     local t_version
+    local compression
+
+    case "$(___x_cmd_os name)" in
+          linux)      compression=tar.gz                ;;
+          win)        compression=zip                   ;;
+          macOS)      compression=tar.gz                ;;
+          *)          return 1 ;;
+    esac
 
     case ${version} in
         3.1*)  t_version=3.1    ;;
@@ -36,11 +42,12 @@ ___x_cmd_env_ruby_download_archive(){
 		env_log info  "Archive existed: $version"
 		return 0
 	fi
-
+    local archive_path="$___X_CMD_ENV_PATH/ruby/archive/ruby-${version}.${compression}"
     mkdir -p "$(dirname "${archive_path}")"
 
-    local download_url="https://cache.ruby-lang.org/pub/ruby/${t_version}/ruby-${version}.zip"
+    local download_url="https://cache.ruby-lang.org/pub/ruby/${t_version}/ruby-${version}.${compression}"
     env_log info "Downloading ruby ${version}"
+    echo "${download_url}"
 
     if ! curl --progress-bar --location --retry-max-time 10 --retry 0 "${download_url}" --output "${archive_path}"; then
 		env_log info "Download failure"
@@ -51,19 +58,45 @@ ___x_cmd_env_ruby_download_archive(){
 
 }
 
+ ___x_cmd_env_ruby_unpack_win(){
+    x uz "$archive_path" "$(dirname "$archive_path")" || return 1
+
+    local version_path="${___X_CMD_ENV_PATH}/ruby/versions/${version}/bin"
+    mkdir -p "${version_path}" && (
+        mv "${archive_unpack_files}/"*/* "${version_path}" || return 1
+        cd "${version_path}" && chmod +x ruby.exe npm npx
+        # chmod +x "${version_path}"/npx 2>/dev/null
+    )
+}
+
+___x_cmd_env_ruby_unpack_other(){
+    local version_path="${___X_CMD_ENV_PATH}/ruby/versions/${version}"
+    tar -xzf "${archive_path}" -C "${archive_unpack_files}" --strip-components 1 || return 1
+    mkdir -p "${version_path}" && mv "${archive_unpack_files}/"* "${version_path}"
+}
+
 ___x_cmd_env_ruby_unpack(){
     local version="${1:?Provide a version}"
-    env_log info "Unpacking: ruby ${version}"
-
-    local archive_path="$___X_CMD_ENV_PATH/ruby/archive/ruby-${version}.zip"
-	x uz "$___X_CMD_ENV_PATH/ruby/archive/ruby-${version}.zip" "$(dirname "$archive_path")" || return 1
+    local platform
+    {
+        read -r platform
+    } <<A
+$(x os name; x os arch)
+A
+    local compression='tar.gz'; [ "${platform}" = 'win' ] && compression='zip' # TODO: tar.xz support
+    local archive_path="$___X_CMD_ENV_PATH/ruby/archive/ruby-${version}.${compression}"
 
     local archive_unpack_files
-    archive_unpack_files="$(dirname "$archive_path")/ruby-$version"
+    archive_unpack_files="$(dirname "$archive_path")/ruby-${version}"
+    mkdir -p "$archive_unpack_files"
 
-    local versions_path="$___X_CMD_ENV_PATH/ruby/versions"
-	mkdir -p "$versions_path/${version}"
-	mv -f "$archive_unpack_files/"* "$versions_path/${version}"
-	rm -rf "$archive_unpack_files"
+    case "$platform" in
+        win)    ___x_cmd_env_ruby_unpack_win    ;;
+        *)      ___x_cmd_env_ruby_unpack_other  ;;
+    esac
+    local code=$?
 
+    rm -rf "${archive_unpack_files}"
+    env_log info "Done unpacking!"
+    return $code
 }

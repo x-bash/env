@@ -12,44 +12,45 @@ ___x_cmd_env_go_ls_remote(){
 
 
 ___x_cmd_env_go_download_archive(){
-    local version=${1:?Provide a version}
+     xrc os
+    local version="${1:?Provide a version}"
+    local archive_path
+
     if ___x_cmd_env_util_is_archive_cached "$candidate" "$version" 2>/dev/null; then
         env_log info "Archive existed: $version"
         return 0
     fi
+    echo "ddd" >&2
 
-   if [ "$(xrc os; ___x_cmd_os name)"="windows" ] && [ "$(xrc os; ___x_cmd_os arch)"="x86" ]         ;   then
-        download_url="https://golang.google.cn/dl/go${version}.windows-386.zip"
-        file_suffix="zip"
-   elif [ "$(xrc os;___x_cmd_os name)"="windows" ] && [ "$(xrc os;___x_cmd_os arch)"="x86-64" ]      ;   then
-        download_url="https://golang.google.cn/dl/go${version}.windows-amd64.zip"
-        file_suffix="zip"
-   elif [ "$(xrc os; ___x_cmd_os name)"="linux" ] && [ "$(xrc os; ___x_cmd_os arch)"="x86" ]         ;   then
-        download_url="https://golang.google.cn/dl/go${version}.linux-386.tar.gz"
-        file_suffix="tar.gz"
-   elif [ "$(xrc os; ___x_cmd_os name)"="linux" ] && [ "$(xrc os; ___x_cmd_os arch)"="x86-64" ]      ;   then
-        download_url="https://golang.google.cn/dl/go${version}.linux-amd64.tar.gz"
-        file_suffix="tar.gz"
-   elif [ "$(xrc os; ___x_cmd_os name)"="linux" ] && [ "$(xrc os; ___x_cmd_os arch)"="ARM64" ]       ;   then
-        download_url="https://golang.google.cn/dl/go${version}.linux-arm64.tar.gz"
-        file_suffix="tar.gz"
-   elif [ "$(xrc os; ___x_cmd_os name)"= "linux" ] && [ "$(xrc os; ___x_cmd_os arch)" ="ARMv6"  ]    ;   then
-        download_url="https://golang.google.cn/dl/go${version}.linux-armv6l.tar.gz"
-        file_suffix="tar.gz"
-   elif [ "$(xrc os; ___x_cmd_os name)"= "macOS" ] && [ "$(xrc os; ___x_cmd_os arch)" ="x86-64" ]    ;   then
-        download_url="https://golang.google.cn/dl/go${version}.darwin-amd64.tar.gz"
-        file_suffix="tar.gz"
-   elif [ "$(xrc os; ___x_cmd_os name)"= "macOS" ] && [ "$(xrc os; ___x_cmd_os arch)" ="ARM64" ]     ;   then
-         download_url="https://golang.google.cn/dl/go${version}.darwin-arm64.tar.gz"
-   else  env_log error "your OS or Arch are not matched"
-    fi
+    case "$(___x_cmd_os name)" in
+          linux)      platform=linux                ;;
+          win)        platform=windows              ;;
+          macOS)      platform=darwin               ;;
+          *)          return 1 ;;
+     esac
 
-   local archive_path="$___X_CMD_ENV_PATH/go/archive/go-${version}.${file_suffix}"
+     case "$(___x_cmd_os arch)" in
+          x86)        arch=386                  ;;
+          x64)        arch=amd64                ;;
+          arm64)      arch=arm64                ;;
+          ARMv6)      arch=armv6l               ;;
+          *)          return 1 ;;
+     esac
 
+    echo "1.${platform},2.${arch}"
 
+     if [ "${platform}" = "windows" ]  ; then
+          download_url="https://golang.google.cn/dl/go${version}.${platform}-${arch}.zip"
+          local archive_path="$___X_CMD_ENV_PATH/go/archive/go-${version}.zip"
+     else
+          download_url="https://golang.google.cn/dl/go${version}.${platform}-${arch}.tar.gz"
+          local archive_path="$___X_CMD_ENV_PATH/go/archive/go-${version}.tar.gz"
+     fi
+
+    echo "${download_url}"
      mkdir -p "$(dirname "$archive_path")"
 
-     env_log info "Downloading go ${version}"
+     env_log info "Downloading go ${download_url}"
 
 
     if ! curl --progress-bar --location --retry-max-time 10 --retry 0 "${download_url}" --output "${archive_path}"; then
@@ -61,26 +62,45 @@ ___x_cmd_env_go_download_archive(){
 }
 
 ___x_cmd_env_go_unpack(){
-   local version="${1:?Provide a version}"
-   local archive_path="$___X_CMD_ENV_PATH/go/archive/go-${version}.${file_suffix}"
-       env_log info "Unpacking: go ${version}"
+local version="${1:?Provide go version}"
+    local platform
+    local arch
+    {
+        read -r platform
+        read -r arch
+    } <<A
+$(x os name; x os arch)
+A
 
-   if   [ "${file_suffix}"="zip" ]  ; then
-       x uz "$archive_path" "$(dirname "$archive_path")" || return 1
-   elif [ "${file_suffix}"="tar.gz" ]  ; then
-       tar -zxvf "$archive_path" "$(dirname "$archive_path")" || return 1
-   fi
+    local compression='tar.gz'; [ "${platform}" = 'win' ] && compression='zip' # TODO: tar.xz support
+    local archive_path="$___X_CMD_ENV_PATH/go/archive/go-${version}.${compression}"
 
+    local archive_unpack_files
+    archive_unpack_files="$(dirname "$archive_path")/go-${version}"
+    mkdir -p "$archive_unpack_files"
 
-   local archive_unpack_files
-   archive_unpack_files="$(dirname "$archive_path")/go"
+    case "$platform" in
+        win)    ___x_cmd_env_go_unpack_win    ;;
+        *)      ___x_cmd_env_go_unpack_other  ;;
+    esac
+    local code=$?
 
-   local versions_path="$___X_CMD_ENV_PATH/go/versions"
+    rm -rf "${archive_unpack_files}"
+    env_log info "Done unpacking!"
+    return $code
+}
+___x_cmd_env_go_unpack_win(){
+    x uz "$archive_path" "$(dirname "$archive_path")" || return 1
 
-   mkdir -p "$versions_path/${version}"
-   mv -f "$archive_unpack_files/"* "$versions_path/${version}"
-   rm -rf "$archive_unpack_files"
+    local version_path="${___X_CMD_ENV_PATH}/go/versions/${version}/bin"
+    mkdir -p "${version_path}" && (
+        mv "${archive_unpack_files}/"*/* "${version_path}" || return 1
+        cd "${version_path}" && chmod +x go.exe npm npx
+    )
+}
 
-   env_log info " Successfully unpacked"
-
+___x_cmd_env_go_unpack_other(){
+    local version_path="${___X_CMD_ENV_PATH}/go/versions/${version}"
+    tar -xzf "${archive_path}" -C "${archive_unpack_files}" --strip-components 1 || return 1
+    mkdir -p "${version_path}" && mv "${archive_unpack_files}/"* "${version_path}"
 }

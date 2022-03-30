@@ -1,6 +1,6 @@
 # shellcheck shell=sh disable=SC1072 #source
 
-xws install >/dev/null
+xws install
 ___X_CMD_XRC_MODULE_IMPORTED=
 advise rm ___x_cmd_env_main
 xrc env
