@@ -1,48 +1,50 @@
 # shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263    # xrc
 
-# esac_
+# Section: Go ls_remote
 
 ___x_cmd_env_go_ls_remote(){
-    local cache_path=$___X_CMD_ENV_PATH/go/archive/cache_list
-    local cache_expiration=${2:-1}
-
+    local cache_path="$___X_CMD_ENV_PATH/go/archive/cache_list"
+    local cache_expiration="${2:-1}"
     ___x_cmd_httpget "https://go.dev/project" "$cache_path" "$cache_expiration" 2>/dev/null && \
         awk 'match($0,/Go [.-9]+<\/a>/){print substr ($0,RSTART+3,RLENGTH-7)}' < "$cache_path"
 }
 
+# EndSection
+
+# Section: download, unpack
 
 ___x_cmd_env_go_download_archive(){
-    local version=${1:?Provide a version}
-    if ___x_cmd_env_util_is_archive_cached "$candidate" "$version" 2>/dev/null; then
-        env_log info "Archive existed: $version"
-        return 0
-    fi
-
-   if [ "$(xrc os; ___x_cmd_os name)"="windows" ] && [ "$(xrc os; ___x_cmd_os arch)"="x86" ]         ;   then
+     local version="${1:?Provide a version}"
+     if ___x_cmd_env_util_is_archive_cached go "$version" 2>/dev/null; then
+          env_log info "Archive existed: $version"
+          return 0
+     fi
+     # TODO: optimizable
+     if [ "$(xrc os; ___x_cmd_os name)" = "windows" ] && [ "$(xrc os; ___x_cmd_os arch)" = "x86" ]; then
         download_url="https://golang.google.cn/dl/go${version}.windows-386.zip"
         file_suffix="zip"
-   elif [ "$(xrc os;___x_cmd_os name)"="windows" ] && [ "$(xrc os;___x_cmd_os arch)"="x86-64" ]      ;   then
+     elif [ "$(xrc os;___x_cmd_os name)" = "windows" ] && [ "$(xrc os;___x_cmd_os arch)" = "x86-64" ]; then
         download_url="https://golang.google.cn/dl/go${version}.windows-amd64.zip"
         file_suffix="zip"
-   elif [ "$(xrc os; ___x_cmd_os name)"="linux" ] && [ "$(xrc os; ___x_cmd_os arch)"="x86" ]         ;   then
+     elif [ "$(xrc os; ___x_cmd_os name)" = "linux" ] && [ "$(xrc os; ___x_cmd_os arch)" = "x86" ]; then
         download_url="https://golang.google.cn/dl/go${version}.linux-386.tar.gz"
         file_suffix="tar.gz"
-   elif [ "$(xrc os; ___x_cmd_os name)"="linux" ] && [ "$(xrc os; ___x_cmd_os arch)"="x86-64" ]      ;   then
+     elif [ "$(xrc os; ___x_cmd_os name)" = "linux" ] && [ "$(xrc os; ___x_cmd_os arch)" = "x86-64" ]; then
         download_url="https://golang.google.cn/dl/go${version}.linux-amd64.tar.gz"
         file_suffix="tar.gz"
-   elif [ "$(xrc os; ___x_cmd_os name)"="linux" ] && [ "$(xrc os; ___x_cmd_os arch)"="ARM64" ]       ;   then
+     elif [ "$(xrc os; ___x_cmd_os name)" = "linux" ] && [ "$(xrc os; ___x_cmd_os arch)" = "ARM64" ]; then
         download_url="https://golang.google.cn/dl/go${version}.linux-arm64.tar.gz"
         file_suffix="tar.gz"
-   elif [ "$(xrc os; ___x_cmd_os name)"= "linux" ] && [ "$(xrc os; ___x_cmd_os arch)" ="ARMv6"  ]    ;   then
+     elif [ "$(xrc os; ___x_cmd_os name)" = "linux" ] && [ "$(xrc os; ___x_cmd_os arch)" = "ARMv6"  ]; then
         download_url="https://golang.google.cn/dl/go${version}.linux-armv6l.tar.gz"
         file_suffix="tar.gz"
-   elif [ "$(xrc os; ___x_cmd_os name)"= "macOS" ] && [ "$(xrc os; ___x_cmd_os arch)" ="x86-64" ]    ;   then
+     elif [ "$(xrc os; ___x_cmd_os name)" = "macOS" ] && [ "$(xrc os; ___x_cmd_os arch)" = "x86-64" ]; then
         download_url="https://golang.google.cn/dl/go${version}.darwin-amd64.tar.gz"
         file_suffix="tar.gz"
-   elif [ "$(xrc os; ___x_cmd_os name)"= "macOS" ] && [ "$(xrc os; ___x_cmd_os arch)" ="ARM64" ]     ;   then
+     elif [ "$(xrc os; ___x_cmd_os name)" = "macOS" ] && [ "$(xrc os; ___x_cmd_os arch)" = "ARM64" ]; then
          download_url="https://golang.google.cn/dl/go${version}.darwin-arm64.tar.gz"
-   else  env_log error "your OS or Arch are not matched"
-    fi
+     else  env_log error "your OS or Arch are not matched"
+     fi
 
    local archive_path="$___X_CMD_ENV_PATH/go/archive/go-${version}.${file_suffix}"
 
@@ -84,3 +86,5 @@ ___x_cmd_env_go_unpack(){
    env_log info " Successfully unpacked"
 
 }
+
+# EndSection
