@@ -1,15 +1,15 @@
 # shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263    # xrc
 
-# esac_
+# Section: Go ls_remote
 
 ___x_cmd_env_go_ls_remote(){
-    local cache_path=$___X_CMD_ENV_PATH/go/archive/cache_list
-    local cache_expiration=${2:-1}
-
+    local cache_path="$___X_CMD_ENV_PATH/go/archive/cache_list"
+    local cache_expiration="${2:-1}"
     ___x_cmd_httpget "https://go.dev/project" "$cache_path" "$cache_expiration" 2>/dev/null && \
         awk 'match($0,/Go [.-9]+<\/a>/){print substr ($0,RSTART+3,RLENGTH-7)}' < "$cache_path"
 }
 
+# EndSection
 
 ___x_cmd_env_go_download_archive(){
      xrc os
