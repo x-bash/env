@@ -44,8 +44,8 @@ subcommands:
     download                "Download environment"
     install                 "Install environment"
     uninstall               "Remove environment"
-    try                     "Set default environment in this shell session"
-    use                     "Set global default environment"
+    try                     "Set environment version in this shell session"
+    use                     "Set global environment version"
 
     current                 "Show current environment"
     which                   "Display path of environment installed"
@@ -55,7 +55,7 @@ A
     param:run
 
     # TODO: la---"list all available environments"
-    # TODO: ws---"Set workspace default environment"
+    # TODO: ws---"Set workspace environment"
 
     #TODO: Should be optimized
     if [ "${1}" = "___x_cmd_ui_catsel" ]; then

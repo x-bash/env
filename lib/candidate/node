@@ -67,16 +67,16 @@ A
 
     # TODO: node <= 0.1.13 does not have a directory
     local slug="node-${version}-${platform}-${arch}"
-    local archive_url="${___X_CMD_ENV_NODE_MIRROR}/${version}/${slug}.${compression}"
-    if ! curl -L -C - --progress-bar "${archive_url}" -o "${archive_path}"; then
+    local download_url="${___X_CMD_ENV_NODE_MIRROR}/${version}/${slug}.${compression}"
+    if ! curl -L -C - --progress-bar "${download_url}" -o "${archive_path}"; then
         rm -rf "${archive_path}"
-        env_log error "Download from ${archive_url} failed."
+        env_log error "Download from ${download_url} failed."
         return 1
     fi
 
     # TODO: checksum
 
-    env_log info "Downloaded ${archive_url} to ${archive_path}"
+    env_log info "Downloaded ${download_url} to ${archive_path}"
 }
 # EndSection
 
