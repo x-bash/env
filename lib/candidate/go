@@ -1,6 +1,6 @@
 # shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263    # xrc
 
-# Section: Go
+# Section: Go ls_remote
 
 ___x_cmd_env_go_ls_remote(){
     local cache_path="$___X_CMD_ENV_PATH/go/archive/cache_list"
@@ -8,8 +8,9 @@ ___x_cmd_env_go_ls_remote(){
     ___x_cmd_httpget "https://go.dev/project" "$cache_path" "$cache_expiration" 2>/dev/null && \
         awk 'match($0,/Go [.-9]+<\/a>/){print substr ($0,RSTART+3,RLENGTH-7)}' < "$cache_path"
 }
-
 # EndSection
+
+# Section: download
 
 ___x_cmd_env_go_download_archive(){
     xrc os
@@ -59,6 +60,7 @@ ___x_cmd_env_go_download_archive(){
 
    env_log info "Download Done"
 }
+# EndSection
 
 # Section: unpack
 
@@ -106,3 +108,4 @@ ___x_cmd_env_go_unpack_other(){
     tar -xzf "${archive_path}" -C "${archive_unpack_files}" --strip-components 1 || return 1
     mkdir -p "${version_path}" && mv "${archive_unpack_files}/"* "${version_path}"
 }
+# EndSection

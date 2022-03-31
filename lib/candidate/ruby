@@ -12,7 +12,7 @@ ___x_cmd_env_ruby_ls_remote(){
 
 # EndSection
 
-# Section: download, unpack
+# Section: download
 
 ___x_cmd_env_ruby_download_archive(){
     local version=${1:?Provide a version}
@@ -63,6 +63,9 @@ ___x_cmd_env_ruby_download_archive(){
     env_log info "Download completed $download_url"
 
 }
+# EndSection
+
+# Section: unpack
 
  ___x_cmd_env_ruby_unpack_win(){
     x uz "$archive_path" "$(dirname "$archive_path")" || return 1
@@ -106,3 +109,4 @@ A
     env_log info "Done unpacking!"
     return $code
 }
+# EndSection

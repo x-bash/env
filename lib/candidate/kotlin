@@ -10,7 +10,7 @@ ___x_cmd_env_kotlin_ls_remote(){
 
 # EndSection
 
-# Section: download, unpack
+# Section: download
 
 ___x_cmd_env_kotlin_download_archive(){
 	local version="${1:? Provide a version}"
@@ -28,6 +28,9 @@ ___x_cmd_env_kotlin_download_archive(){
 	fi
 	env_log info "Download completed $download_url"
 }
+# EndSection
+
+# Section: unpack
 
 ___x_cmd_env_kotlin_unpack(){
 	local version="${1:?Provide a version}"
@@ -43,11 +46,17 @@ ___x_cmd_env_kotlin_unpack(){
     mv -f "$archive_unpack_files"/* "$___X_CMD_ENV_PATH/kotlin/versions/${version}"
 	rm -rf "$archive_unpack_files"
 }
-
-
-
 # EndSection
 
+# Section: current exec
+___x_cmd_env_kotlin_exec(){
+    kotlin -help
+}
+
+___x_cmd_env_kotlin_current(){
+    kotlin -version
+}
 ___x_cmd_env_kotlin_ws(){
     :
 }
+# EndSection

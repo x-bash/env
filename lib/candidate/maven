@@ -8,7 +8,6 @@ ___x_cmd_env_maven_ls_remote(){
     ___x_cmd_httpget "https://archive.apache.org/dist/maven/maven-3/" "$cache_path" "$cache_expiration"  && \
         awk 'match($0, /href="([0-9.]+)\/"/){ print(substr($0,52,5))} ' <"$cache_path"
 }
-
 # EndSection
 
 # Section: download
@@ -29,8 +28,10 @@ ___x_cmd_env_maven_download_archive(){
     fi
     env_log info "Download Successfully"
 }
+# EndSection
 
 # Section: unpack
+
 ___x_cmd_env_maven_unpack(){
     local version="${1:?Provide a version}"
     local archive_path="$___X_CMD_ENV_PATH/maven/archive/maven-${version}.zip"
@@ -46,8 +47,10 @@ ___x_cmd_env_maven_unpack(){
     mv -f "$archive_unpack_files/"* "$versions_path/${version}"
     rm -rf "$archive_unpack_files"
 }
+# EndSection
 
-# Section: current
+# Section: current,exec
+
 ___x_cmd_env_maven_current(){
    ___x_cmd_env_common_current mvn "$@"
 }

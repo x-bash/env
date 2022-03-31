@@ -15,7 +15,6 @@ ___x_cmd_env_scala_ls_remote(){
 }
 
 # EndSection
-
 # Section: download
 
 ___x_cmd_env_scala_download_archive(){
@@ -49,6 +48,7 @@ ___x_cmd_env_scala_download_archive(){
         return 1
     fi
 }
+# EndSection
 
 # Section: unpack
 
@@ -81,4 +81,13 @@ ___x_cmd_env_scala_unpack(){
 	rm -rf "$archive_unpack_files"
 }
 
+# EndSection
+
+# Section: exec,current
+___x_cmd_env_scala_exec(){
+    scala -help
+}
+___x_cmd_env_scalat_current(){
+    scala -version
+}
 # EndSection
