@@ -52,7 +52,7 @@ ___x_cmd_env_ruby_download_archive(){
     mkdir -p "$(dirname "${archive_path}")"
 
     local download_url="https://cache.ruby-lang.org/pub/ruby/${t_version}/ruby-${version}.${compression}"
-    env_log info "Downloading ruby ${version}"
+    env_log info "Downloading ruby ${download_url}"
     echo "${download_url}"
 
     if ! curl --progress-bar --location --retry-max-time 10 --retry 0 "${download_url}" --output "${archive_path}"; then
@@ -69,9 +69,9 @@ ___x_cmd_env_ruby_download_archive(){
 
     local version_path="${___X_CMD_ENV_PATH}/ruby/versions/${version}/bin"
     mkdir -p "${version_path}" && (
-        mv "${archive_unpack_files}/"*/* "${version_path}" || return 1
-        cd "${version_path}" && chmod +x ruby.exe npm npx
-        # chmod +x "${version_path}"/npx 2>/dev/null
+    mv "${archive_unpack_files}/"*/* "${version_path}" || return 1
+    cd "${version_path}"
+    # chmod +x "${version_path}"/npx 2>/dev/null
     )
 }
 

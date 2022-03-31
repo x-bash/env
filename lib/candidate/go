@@ -1,6 +1,6 @@
 # shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263    # xrc
 
-# Section: Go ls_remote
+# Section: Go
 
 ___x_cmd_env_go_ls_remote(){
     local cache_path="$___X_CMD_ENV_PATH/go/archive/cache_list"
@@ -12,7 +12,7 @@ ___x_cmd_env_go_ls_remote(){
 # EndSection
 
 ___x_cmd_env_go_download_archive(){
-     xrc os
+    xrc os
     local version="${1:?Provide a version}"
     local archive_path
 
@@ -20,37 +20,36 @@ ___x_cmd_env_go_download_archive(){
         env_log info "Archive existed: $version"
         return 0
     fi
-    echo "ddd" >&2
 
     case "$(___x_cmd_os name)" in
-          linux)      platform=linux                ;;
-          win)        platform=windows              ;;
-          macOS)      platform=darwin               ;;
-          *)          return 1 ;;
-     esac
+        linux)      platform=linux                ;;
+        win)        platform=windows              ;;
+        macOS)      platform=darwin               ;;
+        *)          return 1 ;;
+    esac
 
-     case "$(___x_cmd_os arch)" in
-          x86)        arch=386                  ;;
-          x64)        arch=amd64                ;;
-          arm64)      arch=arm64                ;;
-          ARMv6)      arch=armv6l               ;;
-          *)          return 1 ;;
-     esac
+    case "$(___x_cmd_os arch)" in
+        x86)        arch=386                  ;;
+        x64)        arch=amd64                ;;
+        arm64)      arch=arm64                ;;
+        ARMv6)      arch=armv6l               ;;
+        *)          return 1 ;;
+    esac
 
     echo "1.${platform},2.${arch}"
 
-     if [ "${platform}" = "windows" ]  ; then
-          download_url="https://golang.google.cn/dl/go${version}.${platform}-${arch}.zip"
-          local archive_path="$___X_CMD_ENV_PATH/go/archive/go-${version}.zip"
-     else
-          download_url="https://golang.google.cn/dl/go${version}.${platform}-${arch}.tar.gz"
-          local archive_path="$___X_CMD_ENV_PATH/go/archive/go-${version}.tar.gz"
-     fi
+    if  [ "${platform}" = "windows" ]  ; then
+        download_url="https://golang.google.cn/dl/go${version}.${platform}-${arch}.zip"
+        local archive_path="$___X_CMD_ENV_PATH/go/archive/go-${version}.zip"
+    else
+        download_url="https://golang.google.cn/dl/go${version}.${platform}-${arch}.tar.gz"
+        local archive_path="$___X_CMD_ENV_PATH/go/archive/go-${version}.tar.gz"
+    fi
 
     echo "${download_url}"
-     mkdir -p "$(dirname "$archive_path")"
+    mkdir -p "$(dirname "$archive_path")"
 
-     env_log info "Downloading go ${download_url}"
+    env_log info "Downloading go ${download_url}"
 
 
     if ! curl --progress-bar --location --retry-max-time 10 --retry 0 "${download_url}" --output "${archive_path}"; then
@@ -61,8 +60,10 @@ ___x_cmd_env_go_download_archive(){
    env_log info "Download Done"
 }
 
+# Section: unpack
+
 ___x_cmd_env_go_unpack(){
-local version="${1:?Provide go version}"
+    local version="${1:?Provide go version}"
     local platform
     local arch
     {
@@ -83,6 +84,7 @@ A
         win)    ___x_cmd_env_go_unpack_win    ;;
         *)      ___x_cmd_env_go_unpack_other  ;;
     esac
+
     local code=$?
 
     rm -rf "${archive_unpack_files}"
@@ -94,8 +96,8 @@ ___x_cmd_env_go_unpack_win(){
 
     local version_path="${___X_CMD_ENV_PATH}/go/versions/${version}/bin"
     mkdir -p "${version_path}" && (
-        mv "${archive_unpack_files}/"*/* "${version_path}" || return 1
-        cd "${version_path}" && chmod +x go.exe npm npx
+    mv "${archive_unpack_files}/"*/* "${version_path}" || return 1
+    cd "${version_path}" && chmod +x go.exe npm npx
     )
 }
 

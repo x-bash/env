@@ -16,7 +16,7 @@ ___x_cmd_env_scala_ls_remote(){
 
 # EndSection
 
-# Section: download, unpack
+# Section: download
 
 ___x_cmd_env_scala_download_archive(){
 	local version="${1:?Provide a version}"
@@ -50,23 +50,31 @@ ___x_cmd_env_scala_download_archive(){
     fi
 }
 
+# Section: unpack
+
 ___x_cmd_env_scala_unpack(){
 	local version="${1:?Provide a version}"
     local t_version
     local archive_path="$___X_CMD_ENV_PATH/scala/archive/scala-${version}.zip"
+    local archive_unpack_files
+
     env_log info "Unpacking: scala ${version}"
+
     x uz "$___X_CMD_ENV_PATH/scala/archive/scala-${version}.zip" "$(dirname "$archive_path")" || return 1
+
     case ${version} in
         3*) t_version=3  ;;
     esac
-    local archive_unpack_files
+
+
     if [ "${t_version}" = "3" ] ; then
-        local archive_unpack_files
+       local archive_unpack_files
         archive_unpack_files="$(dirname "$archive_path")/scala3-$version"
     else
        local archive_unpack_files
        archive_unpack_files="$(dirname "$archive_path")/scala-$version"
     fi
+
     local versions_path="$___X_CMD_ENV_PATH/scala/versions"
 	mkdir -p "$versions_path/${version}"
 	mv -f "$archive_unpack_files/"* "$versions_path/${version}"

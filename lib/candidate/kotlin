@@ -1,10 +1,9 @@
 # shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263    # xrc
 
 # Section: Kotlin ls_remote
-
 ___x_cmd_env_kotlin_ls_remote(){
 	local cache_path="$___X_CMD_ENV_PATH/kotlin/cache/version_list"
-	local cache_expiration="${2:-1}"
+  	local cache_expiration="${2:-1}"
 	___x_cmd_httpget "https://api.sdkman.io/2/candidates/kotlin/LINUX64/versions/all" "$cache_path" "$cache_expiration" && \
 	awk 'BEGIN{ RS=","} { print $0 }' < "$cache_path"
 }
@@ -32,16 +31,20 @@ ___x_cmd_env_kotlin_download_archive(){
 
 ___x_cmd_env_kotlin_unpack(){
 	local version="${1:?Provide a version}"
-	env_log info "unpack beginning kotlin-${version}"
 	local archive_path="$___X_CMD_ENV_PATH/kotlin/archive/kotlin-${version}.zip"
+	env_log info "unpack beginning kotlin-${version}"
+
 	x uz "$archive_path" "$(dirname "${archive_path}")" || return 1
 	local archive_unpack_files
-	archive_unpack_files="$(dirname "${archive_path}")/kotlinc"
 	local versions_path="$___X_CMD_ENV_PATH/kotlin/versions"
+
+	archive_unpack_files="$(dirname "${archive_path}")/kotlinc"
 	mkdir -p "$versions_path/${version}"
     mv -f "$archive_unpack_files"/* "$___X_CMD_ENV_PATH/kotlin/versions/${version}"
 	rm -rf "$archive_unpack_files"
 }
+
+
 
 # EndSection
 
