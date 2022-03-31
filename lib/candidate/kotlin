@@ -49,9 +49,6 @@ ___x_cmd_env_kotlin_unpack(){
 # EndSection
 
 # Section: current exec
-___x_cmd_env_kotlin_exec(){
-    kotlin -help
-}
 
 ___x_cmd_env_kotlin_current(){
     kotlin -version

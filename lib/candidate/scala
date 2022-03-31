@@ -84,9 +84,7 @@ ___x_cmd_env_scala_unpack(){
 # EndSection
 
 # Section: exec,current
-___x_cmd_env_scala_exec(){
-    scala -help
-}
+
 ___x_cmd_env_scalat_current(){
     scala -version
 }
