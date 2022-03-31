@@ -1,0 +1,50 @@
+# shellcheck shell=sh disable=SC1072 #source
+
+xrc env
+xrc assert/latest
+
+test_go(){
+    :
+}
+
+test_gradle(){
+    :
+}
+
+test_java(){
+    :
+}
+
+test_kotlin(){
+    :
+}
+
+test_maven(){
+    :
+}
+
+test_node(){
+    assert_stdout "x env install node" << A
+
+A
+}
+
+test_python(){
+    :
+}
+
+test_ruby(){
+    :
+}
+
+test_scala(){
+    :
+}
+
+test_springboot(){
+    :
+}
+
+for testcase in go gradle java kotlin maven node python ruby scala springboot; do
+    "$(test_"$testcase")"
+done

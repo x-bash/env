@@ -1,4 +1,4 @@
-# shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263    # xrc
+# shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263,SC2120    # xrc
 
 # Section: Maven ls_remote
 
@@ -8,6 +8,7 @@ ___x_cmd_env_maven_ls_remote(){
     ___x_cmd_httpget "https://archive.apache.org/dist/maven/maven-3/" "$cache_path" "$cache_expiration"  && \
         awk 'match($0, /href="([0-9.]+)\/"/){ print(substr($0,52,5))} ' <"$cache_path"
 }
+
 # EndSection
 
 # Section: download
@@ -28,6 +29,7 @@ ___x_cmd_env_maven_download_archive(){
     fi
     env_log info "Download Successfully"
 }
+
 # EndSection
 
 # Section: unpack
@@ -36,17 +38,15 @@ ___x_cmd_env_maven_unpack(){
     local version="${1:?Provide a version}"
     local archive_path="$___X_CMD_ENV_PATH/maven/archive/maven-${version}.zip"
     env_log info "Unpacking: maven ${version}"
-
     x uz "$archive_path" "$(dirname "$archive_path")" || return 1
-
     local archive_unpack_files
     local versions_path="$___X_CMD_ENV_PATH/maven/versions"
     archive_unpack_files="$(dirname "$archive_path")/apache-maven-$version"
-
     mkdir -p "$versions_path/${version}"
     mv -f "$archive_unpack_files/"* "$versions_path/${version}"
     rm -rf "$archive_unpack_files"
 }
+
 # EndSection
 
 # Section: current,exec
