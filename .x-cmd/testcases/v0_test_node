@@ -1,0 +1,11 @@
+# shellcheck shell=sh disable=SC1072 #source
+
+xrc env
+xrc assert
+test_node(){
+    x env install node
+    @assert stdout x env current node << A
+v17.8.0
+A
+}
+test_node

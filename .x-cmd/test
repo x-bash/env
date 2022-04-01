@@ -145,7 +145,6 @@ case $1 in
         x env download deno latest
         ;;
     all)
-
         for cmd in python node java deno perl kotlin; do
             x test "$cmd"
         done
