@@ -49,13 +49,6 @@ ___x_cmd_env_kotlin_unpack(){
 
 # EndSection
 
-# Section: current
-
-___x_cmd_env_kotlin_current(){
-    kotlin -version
-}
-# EndSection
-
 # Section: ui_catsel
 
 #TODO: Should be optimized

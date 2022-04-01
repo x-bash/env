@@ -9,7 +9,7 @@ x log env
 
 cross_env_test() {
     for i in ubuntu centos ; do
-        param_log info "Testing : " "$i"
+        env_log info "Testing : " "$i"
         docker run -it --rm -v "$(pwd):/root/env" "xcmd/${i}-dev" bash -i -c "cd /root/env && x test local"
     done
 }
@@ -20,7 +20,7 @@ case $1 in
     ubuntu)
         docker run -it --rm -v "$(pwd):/root/env" xcmd/ubuntu-dev bash -i -c "cd /root/env && bash" ;;
     local)
-        . "$(x wsroot)/.x-cmd/v0_test"
+        . "$(x wsroot)/.x-cmd/testcase/v0_test"
         ;;
     cross)
         cross_env_test
