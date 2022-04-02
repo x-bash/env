@@ -18,8 +18,7 @@ node"
 # EndSection
 
 x log init env
-xrc env/lib/util
-xrc env/lib/common
+xrc:mod:lib env util common
 xrc param
 param_type  env  candidates_list - <<A
 $(___x_cmd_env_candidate_all)
@@ -75,7 +74,7 @@ ___x_cmd_env_run_common_if_notfound(){
     local candidate="${1:?Provide candidate}";  shift
 
     # TODO: It might be better to have one folder for one language.
-    xrc "env/lib/candidate/$candidate"
+    xrc:mod:lib env "candidate/$candidate"
 
     local cmd="___x_cmd_env_${candidate}_${op}"
     if command -v "$cmd" >/dev/null; then

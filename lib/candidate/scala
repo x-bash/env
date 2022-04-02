@@ -1,5 +1,4 @@
 # shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263,SC2120    # xrc
-xrc env/lib/sdk
 
 # Section: Scala ls_remote
 
@@ -10,7 +9,7 @@ ___x_cmd_env_scala_sort_versions(){
 ___x_cmd_env_scala_ls_remote(){
 	local cache_path="$___X_CMD_ENV_PATH/scala/cache/cache_list"
 	local cache_expiration="${2:-1}"
-	___x_cmd_httpget "https://www.scala-lang.org/download/all.html" "$cache_path" "$cache_expiration" 2>/dev/null && \
+	___x_cmd_httpget "https://www.scala-lang.org/download/all.html" "$cache_path" "$cache_expiration" && \
 	awk  'match($0, /\/[0-9.]+.html/) { print substr($0, RSTART+1, RLENGTH-6)}' <"$cache_path" | ___x_cmd_env_scala_sort_versions | uniq
 }
 
@@ -56,24 +55,22 @@ ___x_cmd_env_scala_download_archive(){
 
 ___x_cmd_env_scala_unpack(){
 	local version="${1:?Provide a version}"
-    local t_version
-    local archive_path="$___X_CMD_ENV_PATH/scala/archive/scala-${version}.zip"
-    local archive_unpack_files
     env_log info "Unpacking: scala ${version}"
     x uz "$___X_CMD_ENV_PATH/scala/archive/scala-${version}.zip" "$(dirname "$archive_path")" || return 1
-    case ${version} in
+
+    local t_version
+    case "$version" in
         3*) t_version=3  ;;
     esac
-    if [ "${t_version}" = "3" ] ; then
-       local archive_unpack_files
-        archive_unpack_files="$(dirname "$archive_path")/scala3-$version"
-    else
-       local archive_unpack_files
-       archive_unpack_files="$(dirname "$archive_path")/scala-$version"
-    fi
+
+    local archive_unpack_files
+    local archive_path="$___X_CMD_ENV_PATH/scala/archive/scala-$version.zip"
+    archive_unpack_files="$(dirname "$archive_path")/scala$t_version-$version"
+
     local versions_path="$___X_CMD_ENV_PATH/scala/versions"
-	mkdir -p "$versions_path/${version}"
-	mv -f "$archive_unpack_files/"* "$versions_path/${version}"
+	mkdir -p "$versions_path/$version"
+	mv -f "$archive_unpack_files/"* "$versions_path/$version"
+    chmod -R +x "$versions_path/$version/bin"
 	rm -rf "$archive_unpack_files"
 }
 

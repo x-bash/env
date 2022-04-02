@@ -9,7 +9,7 @@ ___x_cmd_env_go_sort_versions(){
 ___x_cmd_env_go_ls_remote(){
     local cache_path="$___X_CMD_ENV_PATH/go/cache/version_list"
     local cache_expiration="${2:-1}"
-    ___x_cmd_httpget "https://go.dev/project" "$cache_path" "$cache_expiration" 2>/dev/null && \
+    ___x_cmd_httpget "https://go.dev/project" "$cache_path" "$cache_expiration" && \
         awk 'match($0,/Go [.-9]+<\/a>/){print substr ($0,RSTART+3,RLENGTH-7)}' < "$cache_path" | ___x_cmd_env_go_sort_versions | uniq
 }
 # EndSection

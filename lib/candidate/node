@@ -17,7 +17,7 @@ ___x_cmd_env_node_ls_remote(){
     local cache_expiration="${2:-1}"
     local cache_path="$___X_CMD_ENV_PATH/node/cache/version_list"
 
-	___x_cmd_httpget "$___X_CMD_ENV_NODE_MIRROR/index.tab" "$cache_path" "$cache_expiration" 2>/dev/null && \
+	___x_cmd_httpget "$___X_CMD_ENV_NODE_MIRROR/index.tab" "$cache_path" "$cache_expiration" && \
     awk -v pattern="$pattern" -v prev_codename="x-cmd" '
         ((NR>1)&&($1)){
             codename=$10

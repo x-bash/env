@@ -5,7 +5,7 @@ ___x_cmd_env_perl_ls_remote(){
     local cache_path="$___X_CMD_ENV_PATH/perl/cache/version_list"
     local cache_expiration=${2:-1}
 
-    ___x_cmd_httpget "https://www.cpan.org/src/README.html" "$cache_path" "$cache_expiration" 2>/dev/null && \
+    ___x_cmd_httpget "https://www.cpan.org/src/README.html" "$cache_path" "$cache_expiration" && \
         awk 'match($0, /<td><a href="https:\/\/www.cpan.org\/src\/5.0\/perl-[0-9.]{1,}tar/){gsub(/^[ ]+/,"",$0);gsub(/<t[\/]?d>/,"",$0);
         gsub(/<a href="https:\/\/www.cpan.org\/src\/5.0\/perl-[0-9.]{1,}[a-z.]{1,}[2]?">perl-/,"",$0);
         gsub(/.tar.[a-z]{1,}[2]?<\/a><\/td>/,"",$0);
