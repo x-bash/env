@@ -5,14 +5,12 @@ ___x_cmd_env_candidate_all(){
     printf "%s" "python
 node
 java
-deno
 go
 scala
 maven
 springboot
 kotlin
 gradle
-ruby
 node"
 
 }
