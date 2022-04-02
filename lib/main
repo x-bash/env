@@ -8,12 +8,12 @@ java
 deno
 go
 scala
+sbt
 maven
 springboot
 kotlin
 gradle
-ruby
-node"
+ruby"
 
 }
 
