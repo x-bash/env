@@ -1,12 +1,15 @@
 # shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263,SC2120    # xrc
 
+# Section: sbt ls_remote
 ___x_cmd_env_sbt_ls_remote(){
 	local cache_path="$___X_CMD_ENV_PATH/sbt/cache/version_list"
   	local cache_expiration="${2:-1}"
 	___x_cmd_httpget "https://www.scala-sbt.org/download.html" "$cache_path" "$cache_expiration" 2>/dev/null && \
 	    awk ' match($0,/sbt [0-9.]+/) { print substr($0,RSTART+4,RLENGTH-1) }' < "$cache_path"
 }
+# EndSection
 
+# Section: sbt download_archive
 ___x_cmd_env_sbt_download_archive(){
     local version=${1:?Provide a version}
     if ___x_cmd_env_util_is_archive_cached sbt "$version" 2>/dev/null; then
@@ -23,7 +26,9 @@ ___x_cmd_env_sbt_download_archive(){
 	fi
     env_log info "Download completed $download_url"
 }
+# EndSection
 
+# Section: sbt unpack
 ___x_cmd_env_sbt_unpack(){
     local version="${1:?Provide a version}"
     env_log info "Unpacking: sbt ${version}"
@@ -36,3 +41,4 @@ ___x_cmd_env_sbt_unpack(){
 	mv -f "${archive_unpack_files}/"* "$versions_path/${version}"
 	rm -rf "$archive_unpack_files"
 }
+# EndSection
