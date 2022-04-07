@@ -22,12 +22,9 @@ ___x_cmd_env_go_download_archive(){
         env_log info "Archive existed: $version"
         return 0
     fi
-<<<<<<< Updated upstream
 
     xrc os
-=======
     env_log info "your os is" "$(___x_cmd_os name)"  "your arch is" "$(___x_cmd_os arch)"
->>>>>>> Stashed changes
     case "$(___x_cmd_os name)" in
         linux)      platform=linux                ;;
         win)        platform=windows              ;;
