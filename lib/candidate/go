@@ -1,5 +1,24 @@
 # shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263,SC2120    # xrc
 
+
+___x_cmd_env_go_get_system_platform(){
+    xrc os
+    case "$(___x_cmd_os name)" in
+        linux)      platform=linux                ;;
+        win)        platform=windows              ;;
+        macOS)      platform=darwin               ;;
+        *)          return 1 ;;
+    esac
+    case "$(___x_cmd_os arch)" in
+        x86)        arch=386                  ;;
+        x64)        arch=amd64                ;;
+        arm64)      arch=arm64                ;;
+        armv7l)     arch=armv6l                ;;
+        ARMv6)      arch=armv6l               ;;
+        *)          return 1 ;;
+    esac
+}
+
 # Section: Go ls_remote
 
 ___x_cmd_env_go_sort_versions(){
@@ -9,8 +28,18 @@ ___x_cmd_env_go_sort_versions(){
 ___x_cmd_env_go_ls_remote(){
     local cache_path="$___X_CMD_ENV_PATH/go/cache/version_list"
     local cache_expiration="${2:-1}"
-    ___x_cmd_httpget "https://go.dev/project" "$cache_path" "$cache_expiration" && \
-        awk 'match($0,/Go [.-9]+<\/a>/){print substr ($0,RSTART+3,RLENGTH-7)}' < "$cache_path" | ___x_cmd_env_go_sort_versions | uniq
+
+    local platform
+    local arch
+    ___x_cmd_env_go_get_system_platform
+
+    ___x_cmd_httpget "https://golang.google.cn/dl/" "$cache_path" - && \
+        awk -v platform="${platform}" -v arch="${arch}" '
+        BEGIN{RS="/"}
+             {if (match($0, "go[0-9.]+" platform "-" arch))
+                split($0,a,/.linux/)
+                split(a[1],b,"o")
+                print b[2]}' < "$cache_path" | ___x_cmd_env_go_sort_versions | uniq
 }
 # EndSection
 
@@ -23,21 +52,7 @@ ___x_cmd_env_go_download_archive(){
         return 0
     fi
 
-    xrc os
-    env_log info "your os is" "$(___x_cmd_os name)"  "your arch is" "$(___x_cmd_os arch)"
-    case "$(___x_cmd_os name)" in
-        linux)      platform=linux                ;;
-        win)        platform=windows              ;;
-        macOS)      platform=darwin               ;;
-        *)          return 1 ;;
-    esac
-    case "$(___x_cmd_os arch)" in
-        x86)        arch=386                  ;;
-        x64)        arch=amd64                ;;
-        arm64)      arch=arm64                ;;
-        ARMv6)      arch=armv6l               ;;
-        *)          return 1 ;;
-    esac
+    ___x_cmd_env_go_get_system_platform
 
     local compression='tar.gz'; [ "${platform}" = 'windows' ] && compression='zip' # TODO: tar.xz support
     download_url="https://golang.google.cn/dl/go${version}.${platform}-${arch}.${compression}"

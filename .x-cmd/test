@@ -15,6 +15,8 @@ cross_env_test() {
 }
 
 case $1 in
+    pi)
+        rsync -acvP --exclude=.git ../env/ pi@192.168.31.45:.x-cmd/env/                             ;;
     centos)
         docker run -it --rm -v "$(pwd):/root/env" xcmd/centos-dev bash -i -c "cd /root/env && bash" ;;
     ubuntu)

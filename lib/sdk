@@ -2,10 +2,13 @@
 
 # Section: sdkman utils
 
-___X_CMD_ENV_SDK_PLATFORM="$(xrc os && printf "%s%s" "$(___x_cmd_os name)" "$(___x_cmd_os arch)" | tr '[:lower:]' '[:upper:]' )"
+___X_CMD_ENV_SDK_PLATFORM="$(xrc os && printf "%s%s" "$(___x_cmd_os name)" "$(___x_cmd_os arch)")"
 case $___X_CMD_ENV_SDK_PLATFORM in
 	WIN*)  ___X_CMD_ENV_SDK_PLATFORM=$(uname -s)         ;;
 esac
+if [ "$(___x_cmd_os arch)" = "armv7l" ] ; then
+	 ___X_CMD_ENV_SDK_PLATFORM="LinuxARM32HF"
+fi
 
 __sdkman_echo_debug() {
 	env_log debug "$1"
@@ -44,11 +47,11 @@ ___x_cmd_env_sdk_sort_versions(){
 }
 
 ___x_cmd_env_sdk_ls_remote(){
-    local candidate="${1:?Provide canddidate}"
+    local candidate="${1:?Provide candidate}"
 	# local pattern="${2:-""}"	# TODO: ls remote filter
 	local cache_expiration="${3:-1}"
 	local cache_path="$___X_CMD_ENV_PATH/$candidate/cache/version_list"
-
+	echo "https://api.sdkman.io/2/candidates/$candidate/${___X_CMD_ENV_SDK_PLATFORM}/versions/all"
 	___x_cmd_httpget "https://api.sdkman.io/2/candidates/$candidate/${___X_CMD_ENV_SDK_PLATFORM}/versions/all" "$cache_path" "$cache_expiration" 2>/dev/null && \
 	awk 'BEGIN{ RS=","} { print $0 }' <"$cache_path" | ___x_cmd_env_sdk_sort_versions | uniq
 }
