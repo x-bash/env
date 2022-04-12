@@ -1,22 +1,26 @@
 # shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263,SC2120    # xrc
 
-# Section: sdkman utils
+# Section: get system platform
 
 ___x_cmd_env_go_get_system_platform(){
     xrc os
     case "$(___x_cmd_os name)" in
-        linux)      platform=linux                                      ;;
-        win)        platform=windows                                    ;;
-        macOS)      platform=darwin                                     ;;
-        *)          env_log error "your OS are not supported"; return 1 ;;
+        linux)      platform=linux    ;;
+        win)        platform=windows  ;;
+        darwin)      platform=darwin   ;;
+        *)          env_log error "your OS are not supported"
+                    return 1
+                    ;;
     esac
     case "$(___x_cmd_os arch)" in
-        x86)        arch=386                                               ;;
-        x64)        arch=amd64                                             ;;
-        arm64)      arch=arm64                                             ;;
-        armv7l)     arch=armv6l                                            ;;
-        ARMv6)      arch=armv6l                                            ;;
-        *)          env_log error "your arch are not supported" ; return 1 ;;
+        x86)           arch=386        ;;
+        x64)           arch=amd64      ;;
+        arm64)         arch=arm64      ;;
+        armv7l|ARMv6)  arch=armv6l     ;;
+        # TODO: Talk to user the arch of the system
+        *)  env_log error "your arch are not supported"
+            return 1
+            ;;
     esac
 }
 # EndSection
@@ -24,6 +28,7 @@ ___x_cmd_env_go_get_system_platform(){
 # Section: Go ls_remote
 
 ___x_cmd_env_go_sort_versions(){
+    # TODO: use sort to uniq the version
 	sort -t . -n
 }
 
@@ -33,15 +38,17 @@ ___x_cmd_env_go_ls_remote(){
 
     local platform
     local arch
+    # TODO: Catch the error
     ___x_cmd_env_go_get_system_platform
 
-    ___x_cmd_httpget "https://golang.google.cn/dl/" "$cache_path" - && \
+    # TODO: Has BUG
+    ___x_cmd_httpget "https://golang.google.cn/dl/" "$cache_path" "$cache_expiration" && \
         awk -v platform="${platform}" -v arch="${arch}" '
         BEGIN{RS="/"}
              {if (match($0, "go[0-9.]+" platform "-" arch))
                 split($0,a,/.linux/)
                 split(a[1],b,"o")
-                print b[2]}' < "$cache_path" | ___x_cmd_env_go_sort_versions | uniq
+                print b[2]}' < "$cache_path" | ___x_cmd_env_go_sort_versions
 }
 # EndSection
 
