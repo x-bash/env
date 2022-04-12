@@ -7,8 +7,8 @@ ___x_cmd_env_go_get_system_platform(){
     case "$(___x_cmd_os name)" in
         linux)      platform=linux    ;;
         win)        platform=windows  ;;
-        darwin)      platform=darwin   ;;
-        *)          env_log error "your OS are not supported"
+        darwin)      platform=darwin  ;;
+        *)          env_log error "your arch:(" "$(___x_cmd_os name)" ") are not supported"
                     return 1
                     ;;
     esac
@@ -17,8 +17,7 @@ ___x_cmd_env_go_get_system_platform(){
         x64)           arch=amd64      ;;
         arm64)         arch=arm64      ;;
         armv7l|ARMv6)  arch=armv6l     ;;
-        # TODO: Talk to user the arch of the system
-        *)  env_log error "your arch are not supported"
+        *)  env_log error "your arch:(" "$(___x_cmd_os arch)" ") are not supported"
             return 1
             ;;
     esac
@@ -28,7 +27,6 @@ ___x_cmd_env_go_get_system_platform(){
 # Section: Go ls_remote
 
 ___x_cmd_env_go_sort_versions(){
-    # TODO: use sort to uniq the version
 	sort -t . -n
 }
 
@@ -38,17 +36,17 @@ ___x_cmd_env_go_ls_remote(){
 
     local platform
     local arch
-    # TODO: Catch the error
     ___x_cmd_env_go_get_system_platform
 
-    # TODO: Has BUG
+    if ___x_cmd_env_go_get_system_platform 2>/dev/null; then
     ___x_cmd_httpget "https://golang.google.cn/dl/" "$cache_path" "$cache_expiration" && \
         awk -v platform="${platform}" -v arch="${arch}" '
-        BEGIN{RS="/"}
-             {if (match($0, "go[0-9.]+" platform "-" arch))
-                split($0,a,/.linux/)
-                split(a[1],b,"o")
-                print b[2]}' < "$cache_path" | ___x_cmd_env_go_sort_versions
+            match($0, "/dl/go[0-9.]+" platform "-" arch) {
+                a = substr($0,RSTART+6,RLENGTH-6)
+                match(a, "^[0-9.]+")
+                print substr(a, RSTART, RLENGTH-1)
+            }' < "$cache_path"  | ___x_cmd_env_go_sort_versions
+    fi
 }
 # EndSection
 
@@ -123,7 +121,7 @@ ___x_cmd_env_go_unpack_other(){
 
 # EndSection
 
-# Section: ui_catsel
+# Section: ui_catsel# split(a[1],b,"o")
 
 #TODO: Should be optimized
 ___x_cmd_env_go_ui_catsel(){

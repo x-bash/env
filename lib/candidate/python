@@ -5,19 +5,19 @@
 ___x_cmd_env_python_get_system_platform(){
     xrc os
     case "$(___x_cmd_os name)" in
-        linux)      system=Linux                           ;;
-        windows)    system=Windows                         ;;
-        darwin)     system=MacOSX                          ;;
-        *)          "your OS are not supported" ; return 1 ;;
+        linux)      system=Linux                                                          ;;
+        windows)    system=Windows                                                        ;;
+        darwin)     system=MacOSX                                                         ;;
+        *)          "your arch:(" "$(___x_cmd_os name)" ") are not supported"  ; return 1 ;;
     esac
 
     case "$(___x_cmd_os arch)" in
-        aarch64)    platform=aarch64                         ;;
-        x64)        platform=x86_64                          ;;
-        arm64)      platform=arm64                           ;;
-        armv7l)     platform=armv7l                          ;;
-        armv6l)     platform=armv6l                          ;;
-        *)          "your arch are not supported" ; return 1 ;;
+        aarch64)    platform=aarch64                                                     ;;
+        x64)        platform=x86_64                                                      ;;
+        arm64)      platform=arm64                                                       ;;
+        armv7l)     platform=armv7l                                                      ;;
+        armv6l)     platform=armv6l                                                      ;;
+        *)          "your arch:(" "$(___x_cmd_os arch)" ") are not supported" ; return 1 ;;
     esac
 }
 
@@ -53,6 +53,7 @@ ___x_cmd_env_python_ls_remote(){
     local system
     ___x_cmd_env_python_get_system_platform
 
+    if ___x_cmd_env_python_get_system_platform ; then
     ___x_cmd_httpget "https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/" "$cache_path" "$cache_expiration" && \
     awk -v platform="${platform}" -v arch="${system}" '
         BEGIN{RS="<a href=";FS="\""}{
@@ -61,6 +62,7 @@ ___x_cmd_env_python_ls_remote(){
                 print a[2]
             }
         }' <"$cache_path" | ___x_cmd_env_python_sort_versions | uniq
+    fi
 }
 
 # EndSection
