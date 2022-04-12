@@ -68,7 +68,6 @@ A
     # TODO: node <= 0.1.13 does not have a directory
     local slug="node-${version}-${platform}-${arch}"
     local download_url="${___X_CMD_ENV_NODE_MIRROR}/${version}/${slug}.${compression}"
-    echo "${download_url}"
     if ! curl -L -C - --progress-bar "${download_url}" -o "${archive_path}"; then
         rm -rf "${archive_path}"
         env_log error "Download from ${download_url} failed."

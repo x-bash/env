@@ -117,7 +117,7 @@ ___x_cmd_env_go_unpack_other(){
 
 # EndSection
 
-# Section: ui_catsel# split(a[1],b,"o")
+# Section: ui_catsel
 
 #TODO: Should be optimized
 ___x_cmd_env_go_ui_catsel(){
