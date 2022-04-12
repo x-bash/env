@@ -58,14 +58,14 @@ ___x_cmd_env_python_ls_remote(){
     local system
 
     if ___x_cmd_env_python_get_system_platform ; then
-    ___x_cmd_httpget "https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/" "$cache_path" "$cache_expiration" && \
-    awk -v platform="${platform}" -v arch="${system}" '
-        BEGIN{RS="<a href=";FS="\""}{
-            if (match($2, "^.*-" arch "-" platform ".sh$")) {
-                split($2, a, /-/)
-                print a[2]
-            }
-        }' <"$cache_path" | ___x_cmd_env_python_sort_versions | uniq
+        ___x_cmd_httpget "https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/" "$cache_path" "$cache_expiration" && \
+        awk -v platform="${platform}" -v arch="${system}" '
+            BEGIN{RS="<a href=";FS="\""}{
+                if (match($2, "^.*-" arch "-" platform ".sh$")) {
+                    split($2, a, /-/)
+                    print a[2]
+                }
+            }' <"$cache_path" | ___x_cmd_env_python_sort_versions
     fi
 }
 
