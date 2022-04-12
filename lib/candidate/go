@@ -7,7 +7,7 @@ ___x_cmd_env_go_get_system_platform(){
     case "$(___x_cmd_os name)" in
         linux)      platform=linux    ;;
         win)        platform=windows  ;;
-        darwin)      platform=darwin  ;;
+        darwin)     platform=darwin   ;;
         *)          env_log error "your arch:(" "$(___x_cmd_os name)" ") are not supported"
                     return 1
                     ;;
