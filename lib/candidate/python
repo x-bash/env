@@ -5,19 +5,23 @@
 ___x_cmd_env_python_get_system_platform(){
     xrc os
     case "$(___x_cmd_os name)" in
-        linux)      system=Linux                                                          ;;
-        windows)    system=Windows                                                        ;;
-        darwin)     system=MacOSX                                                         ;;
-        *)          "your arch:(" "$(___x_cmd_os name)" ") are not supported"  ; return 1 ;;
+        linux)      system=Linux                                                            ;;
+        windows)    system=Windows                                                          ;;
+        darwin)     system=MacOSX                                                           ;;
+        *)          env_log error "your arch:(" "$(___x_cmd_os name)" ") are not supported"  ;
+                    return 1
+                    ;;
     esac
 
     case "$(___x_cmd_os arch)" in
-        aarch64)    platform=aarch64                                                     ;;
-        x64)        platform=x86_64                                                      ;;
-        arm64)      platform=arm64                                                       ;;
-        armv7l)     platform=armv7l                                                      ;;
-        armv6l)     platform=armv6l                                                      ;;
-        *)          "your arch:(" "$(___x_cmd_os arch)" ") are not supported" ; return 1 ;;
+        aarch64)    platform=aarch64                                                       ;;
+        x64)        platform=x86_64                                                        ;;
+        arm64)      platform=arm64                                                         ;;
+        armv7l)     platform=armv7l                                                        ;;
+        armv6l)     platform=armv6l                                                        ;;
+        *)          env_log error "your arch:(" "$(___x_cmd_os arch)" ") are not supported" ;
+                    return 1
+                    ;;
     esac
 }
 
@@ -26,12 +30,13 @@ ___x_cmd_env_python_get_miniconda_filename_and_compression(){
 
     local platform
     local system
-    ___x_cmd_env_python_get_system_platform
+    if ___x_cmd_env_python_get_system_platform ; then
 
-    if [ $system = "Windows" ] ; then
-        compression="exe"
-    else
-        compression="sh"
+        if [ $system = "Windows" ] ; then
+            compression="exe"
+        else
+            compression="sh"
+        fi
     fi
     miniconda_filename="Miniconda3-${version}-${system}-${platform}.${compression}"
 }
@@ -51,7 +56,6 @@ ___x_cmd_env_python_ls_remote(){
 
     local platform
     local system
-    ___x_cmd_env_python_get_system_platform
 
     if ___x_cmd_env_python_get_system_platform ; then
     ___x_cmd_httpget "https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/" "$cache_path" "$cache_expiration" && \
