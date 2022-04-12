@@ -5,18 +5,18 @@
 ___x_cmd_env_go_get_system_platform(){
     xrc os
     case "$(___x_cmd_os name)" in
-        linux)      platform=linux                ;;
-        win)        platform=windows              ;;
-        macOS)      platform=darwin               ;;
-        *)          return 1 ;;
+        linux)      platform=linux                                      ;;
+        win)        platform=windows                                    ;;
+        macOS)      platform=darwin                                     ;;
+        *)          env_log error "your OS are not supported"; return 1 ;;
     esac
     case "$(___x_cmd_os arch)" in
-        x86)        arch=386                  ;;
-        x64)        arch=amd64                ;;
-        arm64)      arch=arm64                ;;
-        armv7l)     arch=armv6l                ;;
-        ARMv6)      arch=armv6l               ;;
-        *)          return 1 ;;
+        x86)        arch=386                                               ;;
+        x64)        arch=amd64                                             ;;
+        arm64)      arch=arm64                                             ;;
+        armv7l)     arch=armv6l                                            ;;
+        ARMv6)      arch=armv6l                                            ;;
+        *)          env_log error "your arch are not supported" ; return 1 ;;
     esac
 }
 # EndSection

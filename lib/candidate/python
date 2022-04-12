@@ -5,19 +5,19 @@
 ___x_cmd_env_python_get_system_platform(){
     xrc os
     case "$(___x_cmd_os name)" in
-        linux)      system=Linux            ;;
-        windows)    system=Windows          ;;
-        darwin)     system=MacOSX           ;;
-        *)          return 1 ;;
+        linux)      system=Linux                           ;;
+        windows)    system=Windows                         ;;
+        darwin)     system=MacOSX                          ;;
+        *)          "your OS are not supported" ; return 1 ;;
     esac
 
     case "$(___x_cmd_os arch)" in
-        aarch64)    platform=aarch64        ;;
-        x64)        platform=x86_64         ;;
-        arm64)      platform=arm64          ;;
-        armv7l)     platform=armv7l             ;;
-        armv6l)     platform=armv6l             ;;
-        *)          return 1 ;;
+        aarch64)    platform=aarch64                         ;;
+        x64)        platform=x86_64                          ;;
+        arm64)      platform=arm64                           ;;
+        armv7l)     platform=armv7l                          ;;
+        armv6l)     platform=armv6l                          ;;
+        *)          "your arch are not supported" ; return 1 ;;
     esac
 }
 
