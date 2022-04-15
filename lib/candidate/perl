@@ -17,14 +17,29 @@ ___x_cmd_env_perl_get_system_platform(){
                     return 1
                     ;;
     esac
+
+    case "$_arch" in
+        x32)                            ___X_CMD_ENV_ARCH="64bit"   ;;
+        x64)                            ___X_CMD_ENV_ARCH="64bit"   ;;
+        *)          env_log error "your arch:(" "$_arch" ") are not supported"
+                    return 1
+                    ;;
+    esac
+
 }
 
 ___x_cmd_env_perl_ls_remote(){
     local cache_path="$___X_CMD_ENV_PATH/perl/cache/version_list"
     local cache_expiration=${2:-1}
+    if [ "$___X_CMD_ENV_PLATFORM" == "linux" || "$___X_CMD_ENV_PLATFORM" == "darwin "] ; then
+       ___x_cmd_httpget "https://api.github.com/repos/skaji/relocatable-perl/releases" "$cache_path" "$cache_expiration" 2>/dev/null && \
+                     ja 'k()=="tag_name"{ print v(); }' < "$cache_path"
+    fi
+    if [ "$___X_CMD_ENV_PLATFORM" == "windows" ] ; then
+        ___x_cmd_httpget "https://strawberryperl.com/releases.html" "$cache_path" "$cache_expiration" 2>/dev/null && \
+                    awk ' match($0, /<td><b>[0-9.]+<\/b><\/td>/) { print substr($0,RSTART+7,RLENGTH-16)}' < "$cache_path"
+    fi
 
-      ___x_cmd_httpget "https://api.github.com/repos/skaji/relocatable-perl/releases" "$cache_path" "$cache_expiration" 2>/dev/null && \
-       ja 'k()=="tag_name"{ print v(); }' < "$cache_path"
 }
 # EndSection
 
@@ -33,8 +48,7 @@ ___x_cmd_env_perl_download_archive(){
     local version=${1:?Provide a version}
     local archive_path="$___X_CMD_ENV_PATH/perl/archive/perl-${version}.tar.gz"
     env_log info "Downloading perl-${version}"
-
-	if ___x_cmd_env_util_is_archive_cached perl "$version" 2>/dev/null; then
+    if ___x_cmd_env_util_is_archive_cached perl "$version" 2>/dev/null; then
 		env_log info  "Archive existed: $version"
 		return 0
 	fi
@@ -43,11 +57,11 @@ ___x_cmd_env_perl_download_archive(){
 
     if ___x_cmd_env_perl_get_system_platform ; then
         if [ "$___X_CMD_ENV_PLATFORM" = "linux" ] ; then
-           download_url="https://github.com/skaji/relocatable-perl/releases/download/${version}/perl-x86_64-linux.tar.gz"
-        fi
-        if [ "$___X_CMD_ENV_PLATFORM" = "darwin" ] ; then
-           download_url="https://github.com/skaji/relocatable-perl/releases/download/${version}/perl-darwin-2level.tar.gz"
-        fi
+             download_url="https://github.com/skaji/relocatable-perl/releases/download/${version}/perl-x86_64-linux.tar.gz"
+        elif [ "$___X_CMD_ENV_PLATFORM" = "darwin" ] ; then
+             download_url="https://github.com/skaji/relocatable-perl/releases/download/${version}/perl-darwin-2level.tar.gz"
+        else [ "$___X_CMD_ENV_PLATFORM" = "windows" ] ; then
+             download_url="https://strawberryperl.com/download/${version}/strawberry-perl-${version}-${_arch}.zip"
     fi
     if ! curl --progress-bar --location --retry-max-time 10 --retry 0 "$download_url" --output "$archive_path" ; then
         env_log error "Download failure from $download_url"
