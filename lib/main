@@ -9,6 +9,7 @@ go
 scala
 sbt
 maven
+perl
 springboot
 kotlin
 gradle"
