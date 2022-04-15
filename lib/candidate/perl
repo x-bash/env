@@ -44,7 +44,6 @@ ___x_cmd_env_perl_ls_remote(){
     local cache_expiration=${2:-1}
     ___x_cmd_env_perl_get_system_platform
     if [ "$___X_CMD_ENV_PLATFORM" = "linux" ] || [ "$___X_CMD_ENV_PLATFORM" = "darwin" ] ; then
-    echo "dd"
         ___x_cmd_httpget "https://api.github.com/repos/skaji/relocatable-perl/releases" "$cache_path" "$cache_expiration" 2>/dev/null && \
             ja 'k()=="tag_name"{ print v(); }' < "$cache_path"
     fi
@@ -111,6 +110,5 @@ ___x_cmd_env_perl_unpack(){
 	mkdir -p "${versions_path}/${version}"
 	mv -f "$archive_unpack_files/"* "$versions_path/${version}"
 	rm -rf "$archive_unpack_files"
-
 }
 # EndSection
