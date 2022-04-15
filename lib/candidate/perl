@@ -1,4 +1,5 @@
 # shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263    # xrc
+
 # Section: util
 . "$___X_CMD_ROOT_MOD/jawk"
 alias ja=___x_cmd_jawk
@@ -7,6 +8,7 @@ ___x_cmd_env_perl_get_system_platform(){
     xrc os
     local _platform
     local _arch
+    local _compression
     _platform="$(x os name)"
     _arch="$(x os arch)"
     case "$_platform" in
@@ -26,6 +28,13 @@ ___x_cmd_env_perl_get_system_platform(){
                     ;;
     esac
 
+    case "$_platform" in
+        linux | darwin)     _compression=tar.gz   ;;
+        win)                _compression=zip      ;;
+        *)                  env_log error "your arch:(" "$(___x_cmd_os name)" ") are not supported"
+                             return 1
+                             ;;
+    esac
 }
 # EndSection
 
@@ -48,7 +57,7 @@ ___x_cmd_env_perl_ls_remote(){
 # Section: download
 ___x_cmd_env_perl_download_archive(){
     local version=${1:?Provide a version}
-    local archive_path="$___X_CMD_ENV_PATH/perl/archive/perl-${version}.tar.gz"
+    local archive_path="$___X_CMD_ENV_PATH/perl/archive/perl-${version}.${_compression}"
     env_log info "Downloading perl-${version}"
     if ___x_cmd_env_util_is_archive_cached perl "$version" 2>/dev/null; then
 		env_log info  "Archive existed: $version"
