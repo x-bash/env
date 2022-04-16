@@ -1,8 +1,7 @@
 # shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263    # xrc
 
-# Section: util
-. "$___X_CMD_ROOT_MOD/jawk"
-alias ja=___x_cmd_jawk
+# Section(util): get_system_platform
+xrc ja
 
 ___x_cmd_env_perl_get_system_platform(){
     xrc os
@@ -32,8 +31,8 @@ ___x_cmd_env_perl_get_system_platform(){
         linux | darwin)     _compression=tar.gz   ;;
         win)                _compression=zip      ;;
         *)                  env_log error "your arch:(" "$(___x_cmd_os name)" ") are not supported"
-                             return 1
-                             ;;
+                            return 1
+                            ;;
     esac
 }
 # EndSection
@@ -41,23 +40,22 @@ ___x_cmd_env_perl_get_system_platform(){
 # Section: ls remote
 ___x_cmd_env_perl_ls_remote(){
     local cache_path="$___X_CMD_ENV_PATH/perl/cache/version_list"
-    local cache_expiration=${2:-1}
+    local cache_expiration="${2:-1}"
     ___x_cmd_env_perl_get_system_platform
     if [ "$___X_CMD_ENV_PLATFORM" = "linux" ] || [ "$___X_CMD_ENV_PLATFORM" = "darwin" ] ; then
-        ___x_cmd_httpget "https://api.github.com/repos/skaji/relocatable-perl/releases" "$cache_path" "$cache_expiration" 2>/dev/null && \
+        ___x_cmd_httpget "https://api.github.com/repos/skaji/relocatable-perl/releases" "$cache_path" "$cache_expiration" && \
             ja 'k()=="tag_name"{ print v(); }' < "$cache_path"
     fi
     if [ "$___X_CMD_ENV_PLATFORM" = "windows" ] ; then
-        ___x_cmd_httpget "https://strawberryperl.com/releases.html" "$cache_path" "$cache_expiration" 2>/dev/null && \
+        ___x_cmd_httpget "https://strawberryperl.com/releases.html" "$cache_path" "$cache_expiration" && \
             awk ' match($0, /<td><b>[0-9.]+<\/b><\/td>/) { print substr($0,RSTART+7,RLENGTH-16)}' < "$cache_path"
     fi
-
 }
 # EndSection
 
 # Section: download
 ___x_cmd_env_perl_download_archive(){
-    local version=${1:?Provide a version}
+    local version="${1:?Provide a version}"
     local archive_path="$___X_CMD_ENV_PATH/perl/archive/perl-${version}.${_compression}"
     ___x_cmd_env_perl_get_system_platform
     env_log info "Downloading perl-${version}"
@@ -66,7 +64,7 @@ ___x_cmd_env_perl_download_archive(){
 		return 0
 	fi
     mkdir -p "$(dirname "${archive_path}")"
-    local archive_path=$___X_CMD_ENV_PATH/perl/archive/perl-${version}.tar.gz
+    local archive_path="$___X_CMD_ENV_PATH/perl/archive/perl-${version}.tar.gz"
 
     if ___x_cmd_env_perl_get_system_platform ; then
         if [ "$___X_CMD_ENV_PLATFORM" = "linux" ] ; then

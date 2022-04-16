@@ -51,7 +51,7 @@ ___x_cmd_env_sdk_ls_remote(){
 	# local pattern="${2:-""}"	# TODO: ls remote filter
 	local cache_expiration="${3:-1}"
 	local cache_path="$___X_CMD_ENV_PATH/$candidate/cache/version_list"
-	___x_cmd_httpget "https://api.sdkman.io/2/candidates/$candidate/${___X_CMD_ENV_SDK_PLATFORM}/versions/all" "$cache_path" "$cache_expiration" 2>/dev/null && \
+	___x_cmd_httpget "https://api.sdkman.io/2/candidates/$candidate/${___X_CMD_ENV_SDK_PLATFORM}/versions/all" "$cache_path" "$cache_expiration" && \
 	awk 'BEGIN{ RS=","} { print $0 }' <"$cache_path" | ___x_cmd_env_sdk_sort_versions | uniq
 }
 
