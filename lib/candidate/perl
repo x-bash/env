@@ -9,6 +9,7 @@ ___x_cmd_env_perl_get_system_platform(){
     local _platform
     local _arch
     local _compression
+    local ___X_CMD_ENV_PLATFORM
     _platform="$(x os name)"
     _arch="$(x os arch)"
     case "$_platform" in
