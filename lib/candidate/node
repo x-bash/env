@@ -14,7 +14,7 @@ ___x_cmd_env_node_sort_versions(){
 
 ___x_cmd_env_node_ls_remote(){
     local pattern="${1:-""}"
-    local cache_expiration="${2:-1}"
+    local cache_expiration="${2:-86400}"
     local cache_path="$___X_CMD_ENV_PATH/node/cache/version_list"
 
 	___x_cmd_httpget "$___X_CMD_ENV_NODE_MIRROR/index.tab" "$cache_path" "$cache_expiration" && \

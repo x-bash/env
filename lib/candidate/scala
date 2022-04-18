@@ -8,7 +8,7 @@ ___x_cmd_env_scala_sort_versions(){
 
 ___x_cmd_env_scala_ls_remote(){
 	local cache_path="$___X_CMD_ENV_PATH/scala/cache/cache_list"
-	local cache_expiration="${2:-1}"
+	local cache_expiration="${2:-86400}"
 	___x_cmd_httpget "https://www.scala-lang.org/download/all.html" "$cache_path" "$cache_expiration" && \
 	awk  'match($0, /\/[0-9.]+.html/) { print substr($0, RSTART+1, RLENGTH-6)}' <"$cache_path" | ___x_cmd_env_scala_sort_versions | uniq
 }
