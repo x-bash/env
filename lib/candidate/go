@@ -32,7 +32,7 @@ ___x_cmd_env_go_sort_versions(){
 
 ___x_cmd_env_go_ls_remote(){
     local cache_path="$___X_CMD_ENV_PATH/go/cache/version_list"
-    local cache_expiration="${2:-1}"
+    local cache_expiration="${2:-86400}"
 
     local platform
     local arch

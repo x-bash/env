@@ -52,7 +52,7 @@ ___x_cmd_env_python_sort_versions(){
 
 ___x_cmd_env_python_ls_remote(){
     # local pattern="${1:-""}"    # TODO: ls remote filter
-    local cache_expiration="${2:-1}"
+    local cache_expiration="${2:-86400}"
 	local cache_path="$___X_CMD_ENV_PATH/python/cache/version_list"
 
     local ___X_CMD_ENV_PLATFORM
