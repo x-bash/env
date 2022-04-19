@@ -1,7 +1,5 @@
 # shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263    # xrc
-. "$___X_CMD_ROOT_MOD/jawk"
-alias ja=___x_cmd_jawk
-
+xrc ja
 
  # Section: utils
 ___x_cmd_env_deno_get_system_platform(){

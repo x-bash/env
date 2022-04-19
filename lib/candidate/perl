@@ -1,8 +1,7 @@
 # shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263    # xrc
 
-# Section: util
-. "$___X_CMD_ROOT_MOD/jawk"
-alias ja=___x_cmd_jawk
+# Section(util): get_system_platform
+xrc ja
 
 ___x_cmd_env_perl_get_system_platform(){
     xrc os
@@ -58,7 +57,7 @@ ___x_cmd_env_perl_ls_remote(){
 
 # Section: download
 ___x_cmd_env_perl_download_archive(){
-    local version=${1:?Provide a version}
+    local version="${1:?Provide a version}"
     local archive_path="$___X_CMD_ENV_PATH/perl/archive/perl-${version}.${_compression}"
     ___x_cmd_env_perl_get_system_platform
     env_log info "Downloading perl-${version}"
@@ -67,7 +66,7 @@ ___x_cmd_env_perl_download_archive(){
 		return 0
 	fi
     mkdir -p "$(dirname "${archive_path}")"
-    local archive_path=$___X_CMD_ENV_PATH/perl/archive/perl-${version}.tar.gz
+    local archive_path="$___X_CMD_ENV_PATH/perl/archive/perl-${version}.tar.gz"
 
     if ___x_cmd_env_perl_get_system_platform ; then
         if [ "$___X_CMD_ENV_PLATFORM" = "linux" ] ; then
