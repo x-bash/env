@@ -314,15 +314,13 @@ ___x_cmd_env_main_exec(){
     param:dsl <<A
 advise:
     #1        xrc env/latest && ___x_cmd_env_advise_ls_cmd
-    #2        xrc env/latest && ___x_cmd_env_advise_cmd_ls_local_version
 options:
-    #1        "Environment Candidates command you want to find"
-    #2        "Version"                <version>
+    #1        "Environment Candidates command and version you want to find, e.g. 'node=v16.9.0'"
 A
     param:run
 
-    local cmd="${1}"
-    if [ -z "$cmd" ]; then
+    local cmd="${1%%=*}"
+    if [ -z "$1" ]; then
         ___x_cmd_env_main_exec help
         return 1
     fi
@@ -331,11 +329,15 @@ A
     candidate="$(___x_cmd_env_util_cmd_to_candidate "$cmd")"
 
     local version
-    if ! version="$(___x_cmd_env_run_common_if_notfound full_version "$candidate" "$2")"; then
+    case "$1" in
+        *=*) version="${1#*=}" ;;
+    esac
+
+    if ! version="$(___x_cmd_env_run_common_if_notfound full_version "$candidate" "$version")"; then
         env_log error "Version of $candidate not found: $2"
         return 1
     fi
-    shift 2
+    shift 1
 
     ___x_cmd_env_run_common_if_notfound exec "$candidate" "$cmd" "$version" "$@"
 }

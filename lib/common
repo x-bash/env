@@ -216,9 +216,10 @@ ___x_cmd_env_common_exec(){
     local version="${3:?Provide version}"; shift 3
 
     if ! ___x_cmd_env_util_is_downloaded "${candidate}" "${version}" 2>/dev/null ; then
-        env_log error "No such version: $candidate $version"
+        env_log error "Candidate $candidate No such version: $version"
         return 1
     fi
+    env_log info "Executing $candidate $version $cmd"
     PATH="${___X_CMD_ENV_PATH}/${candidate}/versions/${version}/bin:$PATH" "$cmd" "$@"
 }
 # EndSection
