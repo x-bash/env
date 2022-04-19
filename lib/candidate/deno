@@ -1,5 +1,8 @@
 # shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263    # xrc
-xrc ja
+. "$___X_CMD_ROOT_MOD/jawk"
+alias ja=___x_cmd_jawk
+xrc jawk
+
 
  # Section: utils
 ___x_cmd_env_deno_get_system_platform(){
@@ -8,17 +11,8 @@ ___x_cmd_env_deno_get_system_platform(){
     local _arch
     local _compression
     local ___X_CMD_ENV_PLATFORM
-    local ___X_CMD_ENV_ARCH
     _platform="$(x os name)"
     _arch="$(x os arch)"
-    # case "$_platform" in
-    #     linux)      ___X_CMD_ENV_PLATFORM=linux    ;;
-    #     win)        ___X_CMD_ENV_PLATFORM=windows  ;;
-    #     darwin)     ___X_CMD_ENV_PLATFORM=darwin   ;;
-    #     *)          env_log error "your arch:(" "$(___x_cmd_os name)" ") are not supported"
-    #                 return 1
-    #                 ;;
-    # esac
     if [  $_platform = "win" ] ; then
         ___X_CMD_ENV_ARCH="x86_64-pc-windows-msvc"
     fi
@@ -34,14 +28,9 @@ ___x_cmd_env_deno_get_system_platform(){
     if [ "$_platform" = "linux" ] ; then
         ___X_CMD_ENV_ARCH="x86_64-unknown-linux-gnu"
     fi
-    echo "${___X_CMD_ENV_ARCH}" "$_platform" "$_arch"
-    # case "$_platform" in
-    #     linux | darwin)     _compression=tar.gz   ;;
-    #     win)                _compression=zip      ;;
-    #     *)                  env_log error "your arch:(" "$(___x_cmd_os name)" ") are not supported"
-    #                          return 1
-    #                          ;;
-    # esac
+    if [ "$_platform" != "linux" ] && [ $_platform != "darwin" ] && [  $_platform != "win" ] ; then
+        env_log error "your OS:(" "$_platform" ") are not supported"
+    fi
 }
 # EndSection；
 
@@ -56,13 +45,13 @@ ___x_cmd_env_deno_ls_remote(){
 # EndSection
 
 ___x_cmd_env_deno_download_archive(){
-    local version="${1:?Provide a version}"
+    local version="${1:?""}"
+    local ___X_CMD_ENV_ARCH
     ___x_cmd_env_deno_get_system_platform
     if ___x_cmd_env_util_is_archive_cached deno "$version" 2>/dev/null; then
         env_log info "Archive existed: $version"
         return 0
     fi
-    echo "${___X_CMD_ENV_ARCH}" "66666666666666"
     if [ $# -eq 0 ]; then
         download_url="https://github.com/denoland/deno/releases/latest/download/deno-${___X_CMD_ENV_ARCH}.zip"
     else
@@ -81,15 +70,12 @@ ___x_cmd_env_deno_download_archive(){
 ___x_cmd_env_deno_unpack(){
 	local version="${1:?Provide a version}"
     env_log info "Unpacking: deno ${version}"
-
     local archive_path="$___X_CMD_ENV_PATH/deno/archive/deno-$version.zip"
 	x uz "$archive_path" "$(dirname "$archive_path")" || return 1
-
     local archive_unpack_files
     archive_unpack_files="$(dirname "$archive_path")/deno"
-
     local versions_path="$___X_CMD_ENV_PATH/deno/versions"
 	mkdir -p "$versions_path/${version}/bin"
-	mv -f "$archive_unpack_files/"* "${versions_path}/${version}/bin"
+	mv -f "$archive_unpack_files" "${versions_path}/${version}/bin"
 	rm -rf "$archive_unpack_files"
 }
