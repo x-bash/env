@@ -8,6 +8,7 @@ ___x_cmd_env_perl_get_system_platform(){
     local _platform
     local _arch
     local _compression
+    local ___X_CMD_ENV_PLATFORM
     _platform="$(x os name)"
     _arch="$(x os arch)"
     case "$_platform" in
@@ -31,8 +32,8 @@ ___x_cmd_env_perl_get_system_platform(){
         linux | darwin)     _compression=tar.gz   ;;
         win)                _compression=zip      ;;
         *)                  env_log error "your arch:(" "$(___x_cmd_os name)" ") are not supported"
-                            return 1
-                            ;;
+                             return 1
+                             ;;
     esac
 }
 # EndSection
@@ -43,13 +44,14 @@ ___x_cmd_env_perl_ls_remote(){
     local cache_expiration="${2:-86400}"
     ___x_cmd_env_perl_get_system_platform
     if [ "$___X_CMD_ENV_PLATFORM" = "linux" ] || [ "$___X_CMD_ENV_PLATFORM" = "darwin" ] ; then
-        ___x_cmd_httpget "https://api.github.com/repos/skaji/relocatable-perl/releases" "$cache_path" "$cache_expiration" && \
+        ___x_cmd_httpget "https://api.github.com/repos/skaji/relocatable-perl/releases" "$cache_path" "$cache_expiration" 2>/dev/null && \
             ja 'k()=="tag_name"{ print v(); }' < "$cache_path"
     fi
     if [ "$___X_CMD_ENV_PLATFORM" = "windows" ] ; then
-        ___x_cmd_httpget "https://strawberryperl.com/releases.html" "$cache_path" "$cache_expiration" && \
+        ___x_cmd_httpget "https://strawberryperl.com/releases.html" "$cache_path" "$cache_expiration" 2>/dev/null && \
             awk ' match($0, /<td><b>[0-9.]+<\/b><\/td>/) { print substr($0,RSTART+7,RLENGTH-16)}' < "$cache_path"
     fi
+
 }
 # EndSection
 
