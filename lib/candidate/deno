@@ -1,8 +1,4 @@
 # shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263    # xrc
-. "$___X_CMD_ROOT_MOD/jawk"
-alias ja=___x_cmd_jawk
-xrc jawk
-
 
  # Section: utils
 ___x_cmd_env_deno_get_system_platform(){
@@ -38,8 +34,9 @@ ___x_cmd_env_deno_get_system_platform(){
 ___x_cmd_env_deno_ls_remote(){
     local cache="$___X_CMD_ENV_PATH/deno/cache/version_list"
     local cache_expiration=${2:-1}
-    ___x_cmd_httpget "https://api.github.com/repos/denoland/deno/releases" "${cache}" - && \
-        ja 'k()=="tag_name"{ print substr(v(),2); }' <"$cache"
+
+    ___x_cmd_httpget "https://api.github.com/repos/denoland/deno/releases" "${cache}" "$cache_expiration" && \
+        x ja 'k()=="tag_name"{ print substr(v(),2); }' <"$cache"
 }
 
 # EndSection

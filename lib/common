@@ -13,6 +13,10 @@ ___x_cmd_env_common_full_version(){
     printf "%s\n" "$version"
 }
 
+___x_cmd_env_common_sort_version(){
+    sort -t. -u -k 1.2,1n -k 2,2n -k 3,3n | sort -r 
+}
+
 ___x_cmd_env_common_ls_local(){
     local candidate="${1:?Provide candidate}"
     if [ -d "$___X_CMD_ENV_PATH/$candidate/versions" ]; then
