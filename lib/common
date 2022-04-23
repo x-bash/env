@@ -14,7 +14,17 @@ ___x_cmd_env_common_full_version(){
 }
 
 ___x_cmd_env_common_sort_version(){
-    sort -t. -u -k 1.2,1n -k 2,2n -k 3,3n | sort -r 
+    #TODO split them
+    sort -V -r | awk '{
+        version=$1
+        match(version, /[0-9]+\.[0-9+]+/)
+        prefix = substr(version,RSTART+0,RLENGTH-0)
+
+        if ( uniq_map[ prefix ] == "" ){
+            print version
+            uniq_map[ prefix ] = version
+        }
+    }'
 }
 
 ___x_cmd_env_common_ls_local(){
