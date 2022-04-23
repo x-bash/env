@@ -54,12 +54,12 @@ ___x_cmd_env_rust_download_archive(){
     local version="${1:?Provide a version}"
     local archive_path="$___X_CMD_ENV_PATH/rust/archive/rust-${version}.${___X_CMD_ENV_COMPRESSION}"
     echo "$archive_path %%%"
-    env:info "Downloading perl-${version}"
-    if ___x_cmd_env_util_is_archive_cached perl "$version" 2>/dev/null; then
+    env:info "Downloading rust-${version}"
+    if ___x_cmd_env_util_is_archive_cached rust "$version" 2>/dev/null; then
 		env:info  "Archive existed: $version"
 		return 0
 	fi
-    local url="https://static.rust-lang.org/dist/rust-${version}-${___X_CMD_ENV_ARCH}-${___X_CMD_ENV_PLATFORM}.${___X_CMD_ENV_COMPRESSION}"
+    local download_url="https://static.rust-lang.org/dist/rust-${version}-${___X_CMD_ENV_ARCH}-${___X_CMD_ENV_PLATFORM}.${___X_CMD_ENV_COMPRESSION}"
     echo "${url}"
     mkdir -p "$(dirname "${archive_path}")"
     if ! curl --progress-bar --location --retry-max-time 10 --retry 0 "$download_url" --output "$archive_path" ; then
@@ -69,13 +69,13 @@ ___x_cmd_env_rust_download_archive(){
         env:info "Download Successfully"
 }
 
-___x_cmd_env_unpack_rust(){
+___x_cmd_env_rust_unpack(){
     local version="${1:?Provide a version}"
-    env:info "Unpacking: perl ${version}"
-    ___x_cmd_env_perl_get_system_platform
+    env:info "Unpacking: rust ${version}"
+    ___x_cmd_env_rust_get_system_platform
     local archive_path="$___X_CMD_ENV_PATH/rust/archive/rust-${version}.${___X_CMD_ENV_COMPRESSION}"
     echo "$___X_CMD_ENV_COMPRESSION 222 "
-    x uz "$archive_path" "$(dirname "${archive_path}")" || return 1
+    x uz  "$archive_path" "$(dirname "${archive_path}")" || return 
 	local archive_unpack_files
 	local versions_path="$___X_CMD_ENV_PATH/rust/versions"
 	archive_unpack_files="$(dirname "${archive_path}")/rustc"
