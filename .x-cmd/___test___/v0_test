@@ -1,4 +1,4 @@
-shellcheck shell=sh disable=SC1072 #source
+# shellcheck shell=sh disable=SC1072 #source
 
 test_go(){
     x env install go 1.9 2>/dev/null

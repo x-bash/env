@@ -76,7 +76,7 @@ ___x_cmd_env_run_common_if_notfound(){
     if command -v "$cmd" >/dev/null; then
         "$cmd" "$@"
     else
-        env_log debug "Candidate ${candidate} has no op: $cmd, use common $op function."
+        env:debug "Candidate ${candidate} has no op: $cmd, use common $op function."
         "___x_cmd_env_common_${op}" "$candidate" "$@"
     fi
 }
@@ -96,7 +96,7 @@ A
 
     local candidate="${1}"
     if [ -z "$candidate" ]; then
-        env_log warn "No candidate specified"
+        env:warn "No candidate specified"
         ___x_cmd_env_main_ls --help
         return 1
     fi
@@ -133,7 +133,7 @@ A
     local candidate="${1}"
     local version
     if ! version="$(___x_cmd_env_run_common_if_notfound full_version "$candidate" "$2")"; then
-        env_log error "Version of $candidate not found: $version"
+        env:error "Version of $candidate not found: $version"
         return 1
     fi
     shift 2
@@ -156,7 +156,7 @@ A
     local candidate="${1}"
     local version
     if ! version="$(___x_cmd_env_run_common_if_notfound full_version "$candidate" "$2")"; then
-        env_log error "Version of $candidate not found: $version"
+        env:error "Version of $candidate not found: $version"
         return 1
     fi
     shift 2
@@ -216,7 +216,7 @@ A
 
     local version
     if ! version="$(___x_cmd_env_run_common_if_notfound full_version "$candidate" "$2")"; then
-        env_log error "Version of $candidate not found: $version"
+        env:error "Version of $candidate not found: $version"
         return 1
     fi
     shift 2
@@ -243,7 +243,7 @@ A
 
     local version
     if ! version="$(___x_cmd_env_run_common_if_notfound full_version "$candidate" "$2")"; then
-        env_log error "Version of $candidate not found: $version"
+        env:error "Version of $candidate not found: $version"
         return 1
     fi
     shift 2
@@ -279,7 +279,7 @@ A
 
     local version
     if ! version="$(___x_cmd_env_run_common_if_notfound full_version "$candidate" "$2")"; then
-        env_log error "Version of $candidate not found: $version"
+        env:error "Version of $candidate not found: $version"
         return 1
     fi
     shift 2
@@ -304,7 +304,10 @@ A
     fi
 
     local candidate
-    candidate="$(___x_cmd_env_util_cmd_to_candidate "$cmd")"
+    if ! candidate="$(___x_cmd_env_util_cmd_to_candidate "$cmd")" 2>/dev/null ; then
+        env:error "Command $cmd not found"
+        return 1
+    fi
 
     # TODO: can which specific versions
     ___x_cmd_env_run_common_if_notfound which "$candidate" "$cmd" "$@"
@@ -315,28 +318,33 @@ ___x_cmd_env_main_exec(){
     param:dsl <<A
 advise:
     #1        xrc env/latest && ___x_cmd_env_advise_ls_cmd
-    #2        xrc env/latest && ___x_cmd_env_advise_cmd_ls_local_version
 options:
-    #1        "Environment Candidates command you want to find"
-    #2        "Version"                <version>
+    #1        "Environment Candidates command and version you want to find, e.g. 'node=v16.9.0'"
 A
     param:run
 
-    local cmd="${1}"
-    if [ -z "$cmd" ]; then
+    local cmd="${1%%=*}"
+    if [ -z "$1" ]; then
         ___x_cmd_env_main_exec help
         return 1
     fi
 
     local candidate
-    candidate="$(___x_cmd_env_util_cmd_to_candidate "$cmd")"
-
-    local version
-    if ! version="$(___x_cmd_env_run_common_if_notfound full_version "$candidate" "$2")"; then
-        env_log error "Version of $candidate not found: $2"
+    if ! candidate="$(___x_cmd_env_util_cmd_to_candidate "$cmd")" 2>/dev/null ; then
+        env:error "Command $cmd not found"
         return 1
     fi
-    shift 2
+
+    local version
+    case "$1" in
+        *=*) version="${1#*=}" ;;
+    esac
+
+    if ! version="$(___x_cmd_env_run_common_if_notfound full_version "$candidate" "$version")"; then
+        env:error "Version of $candidate not found: $2"
+        return 1
+    fi
+    shift 1
 
     ___x_cmd_env_run_common_if_notfound exec "$candidate" "$cmd" "$version" "$@"
 }
