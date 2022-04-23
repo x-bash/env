@@ -70,16 +70,19 @@ ___x_cmd_env_rust_download_archive(){
 }
 
 ___x_cmd_env_rust_unpack(){
+    ___x_cmd_env_rust_get_system_platform
     local version="${1:?Provide a version}"
     env:info "Unpacking: rust ${version}"
     ___x_cmd_env_rust_get_system_platform
     local archive_path="$___X_CMD_ENV_PATH/rust/archive/rust-${version}.${___X_CMD_ENV_COMPRESSION}"
     echo "$___X_CMD_ENV_COMPRESSION 222 "
-    x uz  "$archive_path" "$(dirname "${archive_path}")" || return 
+    x uz  "$archive_path" "$(dirname "${archive_path}")" 2>/dev/null || return
 	local archive_unpack_files
 	local versions_path="$___X_CMD_ENV_PATH/rust/versions"
-	archive_unpack_files="$(dirname "${archive_path}")/rustc"
+	archive_unpack_files="$(dirname "${archive_path}")/rust-${version}-${___X_CMD_ENV_ARCH}-${___X_CMD_ENV_PLATFORM}"
 	mkdir -p "$versions_path/${version}"
+    mv -f "${archive_unpack_files}/rustc/"* "${archive_unpack_files}"
+    rm -rf "${archive_unpack_files}/rustc"
     mv -f "$archive_unpack_files"/* "$___X_CMD_ENV_PATH/rust/versions/${version}"
 	rm -rf "$archive_unpack_files"
 }
