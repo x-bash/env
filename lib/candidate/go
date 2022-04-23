@@ -38,7 +38,7 @@ ___x_cmd_env_go_ls_remote(){
             awk -v platform="${platform}" -v arch="${arch}" 'match($0, "/dl/go[0-9.]+" platform "-" arch) {
                 match($0, "/dl/go[0-9.]+")
                 print substr($0, RSTART+6, RLENGTH-7)
-            }' < "$cache_path"  | ___x_cmd_env_common_sort_version
+            }' < "$cache_path"  | ___x_cmd_env_common_sort_version | ___x_cmd_env_common_simplify_version
     fi
 }
 # EndSection

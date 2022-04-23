@@ -9,7 +9,7 @@ ___x_cmd_env_gradle_ls_remote(){
 
     ___x_cmd_httpget "https://services.gradle.org/distributions/" "$cache_path" "$cache_expiration" && \
     awk 'match($0, /gradle-([0-9.]+)-all.zip"/){ print substr($0, RSTART+7, RLENGTH-16)}' <"$cache_path" \
-            | ___x_cmd_env_common_sort_version
+            | ___x_cmd_env_common_sort_version | ___x_cmd_env_common_simplify_version
 }
 
 # EndSection

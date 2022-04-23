@@ -24,7 +24,7 @@ ___x_cmd_env_node_ls_remote(){
                 else                                                    print version, codename
             }
             prev_codename=codename
-        }' <"$cache_path" | ___x_cmd_env_common_sort_version
+        }' <"$cache_path" | ___x_cmd_env_common_sort_version | ___x_cmd_env_common_simplify_version
 }
 
 # EndSection
