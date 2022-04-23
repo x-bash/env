@@ -1,16 +1,13 @@
 # shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263    # xrc
 
 # Section(util): get_system_platform
-xrc ja
 
 ___x_cmd_env_perl_get_system_platform(){
     xrc os
     local _platform
     local _arch
-    local _compression
-    local ___X_CMD_ENV_PLATFORM
-    _platform="$(x os name)"
-    _arch="$(x os arch)"
+    local _platform="$(x os name)"
+    local _arch="$(x os arch)"
     case "$_platform" in
         linux)      ___X_CMD_ENV_PLATFORM=linux    ;;
         win)        ___X_CMD_ENV_PLATFORM=windows  ;;
@@ -45,7 +42,7 @@ ___x_cmd_env_perl_ls_remote(){
     ___x_cmd_env_perl_get_system_platform
     if [ "$___X_CMD_ENV_PLATFORM" = "linux" ] || [ "$___X_CMD_ENV_PLATFORM" = "darwin" ] ; then
         ___x_cmd_httpget "https://api.github.com/repos/skaji/relocatable-perl/releases" "$cache_path" "$cache_expiration" 2>/dev/null && \
-            ja 'k()=="tag_name"{ print v(); }' < "$cache_path" | ___x_cmd_env_common_sort_version
+            ja 'k()=="tag_name"{ print v(); }' < "$cache_path" | ___x_cmd_env_common_sort_version | ___x_cmd_env_common_simplify_version
     fi
     if [ "$___X_CMD_ENV_PLATFORM" = "windows" ] ; then
         ___x_cmd_httpget "https://strawberryperl.com/releases.html" "$cache_path" "$cache_expiration" 2>/dev/null && \
