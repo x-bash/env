@@ -42,6 +42,7 @@ ___x_cmd_env_deno_download_archive(){
         env:info "Archive existed: $version"
         return 0
     fi
+    local download_url
     if [ $# -eq 0 ]; then
         download_url="https://github.com/denoland/deno/releases/latest/download/deno-${___X_CMD_ENV_PLATFORM}.zip"
     else

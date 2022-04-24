@@ -22,7 +22,7 @@ ___x_cmd_env_maven_download_archive(){
         return 0
     fi
     mkdir -p "$(dirname "${archive_path}")"
-    download_url="https://archive.apache.org/dist/maven/maven-3/${version}/binaries/apache-maven-${version}-bin.zip"
+    local download_url="https://archive.apache.org/dist/maven/maven-3/${version}/binaries/apache-maven-${version}-bin.zip"
     env:info "Downloading $download_url"
     if ! curl --progress-bar --location --retry-max-time 10 --retry 0 "$download_url" --output "$archive_path" ; then
         env:error "Download failure from $download_url"

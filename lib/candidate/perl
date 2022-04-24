@@ -68,6 +68,7 @@ ___x_cmd_env_perl_download_archive(){
     mkdir -p "$(dirname "${archive_path}")"
     local archive_path="$___X_CMD_ENV_PATH/perl/archive/perl-${version}.tar.gz"
 
+    local download_url
     if ___x_cmd_env_perl_get_system_platform ; then
         if [ "$___X_CMD_ENV_PLATFORM" = "linux" ] ; then
              download_url="https://github.com/skaji/relocatable-perl/releases/download/${version}/perl-x86_64-linux.tar.gz"

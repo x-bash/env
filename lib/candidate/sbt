@@ -19,7 +19,7 @@ ___x_cmd_env_sbt_download_archive(){
 	fi
     local archive_path="$___X_CMD_ENV_PATH/sbt/archive/sbt-${version}.tgz"
     mkdir -p "$(dirname ${archive_path})"
-    download_url="https://github.com/sbt/sbt/releases/download/v${version}/sbt-${version}.tgz"
+    local download_url="https://github.com/sbt/sbt/releases/download/v${version}/sbt-${version}.tgz"
     env:info "Downloading sbt ${download_url}"
     if ! curl --progress-bar --location --retry-max-time 10 --retry 0 "${download_url}" --output "${archive_path}"; then
 		env:info "Download failure"

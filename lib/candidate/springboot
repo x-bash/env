@@ -22,7 +22,7 @@ ___x_cmd_env_springboot_download_archive(){
         return 0
     fi
     mkdir -p "$(dirname "${archive_path}")"
-    download_url="https://repo.spring.io/simple/release/org/springframework/boot/spring-boot-cli/${version}/spring-boot-cli-${version}-bin.zip"
+    local download_url="https://repo.spring.io/simple/release/org/springframework/boot/spring-boot-cli/${version}/spring-boot-cli-${version}-bin.zip"
     env:info "Downloading"
     if ! curl --progress-bar --location --retry-max-time 10 --retry 0 "$download_url" --output "$archive_path" ; then
         env:error "Download failure from $download_url"
