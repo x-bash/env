@@ -25,7 +25,7 @@ ___x_cmd_env_deno_get_platform(){
 # Section: ls, la
 ___x_cmd_env_deno_ls_remote(){
     local cache="$___X_CMD_ENV_PATH/deno/cache/version_list"
-    local cache_expiration="${2:-1}"
+    local cache_expiration="${2:-86400}"
 
     ___x_cmd_httpget "https://api.github.com/repos/denoland/deno/releases" "${cache}" "$cache_expiration" && \
         x ja 'k()=="tag_name"{ print substr(v(),2); }' <"$cache" \
