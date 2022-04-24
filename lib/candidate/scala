@@ -22,10 +22,8 @@ ___x_cmd_env_scala_download_archive(){
 
     # TODO: optimizable
     case ${version} in
-        2.10*) download_url="https://downloads.lightbend.com/scala/${version}/scala-${version}.zip"                 ;;
+        2.10*|2.13*|2.12*) download_url="https://downloads.lightbend.com/scala/${version}/scala-${version}.zip"     ;;
         2.11*) download_url="http://downloads.typesafe.com/scala/${version}/scala-${version}.zip"                   ;;
-        2.12*) download_url="http://downloads.lightbend.com/scala/${version}/scala-${version}.zip"                  ;;
-        2.13*) download_url="https://downloads.lightbend.com/scala/${version}/scala-${version}.zip"                 ;;
         3.* )  download_url="https://github.com/lampepfl/dotty/releases/download/${version}/scala3-${version}.zip"  ;;
     esac
 
