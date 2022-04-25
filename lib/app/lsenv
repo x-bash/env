@@ -4,6 +4,13 @@ xrc ui/lib/region
 xrc ui/lib/varctl
 
 ___x_cmd_ui_lsenv(){
+    local tgzfilepath="$___X_CMD_ENV_PATH/info.tgz"
+    if ! ___x_cmd_httpget_gitx x-cmd env main "dist/info.tgz" "$tgzfilepath" 86400; then # 1-day
+        env:error "Unaviable info.tgz. Unable to fetch info.tgz."
+        return 1
+    fi
+    x uz "$tgzfilepath" "$___X_CMD_ENV_PATH" 2>/dev/null
+
     local ___X_CMD_UI_LSENV_FINAL_COMMAND
     local ___X_CMD_UI_LSENV_CURRENT_VERSION
     ___x_cmd_ui_region_autorefresh_with_keyboard ___x_cmd_ui_lsenv_mainloop_awk
