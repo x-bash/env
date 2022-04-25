@@ -1,8 +1,8 @@
 # shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263    # xrc
 
-# Section: full_version sort_version simplify_version
+# Section: full_version_remote sort_version simplify_version
 
-___x_cmd_env_common_full_version(){
+___x_cmd_env_common_full_version_remote(){
     local candidate="${1:?Provide candidate}"
     local version="${2}"
 

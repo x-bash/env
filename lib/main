@@ -132,7 +132,7 @@ A
 
     local candidate="${1}"
     local version
-    if ! version="$(___x_cmd_env_run_common_if_notfound full_version "$candidate" "$2")"; then
+    if ! version="$(___x_cmd_env_run_common_if_notfound full_version_remote "$candidate" "$2")"; then
         env:error "Version of $candidate not found: $version"
         return 1
     fi
@@ -155,7 +155,7 @@ A
 
     local candidate="${1}"
     local version
-    if ! version="$(___x_cmd_env_run_common_if_notfound full_version "$candidate" "$2")"; then
+    if ! version="$(___x_cmd_env_run_common_if_notfound full_version_remote "$candidate" "$2")"; then
         env:error "Version of $candidate not found: $version"
         return 1
     fi
@@ -214,7 +214,7 @@ A
     fi
 
     local version
-    if ! version="$(___x_cmd_env_run_common_if_notfound full_version "$candidate" "$2")"; then
+    if ! version="$(___x_cmd_env_run_common_if_notfound full_version_remote "$candidate" "$2")"; then
         env:error "Version of $candidate not found: $version"
         return 1
     fi
@@ -276,7 +276,7 @@ A
     fi
 
     local version
-    if ! version="$(___x_cmd_env_run_common_if_notfound full_version "$candidate" "$2")"; then
+    if ! version="$(___x_cmd_env_run_common_if_notfound full_version_remote "$candidate" "$2")"; then
         env:error "Version of $candidate not found: $version"
         return 1
     fi
@@ -338,7 +338,7 @@ A
         *=*) version="${1#*=}" ;;
     esac
 
-    if ! version="$(___x_cmd_env_run_common_if_notfound full_version "$candidate" "$version")"; then
+    if ! version="$(___x_cmd_env_run_common_if_notfound full_version_remote "$candidate" "$version")"; then
         env:error "Version of $candidate not found: $2"
         return 1
     fi
