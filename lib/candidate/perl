@@ -1,7 +1,6 @@
 # shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263    # xrc
 
 # Section(util): get_system_platform
-xrc ja
 
 ___x_cmd_env_perl_get_system_platform(){
     xrc os

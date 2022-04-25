@@ -13,7 +13,8 @@ perl
 springboot
 deno
 kotlin
-gradle"
+gradle
+"
 
 }
 
@@ -178,7 +179,7 @@ ___x_cmd_env_main_current(){
         local version
         ___x_cmd_env_candidate_all | while read -r candidate; do
             if version="$(___x_cmd_env_run_common_if_notfound current "$candidate" 2>/dev/null)" ; then
-                printf "%s\t%s\n" "$candidate" "$version"
+                printf "%-16s  %s\n" "$candidate" "$version"
             fi
         done
         return
