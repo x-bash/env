@@ -24,11 +24,12 @@ ___x_cmd_env_deno_get_platform(){
 
 # Section: ls, la
 ___x_cmd_env_deno_ls_remote(){
-    local cache="$___X_CMD_ENV_PATH/deno/cache/version_list"
+    local pattern="${1:-""}"
     local cache_expiration="${2:-86400}"
+    local cache="$___X_CMD_ENV_PATH/deno/cache/version_list"
 
     ___x_cmd_httpget "https://api.github.com/repos/denoland/deno/releases" "${cache}" "$cache_expiration" && \
-        x ja 'k()=="tag_name"{ print substr(v(),2); }' <"$cache" \
+        x ja 'k()=="tag_name" && (("'"$pattern"'" == "") || ( index( v(), "'"$pattern"'" ) > 0)) { print substr(v(),2); }' <"$cache" \
         | ___x_cmd_env_common_sort_version | ___x_cmd_env_common_simplify_version
 }
 
