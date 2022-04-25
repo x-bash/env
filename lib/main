@@ -231,7 +231,7 @@ advise:
     #2        xrc env/latest && ___x_cmd_env_advise_ls_local_version
 options:
     #1        "Environment Candidates" <candidates>:candidates_list
-    #2        "Version"                <version>
+    #2        "Version"
 A
     param:run
 
@@ -242,13 +242,14 @@ A
     fi
 
     local version
-    if ! version="$(___x_cmd_env_run_common_if_notfound full_version "$candidate" "$2")"; then
-        env:error "Version of $candidate not found: $version"
+    version="${2:-"$(___x_cmd_env_run_common_if_notfound current "$candidate")"}"
+    version="$(___x_cmd_env_run_common_if_notfound full_version "$candidate" "$version")"
+    if [ -z "$version" ] || [ "$version" = "system" ]; then
+        env:error "Version of $candidate was not installed by xenv: $version"
         return 1
     fi
-    shift 2
 
-    ___x_cmd_env_run_common_if_notfound uninstall "$candidate" "$version" "$@"
+    ___x_cmd_env_run_common_if_notfound uninstall "$candidate" "$version"
 }
 # EndSection
 

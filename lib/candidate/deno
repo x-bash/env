@@ -35,7 +35,7 @@ ___x_cmd_env_deno_ls_remote(){
 # EndSection
 
 ___x_cmd_env_deno_download_archive(){
-    local version="${1:?""}"
+    local version="${1:?Provide a version}"
     local ___X_CMD_ENV_PLATFORM
     ___x_cmd_env_deno_get_platform
     if ___x_cmd_env_util_is_archive_cached deno "$version" 2>/dev/null; then
