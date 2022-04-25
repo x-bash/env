@@ -24,7 +24,7 @@ ___x_cmd_env_go_get_system_platform(){
 }
 # EndSection
 
-# Section: Go ls_remote
+# Section: ls_remote
 
 ___x_cmd_env_go_ls_remote(){
     local cache_path="$___X_CMD_ENV_PATH/go/cache/version_list"

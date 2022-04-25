@@ -4,12 +4,16 @@
 
 ___x_cmd_env_common_full_version_remote(){
     local candidate="${1:?Provide candidate}"
-    local version="${2}"
+    local pattern="${2}"
+    ___x_cmd_env_run_common_if_notfound ls_remote "$candidate" "$pattern" "$3" \
+        | awk 'END{ if (NR<=0) { exit(1) } else print $1;}'
+}
 
-    if [ -z "$version" ]; then
-        ___x_cmd_env_"$candidate"_ls_remote "$version" "$3" | awk 'END{ if (NR<=0) { exit(1) } else print $1;}'
-    fi
-    printf "%s\n" "$version"
+___x_cmd_env_common_full_version_local(){
+    local candidate="${1:?Provide candidate}"
+    local pattern="${2}"
+    ___x_cmd_env_run_common_if_notfound ls_local "$candidate" "$pattern" "$3" \
+        | awk 'END{ if (NR<=0) { exit(1) } else print $1;}'
 }
 
 ___x_cmd_env_common_sort_version(){
@@ -28,17 +32,18 @@ ___x_cmd_env_common_simplify_version(){
         }
         last = version
     }
-    END{
-        if ( last != "" ) { print last ; }
-    }'
+    END{ if ( last != "" ) { print last ; }}'
 }
 # EndSection
 
-# Section: ls_local ls_remote
+# Section: ls_local
 ___x_cmd_env_common_ls_local(){
     local candidate="${1:?Provide candidate}"
+    local pattern="${2}"
     if [ -d "$___X_CMD_ENV_PATH/$candidate/versions" ]; then
-        ls "$___X_CMD_ENV_PATH/$candidate/versions"
+        for version in "$___X_CMD_ENV_PATH/$candidate/versions"/*"$pattern"* ; do
+            printf "%s\n" "${version##*/}"
+        done 2>/dev/null | ___x_cmd_env_common_sort_version
     fi
 }
 
@@ -210,7 +215,7 @@ ___x_cmd_env_common_uninstall(){
 # Section: which, exec
 ___x_cmd_env_common_which(){
     local candidate="${1:?Provide candidate}"
-    local cmd="${2:?Provide command}"
+    local cmd="${2:-"$candidate"}"
     local cmd_path
     cmd_path="$(command -v "$cmd")"
 

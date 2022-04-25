@@ -12,7 +12,7 @@ ___x_cmd_env_sbt_ls_remote(){
 
 # Section: sbt download_archive
 ___x_cmd_env_sbt_download_archive(){
-    local version=${1:?Provide a version}
+    local version="${1:?Provide a version}"
     if ___x_cmd_env_util_is_archive_cached sbt "$version" 2>/dev/null; then
 		env:info  "Archive existed: $version"
 		return 0
