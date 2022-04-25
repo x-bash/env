@@ -159,9 +159,8 @@ A
         env:error "Version of $candidate not found: $version"
         return 1
     fi
-    shift 2
 
-    ___x_cmd_env_run_common_if_notfound use "$candidate" "$version" "$use_shims" "$@"
+    ___x_cmd_env_run_common_if_notfound use "$candidate" "$version" "$use_shims"
 }
 
 ___x_cmd_env_main_ws(){
@@ -219,9 +218,8 @@ A
         env:error "Version of $candidate not found: $version"
         return 1
     fi
-    shift 2
 
-    ___x_cmd_env_run_common_if_notfound install "$candidate" "$version" "$use_shims" "$@"
+    ___x_cmd_env_run_common_if_notfound install "$candidate" "$version" "$use_shims"
 }
 
 ___x_cmd_env_main_uninstall(){
@@ -243,7 +241,6 @@ A
 
     local version
     version="${2:-"$(___x_cmd_env_run_common_if_notfound current "$candidate")"}"
-    version="$(___x_cmd_env_run_common_if_notfound full_version "$candidate" "$version")"
     if [ -z "$version" ] || [ "$version" = "system" ]; then
         env:error "Version of $candidate was not installed by xenv: $version"
         return 1
