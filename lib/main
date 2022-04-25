@@ -69,8 +69,6 @@ A
 ___x_cmd_env_run_common_if_notfound(){
     local op="${1:?Provide op}";  shift
     local candidate="${1:?Provide candidate}";  shift
-
-    # TODO: It might be better to have one folder for one language.
     xrc:mod:lib env "candidate/$candidate"
 
     local cmd="___x_cmd_env_${candidate}_${op}"
