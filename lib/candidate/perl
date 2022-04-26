@@ -3,7 +3,6 @@
 # Section(util): get_system_platform
 
 ___x_cmd_env_perl_get_system_platform(){
-    xrc os
     local _platform
     local _arch
     local _platform="$(x os name)"
@@ -69,10 +68,6 @@ ___x_cmd_env_perl_download_archive(){
 	fi
     mkdir -p "$(dirname "${archive_path}")"
     local archive_path="$___X_CMD_ENV_PATH/perl/archive/perl-${version}.tar.gz"
-<<<<<<< HEAD
-=======
-
->>>>>>> 3f7bb490f78dcb1f47dde074828139d7f54715f9
     local download_url
     if ___x_cmd_env_perl_get_system_platform ; then
         if [ "$___X_CMD_ENV_PLATFORM" = "linux" ] ; then
