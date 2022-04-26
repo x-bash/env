@@ -177,6 +177,32 @@ ___x_cmd_env_common_download(){
 	fi
 }
 
+___x_cmd_env_common_download_archive(){
+    local candidate="${1:?Provide canddidate}"
+    local version="${2:?Provide version}"
+
+    if ___x_cmd_env_util_is_archive_cached "$candidate" "$version" 2>/dev/null; then
+        env:info "Archive existed: $version"
+        return 0
+    fi
+
+    local archive_path="$___X_CMD_ENV_PATH/$candidate/archive/$candidate-$version.zip"
+    mkdir -p "${archive_path%/*}"
+    local download_url
+    if ! download_url="$(___x_cmd_env_run_common_if_notfound get_download_url "$candidate" "$version")"; then
+        env:error "Failed to get download url for $candidate $version"
+        return 1
+    fi
+
+    env:info "Downloading $download_url"
+    if ! curl --progress-bar --location --retry-max-time 10 --retry 0 "$download_url" --output "$archive_path" ; then
+        env:error "Download failure from $download_url"
+        return 1
+    fi
+
+    env:info "Download completed $download_url"
+}
+
 ___x_cmd_env_common_unpack(){
     local candidate="${1:?Provide canddidate}"
 	local version="${2:?Provide a version}"

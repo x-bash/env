@@ -20,25 +20,9 @@ ___x_cmd_env_gradle_ls_remote(){
 
 # Section: download
 
-___x_cmd_env_gradle_download_archive(){
-    local version="${1:?Provide gradle version}"
-
-    if ___x_cmd_env_util_is_archive_cached gradle "$version" 2>/dev/null; then
-        env:info "Archive existed: $version"
-        return 0
-    fi
-
-    local archive_path="$___X_CMD_ENV_PATH/gradle/archive/gradle-$version.zip"
-    mkdir -p "${archive_path%/*}"
-    local download_url="https://services.gradle.org/distributions/gradle-$version-all.zip"
-
-    env:info "Downloading $download_url"
-    if ! curl --progress-bar --location --retry-max-time 10 --retry 0 "$download_url" --output "$archive_path" ; then
-        env:error "Download failure from $download_url"
-        return 1
-    fi
-
-    env:info "Download completed $download_url"
+___x_cmd_env_gradle_get_download_url(){
+    local version="${1:?Provide a version}"
+    printf "https://services.gradle.org/distributions/gradle-%s-all.zip" "$version"
 }
 
 # EndSection
