@@ -6,9 +6,9 @@ ___x_cmd_env_rust_get_system_platform(){
     _platform="$(x os name)"
     _arch="$(x os arch)"
     case "$_platform" in
-        linux)      ___X_CMD_ENV_PLATFORM=unknown-linux-gnu                   ;;
+        linux)      ___X_CMD_ENV_PLATFORM=unknown-linux-gnu                ;;
         windows)    ___X_CMD_ENV_PLATFORM=pc-windows-msvc                  ;;
-        darwin)     ___X_CMD_ENV_PLATFORM=apple-darwin                    ;;
+        darwin)     ___X_CMD_ENV_PLATFORM=apple-darwin                     ;;
         *)          env:error "your arch:(" "$_platform" ") are not supported"
                     return 1
                     ;;
@@ -26,47 +26,40 @@ ___x_cmd_env_rust_get_system_platform(){
     esac
     case "$_platform" in
         linux)      ___X_CMD_ENV_COMPRESSION=tar.gz                   ;;
-        windows)    ___X_CMD_ENV_COMPRESSION=msi                 ;;
-        darwin)     ___X_CMD_ENV_COMPRESSION=pkg                  ;;
+        windows)    ___X_CMD_ENV_COMPRESSION=msi                      ;;
+        darwin)     ___X_CMD_ENV_COMPRESSION=pkg                      ;;
         *)          env:error "your arch:(" "$_platform" ") are not supported"
                     return 1
                     ;;
     esac
-
     if [ "$_platform" != "linux" ] && [ "$_platform" != "darwin" ] && [  "$_platform" != "win" ] ; then
         env:error "your OS:(" "$_platform" ") are not supported"
     fi
-    echo "$___X_CMD_ENV_COMPRESSION 111 "
 }
 
 ___x_cmd_env_rust_ls_remote(){
     local cache_path="$___X_CMD_ENV_PATH/rust/cache/version_list"
     local cache_expiration="${2:-86400}"
-
-
     ___x_cmd_httpget "https://api.github.com/repos/rust-lang/rust/releases" "$cache_path" "$cache_expiration" && \
-        x ja ' k()=="tag_name"{print v()} ' < "$cache_path" \
-        | ___x_cmd_env_common_sort_version | ___x_cmd_env_common_simplify_version
+        x ja ' k()=="tag_name"{print v()} ' < "$cache_path" | ___x_cmd_env_common_sort_version | ___x_cmd_env_common_simplify_version
 }
 
 ___x_cmd_env_rust_download_archive(){
     ___x_cmd_env_rust_get_system_platform
     local version="${1:?Provide a version}"
     local archive_path="$___X_CMD_ENV_PATH/rust/archive/rust-${version}.${___X_CMD_ENV_COMPRESSION}"
-    echo "$archive_path %%%"
     env:info "Downloading rust-${version}"
     if ___x_cmd_env_util_is_archive_cached rust "$version" 2>/dev/null; then
 		env:info  "Archive existed: $version"
 		return 0
 	fi
     local download_url="https://static.rust-lang.org/dist/rust-${version}-${___X_CMD_ENV_ARCH}-${___X_CMD_ENV_PLATFORM}.${___X_CMD_ENV_COMPRESSION}"
-    echo "${url}"
     mkdir -p "$(dirname "${archive_path}")"
     if ! curl --progress-bar --location --retry-max-time 10 --retry 0 "$download_url" --output "$archive_path" ; then
         env:error "Download failure from $download_url"
         return 1
     fi
-        env:info "Download Successfully"
+    env:info "Download Successfully"
 }
 
 ___x_cmd_env_rust_unpack(){
@@ -75,7 +68,6 @@ ___x_cmd_env_rust_unpack(){
     env:info "Unpacking: rust ${version}"
     ___x_cmd_env_rust_get_system_platform
     local archive_path="$___X_CMD_ENV_PATH/rust/archive/rust-${version}.${___X_CMD_ENV_COMPRESSION}"
-    echo "$___X_CMD_ENV_COMPRESSION 222 "
     x uz  "$archive_path" "$(dirname "${archive_path}")" 2>/dev/null || return
 	local archive_unpack_files
 	local versions_path="$___X_CMD_ENV_PATH/rust/versions"
@@ -85,4 +77,5 @@ ___x_cmd_env_rust_unpack(){
     rm -rf "${archive_unpack_files}/rustc"
     mv -f "$archive_unpack_files"/* "$___X_CMD_ENV_PATH/rust/versions/${version}"
 	rm -rf "$archive_unpack_files"
+    env:info "unpack Successfully"
 }
