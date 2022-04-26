@@ -28,7 +28,6 @@ case $1 in
         cross_env_test
         ;;
     python)
-        # TODO: Check if this version is available in your system
         env:info "Testing python ls."
         x env ls python
 
