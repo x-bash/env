@@ -185,8 +185,9 @@ ___x_cmd_env_common_download_archive(){
         env:info "Archive existed: $version"
         return 0
     fi
+    local compression=$(___x_cmd_env_sbt_get_compression "$candidate")
 
-    local archive_path="$___X_CMD_ENV_PATH/$candidate/archive/$candidate-$version.zip"
+    local archive_path="$___X_CMD_ENV_PATH/$candidate/archive/$candidate-$version.${compression:-zip}"
     mkdir -p "${archive_path%/*}"
     local download_url
     if ! download_url="$(___x_cmd_env_run_common_if_notfound get_download_url "$candidate" "$version")"; then

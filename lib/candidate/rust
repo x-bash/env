@@ -44,22 +44,10 @@ ___x_cmd_env_rust_ls_remote(){
         x ja ' k()=="tag_name"{print v()} ' < "$cache_path" | ___x_cmd_env_common_sort_version | ___x_cmd_env_common_simplify_version
 }
 
-___x_cmd_env_rust_download_archive(){
+___x_cmd_env_rust_get_download_url(){
+    local version=${1:?Provide a version}
     ___x_cmd_env_rust_get_system_platform
-    local version="${1:?Provide a version}"
-    local archive_path="$___X_CMD_ENV_PATH/rust/archive/rust-${version}.${___X_CMD_ENV_COMPRESSION}"
-    env:info "Downloading rust-${version}"
-    if ___x_cmd_env_util_is_archive_cached rust "$version" 2>/dev/null; then
-		env:info  "Archive existed: $version"
-		return 0
-	fi
-    local download_url="https://static.rust-lang.org/dist/rust-${version}-${___X_CMD_ENV_ARCH}-${___X_CMD_ENV_PLATFORM}.${___X_CMD_ENV_COMPRESSION}"
-    mkdir -p "$(dirname "${archive_path}")"
-    if ! curl --progress-bar --location --retry-max-time 10 --retry 0 "$download_url" --output "$archive_path" ; then
-        env:error "Download failure from $download_url"
-        return 1
-    fi
-    env:info "Download Successfully"
+    printf "https://static.rust-lang.org/dist/rust-%s-%s-%s.%s" "${version}" "${___X_CMD_ENV_ARCH}" "${___X_CMD_ENV_PLATFORM}" "${___X_CMD_ENV_COMPRESSION}"
 }
 
 ___x_cmd_env_rust_unpack(){
@@ -73,9 +61,11 @@ ___x_cmd_env_rust_unpack(){
 	local versions_path="$___X_CMD_ENV_PATH/rust/versions"
 	archive_unpack_files="$(dirname "${archive_path}")/rust-${version}-${___X_CMD_ENV_ARCH}-${___X_CMD_ENV_PLATFORM}"
 	mkdir -p "$versions_path/${version}"
-    mv -f "${archive_unpack_files}/rustc/"* "${archive_unpack_files}"
-    rm -rf "${archive_unpack_files}/rustc"
-    mv -f "$archive_unpack_files"/* "$___X_CMD_ENV_PATH/rust/versions/${version}"
-	rm -rf "$archive_unpack_files"
+    
+
+    # mv -f "${archive_unpack_files}/rustc/"* "${archive_unpack_files}"
+    # rm -rf "${archive_unpack_files}/rustc"
+    # mv -f "$archive_unpack_files"/* "$___X_CMD_ENV_PATH/rust/versions/${version}"
+	# rm -rf "$archive_unpack_files"
     env:info "unpack Successfully"
 }

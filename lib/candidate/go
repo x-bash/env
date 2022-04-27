@@ -4,18 +4,18 @@
 
 ___x_cmd_env_go_get_system_platform(){
     case "$(x os name)" in
-        linux)      platform=linux    ;;
-        win)        platform=windows  ;;
-        darwin)     platform=darwin   ;;
-        *)          env:error "your arch:(" "$(___x_cmd_os name)" ") are not supported"
+        linux)      ___x_cmd_env_platform=linux    ;;
+        win)        ___x_cmd_env_platform=windows  ;;
+        darwin)     ___x_cmd_env_platform=darwin   ;;
+        *)          _env:error "your arch:(" "$(___x_cmd_os name)" ") are not supported"
                     return 1
                     ;;
     esac
     case "$(x os arch)" in
-        x86)           arch=386        ;;
-        x64)           arch=amd64      ;;
-        arm64)         arch=arm64      ;;
-        armv7l|ARMv6)  arch=armv6l     ;;
+        x86)           ___x_cmd_env_arch=386        ;;
+        x64)           ___x_cmd_env_arch=amd64      ;;
+        arm64)         ___x_cmd_env_arch=arm64      ;;
+        armv7l|ARMv6)  ___x_cmd_env_arch=armv6l     ;;
         *)  env:error "your arch:(" "$(___x_cmd_os arch)" ") are not supported"
             return 1
             ;;
@@ -49,25 +49,10 @@ ___x_cmd_env_go_ls_remote(){
 
 # Section: download
 
-___x_cmd_env_go_download_archive(){
-    local version="${1:?Provide a version}"
-    if ___x_cmd_env_util_is_archive_cached go "$version" 2>/dev/null; then
-        env:info "Archive existed: $version"
-        return 0
-    fi
-
-    if ___x_cmd_env_go_get_system_platform ; then
-        local compression='tar.gz'; [ "${platform}" = 'windows' ] && compression='zip'
-        local download_url="https://golang.google.cn/dl/go${version}.${platform}-${arch}.${compression}"
-        env:info "Downloading go ${download_url}"
-    fi
-    local archive_path="$___X_CMD_ENV_PATH/go/archive/go-${version}.${compression}"
-    mkdir -p "$(dirname "$archive_path")"
-    if ! curl --progress-bar --location --retry-max-time 10 --retry 0 "${download_url}" --output "${archive_path}"; then
-	    env:info "Download failure"
-	    return 1
-	fi
-   env:info "Download Done"
+___x_cmd_env_deno_get_download_url(){
+    local version=${1:?Provide a version}
+    local compression='tar.gz'; [ "${___x_cmd_env_platform}" = 'windows' ] && compression='zip'
+    printf "https://golang.google.cn/dl/go%s.%s-%s.%s" "${version}" "${___x_cmd_env_platform}" "${___x_cmd_env_arch}" "${compression}"
 }
 
 # EndSection

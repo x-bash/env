@@ -20,25 +20,17 @@ ___x_cmd_env_springboot_ls_remote(){
 
 # Section: download
 
-___x_cmd_env_springboot_download_archive(){
+___x_cmd_env_springboot_get_download_url(){
     local version="${1:?Provide a version}"
-    local archive_path="$___X_CMD_ENV_PATH/springboot/archive/springboot-${version}.zip"
-    if ___x_cmd_env_util_is_archive_cached springboot "$version" 2>/dev/null; then
-        env:info "Archive existed: $version"
-        return 0
-    fi
-    mkdir -p "$(dirname "${archive_path}")"
-    local download_url="https://repo.spring.io/simple/release/org/springframework/boot/spring-boot-cli/${version}/spring-boot-cli-${version}-bin.zip"
-    env:info "Downloading"
-    if ! curl --progress-bar --location --retry-max-time 10 --retry 0 "$download_url" --output "$archive_path" ; then
-        env:error "Download failure from $download_url"
-        return 1
-    fi
+    printf "https://repo.spring.io/simple/release/org/springframework/boot/spring-boot-cli/%s/spring-boot-cli-%s-bin.zip" "${version}" "${version}"
 }
 
 # EndSection
 
 # Section: unpack
+___x_cmd_env_sbt_get_compression(){
+    printf 'zip'
+}
 
 ___x_cmd_env_springboot_copy_to_unpackdir(){
     local version="${1:?Provide a version}"
