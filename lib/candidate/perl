@@ -42,7 +42,7 @@ ___x_cmd_env_perl_ls_remote(){
     ___x_cmd_env_perl_get_system_platform
     if [ "$___X_CMD_ENV_PLATFORM" = "linux" ] || [ "$___X_CMD_ENV_PLATFORM" = "darwin" ] ; then
         ___x_cmd_httpget "https://api.github.com/repos/skaji/relocatable-perl/releases" "$cache_path" "$cache_expiration" 2>/dev/null && \
-            ja 'k()=="tag_name" && (("'"$pattern"'" == "") || ( index( v(), "'"$pattern"'" ) > 0)){ print v(); }' < "$cache_path" | ___x_cmd_env_common_sort_version
+            x ja 'k()=="tag_name" && (("'"$pattern"'" == "") || ( index( v(), "'"$pattern"'" ) > 0)){ print v(); }' < "$cache_path" | ___x_cmd_env_common_sort_version
     fi
     if [ "$___X_CMD_ENV_PLATFORM" = "windows" ] ; then
         ___x_cmd_httpget "https://strawberryperl.com/releases.html" "$cache_path" "$cache_expiration" 2>/dev/null && \
@@ -57,59 +57,42 @@ ___x_cmd_env_perl_ls_remote(){
 # EndSection
 
 # Section: download
-___x_cmd_env_perl_download_archive(){
-    local version="${1:?Provide a version}"
-    local archive_path="$___X_CMD_ENV_PATH/perl/archive/perl-${version}.${_compression}"
-    ___x_cmd_env_perl_get_system_platform
-    env:info "Downloading perl-${version}"
-    if ___x_cmd_env_util_is_archive_cached perl "$version" 2>/dev/null; then
-		env:info  "Archive existed: $version"
-		return 0
-	fi
-    mkdir -p "$(dirname "${archive_path}")"
-    local archive_path="$___X_CMD_ENV_PATH/perl/archive/perl-${version}.tar.gz"
-    local download_url
+___x_cmd_env_perl_get_download_url(){
+    local version=${version}
     if ___x_cmd_env_perl_get_system_platform ; then
         if [ "$___X_CMD_ENV_PLATFORM" = "linux" ] ; then
-             download_url="https://github.com/skaji/relocatable-perl/releases/download/${version}/perl-x86_64-linux.tar.gz"
+             printf "https://github.com/skaji/relocatable-perl/releases/download/%s/perl-x86_64-linux.tar.gz" "${version}"
         elif [ "$___X_CMD_ENV_PLATFORM" = "darwin" ] ; then
-             download_url="https://github.com/skaji/relocatable-perl/releases/download/${version}/perl-darwin-2level.tar.gz"
+             printf "https://github.com/skaji/relocatable-perl/releases/download/%s/perl-darwin-2level.tar.gz" "${version}s"
         else [ "$___X_CMD_ENV_PLATFORM" = "windows" ] ;
-             download_url="https://strawberryperl.com/download/${version}/strawberry-perl-${version}-${_arch}.zip"
+             printf "https://strawberryperl.com/download/%s/strawberry-perl-%s-%s.zip" "${version}" "${version}" "${_arch}"
         fi
     fi
-    if ! curl --progress-bar --location --retry-max-time 10 --retry 0 "$download_url" --output "$archive_path" ; then
-        env:error "Download failure from $download_url"
-        return 1
-    fi
-        env:info "Download Successfully"
-
 }
 # EndSection
 
 # Section: unpack
+___x_cmd_env_go_get_compression(){
+    case "$(x os name)" in
+        "darwin" | "linux")  printf "%s" "tar.gz" ;;
+    esac
+}
 
-___x_cmd_env_perl_unpack(){
+___x_cmd_env_perl_copy_to_unpackdir(){
     local version="${1:?Provide a version}"
-    env:info "Unpacking: perl ${version}"
-    local archive_path="$___X_CMD_ENV_PATH/perl/archive/perl-${version}.tar.gz"
-    ___x_cmd_env_perl_get_system_platform
+
+
     if [ "$___X_CMD_ENV_PLATFORM" = "linux" ] ; then
         archive_unpack_files="$(dirname "$archive_path")/perl-x86_64-linux"
-        archive_path="$___X_CMD_ENV_PATH/perl/archive/perl-${version}.tar.gz"
     fi
     if [ "$___X_CMD_ENV_PLATFORM" = "darwin" ] ; then
         archive_unpack_files="$(dirname "$archive_path")/perl-darwin-2level"
-        archive_path="$___X_CMD_ENV_PATH/perl/archive/perl-${version}.tar.gz"
     fi
     if [ "$___X_CMD_ENV_PLATFORM" = "windows" ] ; then
         archive_unpack_files="$(dirname "$archive_path")/perl-darwin-2level"
-        archive_path="$___X_CMD_ENV_PATH/perl/archive/strawberry-perl-${version}-${_arch}.zip"
     fi
-	x uz "$archive_path" "$(dirname "$archive_path")"  1>/dev/null || return 1
-    local versions_path="$___X_CMD_ENV_PATH/perl/versions"
-	mkdir -p "${versions_path}/${version}"
-	mv -f "$archive_unpack_files/"* "$versions_path/${version}"
-	rm -rf "$archive_unpack_files"
+
+    mv -f "${archive_path%/*}/apache-maven-$version/"* "$unpack_dir"
+
 }
 # EndSection

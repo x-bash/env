@@ -195,8 +195,7 @@ ___x_cmd_env_common_download_archive(){
         env:info "Archive existed: $version"
         return 0
     fi
-
-    local compression
+    
     if ! compression="$(___x_cmd_env_run_if_exist get_compression "$candidate" "$version")"; then
 		env:error "Failed to get compression of $candidate $version."
 		return 1
