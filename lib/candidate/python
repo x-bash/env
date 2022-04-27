@@ -1,29 +1,21 @@
 # shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263,SC2120    # xrc
 
-# Section(util): get_platform_arch, compression, miniconda_filename
+# Section(util): get_system_arch, compression, miniconda_filename
 
-___x_cmd_env_python_get_platform_arch(){
-
-    local _platform
-    local _arch
-    _platform="$(x os name)"
-    _arch="$(x os arch)"
-
-    case "$_platform" in
+___x_cmd_env_python_get_system_arch(){
+    case "$(x os name)" in
         linux)      system=Linux                     ;;
         windows)    system=Windows                   ;;
         darwin)     system=MacOSX                    ;;
-        *)          env:error "your arch:(" "$_platform" ") are not supported"
-                    return 1
-                    ;;
+        *)          env:error "your arch:($(x os name)) are not supported"
+                    return 1 ;;
     esac
 
-    case "$_arch" in
-        aarch64|arm64|armv7l|armv6l)    arch="$_arch"   ;;
-        x64)                            arch=x86_64     ;;
-        *)          env:error "your arch:(" "$_arch" ") are not supported"
-                    return 1
-                    ;;
+    case "$(x os arch)" in
+        aarch64|arm64|armv7l|armv6l)    arch="$(x os arch)"   ;;
+        x64)                            arch=x86_64           ;;
+        *)          env:error "your arch:($(x os arch)) are not supported"
+                    return 1 ;;
     esac
 }
 
@@ -39,10 +31,10 @@ ___x_cmd_env_python_miniconda_filename(){
     local version="${1:?Provide a Version}"
     local system
     local arch
+    ___x_cmd_env_python_get_system_arch || return 1
     local compression
-    ___x_cmd_env_python_get_platform_arch || return 1
     compression="$(___x_cmd_env_python_compression)" || return 1
-    printf "Miniconda3-%s-%s-%s.%s" "${version}" "${system}" "${arch}" "${compression}"
+    printf "Miniconda3-%s-%s-%s.%s" "$version" "$system" "$arch" "$compression"
 }
 
 # EndSection
@@ -56,8 +48,8 @@ ___x_cmd_env_python_list_url(){
 ___x_cmd_env_python_version_info(){
     local system
     local arch
-    ___x_cmd_env_python_get_platform_arch || return 1
-    awk -v pattern="$pattern" -v sys="${system}" -v arch="$arch" '
+    ___x_cmd_env_python_get_system_arch || return 1
+    awk -v pattern="$pattern" -v sys="$system" -v arch="$arch" '
     BEGIN{RS="<a href=";FS="\""} (match($2, "^.*-" sys "-" arch ".sh$")) {
         split($2, a, /-/)
         version = a[2]
@@ -95,7 +87,7 @@ ___x_cmd_env_python_unpack(){
     mkdir -p "${versions_path}"
     local archive_path="$___X_CMD_ENV_PATH/python/archive/python-$version.$compression"
     chmod +x "${archive_path}" && \
-        "${archive_path}" -b -u -p "${versions_path}/${version}" 1>&2
+        "${archive_path}" -b -u -p "${versions_path}/$version" 1>&2
 }
 
 # EndSection

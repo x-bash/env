@@ -19,7 +19,7 @@ ___x_cmd_env_maven_version_info(){
 
 ___x_cmd_env_maven_download_url(){
     local version="${1:?Provide a version}"
-    printf "https://archive.apache.org/dist/maven/maven-3/%s/binaries/apache-maven-%s-bin.zip" "${version}" "${version}"
+    printf "https://archive.apache.org/dist/maven/maven-3/%s/binaries/apache-maven-%s-bin.zip" "$version" "$version"
 }
 
 # EndSection

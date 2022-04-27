@@ -56,8 +56,8 @@ A
         arch="x64"
     fi
     # TODO: node <= 0.1.13 does not have a directory
-    local slug="node-${version}-${system}-${arch}"
-    printf "%s/%s/%s.%s" "${___X_CMD_ENV_NODE_MIRROR}" "${version}" "${slug}" "$(___x_cmd_env_node_compression)"
+    local slug="node-$version-$system-$arch"
+    printf "%s/%s/%s.%s" "${___X_CMD_ENV_NODE_MIRROR}" "$version" "${slug}" "$(___x_cmd_env_node_compression)"
 }
 # EndSection
 

@@ -5,29 +5,25 @@
 ___x_cmd_env_rust_compression(){
     case "$(x os name)" in
         linux|darwin|win)      printf "tar.gz"    ;;
-        *)          env:error "your arch:($(x os name)) are not supported"
+        *)          env:error "your system:($(x os name)) are not supported"
                     return 1           ;;
     esac
 }
 
 ___x_cmd_env_rust_get_system_arch(){
-    local _platform
-    local _arch
-    _platform="$(x os name)"
-    _arch="$(x os arch)"
-    case "$_platform" in
+    case "$(x os name)" in
         linux)      system="unknown-linux-gnu"                ;;
         windows)    system="pc-windows-msvc"                  ;;
         darwin)     system="apple-darwin"                     ;;
-        *)          env:error "your arch:($_platform) are not supported"
+        *)          env:error "your system:($(x os name)) are not supported"
                     return 1                                  ;;
     esac
-    case "$_arch" in
+    case "$(x os arch)" in
         arm64)      arch="aarch64"                            ;;
         x64)        arch="x86_64"                         ;;
         x86)        arch="x86_64"                         ;;
-        aarch|powerpc64|armv7)      arch="$_arch"         ;;
-        *)          env:error "your arch:($_arch) are not supported"
+        aarch|powerpc64|armv7)      arch="$(x os arch)"         ;;
+        *)          env:error "your arch:($(x os arch)) are not supported"
                     return 1                              ;;
     esac
 }
@@ -53,7 +49,7 @@ ___x_cmd_env_rust_download_url(){
     local system
     local arch
     ___x_cmd_env_rust_get_system_arch
-    printf "https://static.rust-lang.org/dist/rust-%s-%s-%s.%s" "${version}" "${arch}" "${system}" "$(___x_cmd_env_rust_compression)"
+    printf "https://static.rust-lang.org/dist/rust-%s-%s-%s.%s" "$version" "$arch" "$system" "$(___x_cmd_env_rust_compression)"
 }
 
 # EndSection

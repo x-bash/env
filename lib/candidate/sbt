@@ -25,6 +25,6 @@ ___x_cmd_env_sbt_list_url(){
 # Section(download): download_url
 ___x_cmd_env_sbt_download_url(){
     local version="${1:?Provide a version}"
-    printf "https://github.com/sbt/sbt/releases/download/v%s/sbt-%s.tgz" "${version}" "${version}"
+    printf "https://github.com/sbt/sbt/releases/download/v%s/sbt-%s.tgz" "$version" "$version"
 }
 # EndSection

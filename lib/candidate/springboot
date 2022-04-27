@@ -19,7 +19,7 @@ ___x_cmd_env_springboot_version_info(){
 
 ___x_cmd_env_springboot_download_url(){
     local version="${1:?Provide a version}"
-    printf "https://repo.spring.io/simple/release/org/springframework/boot/spring-boot-cli/%s/spring-boot-cli-%s-bin.zip" "${version}" "${version}"
+    printf "https://repo.spring.io/simple/release/org/springframework/boot/spring-boot-cli/%s/spring-boot-cli-%s-bin.zip" "$version" "$version"
 }
 
 # EndSection

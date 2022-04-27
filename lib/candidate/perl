@@ -33,15 +33,15 @@ ___x_cmd_env_perl_version_info(){
 # Section(download): download_url
 
 ___x_cmd_env_perl_download_url(){
-    local version="${version}"
+    local version="$version"
     case "$(x os name)" in
-        linux)  printf "https://github.com/skaji/relocatable-perl/releases/download/%s/perl-x86_64-linux.tar.gz" "${version}"   ;;
-        darwin) printf "https://github.com/skaji/relocatable-perl/releases/download/%s/perl-darwin-2level.tar.gz" "${version}s" ;;
+        linux)  printf "https://github.com/skaji/relocatable-perl/releases/download/%s/perl-x86_64-linux.tar.gz" "$version"   ;;
+        darwin) printf "https://github.com/skaji/relocatable-perl/releases/download/%s/perl-darwin-2level.tar.gz" "$versions" ;;
         win)
             local download_base_url="https://strawberryperl.com/download"
             case "$(x os arch)" in
-                x32)        printf "%s/%s/strawberry-perl-%s-%s.zip" "$download_base_url" "${version}" "${version}" "32bit" ;;
-                x64)        printf "%s/%s/strawberry-perl-%s-%s.zip" "$download_base_url" "${version}" "${version}" "64bit" ;;
+                x32)        printf "%s/%s/strawberry-perl-%s-%s.zip" "$download_base_url" "$version" "$version" "32bit" ;;
+                x64)        printf "%s/%s/strawberry-perl-%s-%s.zip" "$download_base_url" "$version" "$version" "64bit" ;;
                 *)          env:error "your arch:($(x os arch)) are not supported" return 1 ;;
             esac ;;
         *)      env:error "your system:($(x os name)) are not supported" return 1 ;;
