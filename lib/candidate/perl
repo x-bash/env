@@ -1,99 +1,49 @@
 # shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263    # xrc
 
-# Section(util): get_system_platform
+# Section: ls remote
 
-___x_cmd_env_perl_get_system_platform(){
-    local _platform
-    local _arch
-    local _platform="$(x os name)"
-    local _arch="$(x os arch)"
-    case "$_platform" in
-        linux)      ___X_CMD_ENV_PLATFORM=linux    ;;
-        win)        ___X_CMD_ENV_PLATFORM=windows  ;;
-        darwin)     ___X_CMD_ENV_PLATFORM=darwin   ;;
-        *)          env:error "your arch:(" "$(___x_cmd_os name)" ") are not supported"
-                    return 1
-                    ;;
-    esac
-
-    case "$_arch" in
-        x32)        ___X_CMD_ENV_ARCH="64bit"   ;;
-        x64)        ___X_CMD_ENV_ARCH="64bit"   ;;
-        *)          env:error "your arch:(" "$_arch" ") are not supported"
-                    return 1
-                    ;;
-    esac
-
-    case "$_platform" in
-        linux | darwin)     _compression=tar.gz   ;;
-        win)                _compression=zip      ;;
-        *)                  env:error "your arch:(" "$(___x_cmd_os name)" ") are not supported"
-                            return 1
-                            ;;
+___x_cmd_env_perl_get_list_url(){
+    case "$(x os name)" in
+        linux|darwin)      printf "https://api.github.com/repos/skaji/relocatable-perl/releases"   ;;
+        win)               printf "https://strawberryperl.com/releases.html"                       ;;
+        *)                 env:error "your system:($(x os name)) are not supported" ; return 1 ;;
     esac
 }
-# EndSection
 
-# Section: ls remote
-___x_cmd_env_perl_ls_remote(){
-    local pattern="${1:-""}"
-    local cache_path="$___X_CMD_ENV_PATH/perl/cache/version_list"
-    local cache_expiration="${2:-86400}"
-    ___x_cmd_env_perl_get_system_platform
-    if [ "$___X_CMD_ENV_PLATFORM" = "linux" ] || [ "$___X_CMD_ENV_PLATFORM" = "darwin" ] ; then
-        ___x_cmd_httpget "https://api.github.com/repos/skaji/relocatable-perl/releases" "$cache_path" "$cache_expiration" 2>/dev/null && \
-            x ja 'k()=="tag_name" && (("'"$pattern"'" == "") || ( index( v(), "'"$pattern"'" ) > 0)){ print v(); }' < "$cache_path" | ___x_cmd_env_common_sort_version | ___x_cmd_env_common_simplify_version
-    fi
-    if [ "$___X_CMD_ENV_PLATFORM" = "windows" ] ; then
-        ___x_cmd_httpget "https://strawberryperl.com/releases.html" "$cache_path" "$cache_expiration" 2>/dev/null && \
-            awk -v pattern="$pattern" ' match($0, /<td><b>[0-9.]+<\/b><\/td>/) {
-                version substr($0,RSTART+7,RLENGTH-16)
-                if (pattern == "" || index(version, pattern) > 0) {
-                    print version
-                }
-            }' < "$cache_path" | ___x_cmd_env_common_sort_version | ___x_cmd_env_common_simplify_version
-    fi
+___x_cmd_env_perl_get_version_info(){
+    case "$(x os name)" in
+        linux|darwin)   x ja 'k()=="tag_name" && ( v() ~ "'"$pattern"'" ){ print v(); }' ;;
+        win)            awk -v pattern="$pattern" ' match($0, /<td><b>[0-9.]+<\/b><\/td>/) {
+                            version = substr($0,RSTART+7,RLENGTH-16)
+                            (version ~ pattern) { print version }
+                        }' ;;
+        *)              env:error "your system:(" "$(x os name)" ") are not supported" ; return 1 ;;
+    esac
 }
 # EndSection
 
 # Section: download
 ___x_cmd_env_perl_get_download_url(){
-    ___x_cmd_env_perl_get_system_platform
-    local version=${version}
-    if ___x_cmd_env_perl_get_system_platform ; then
-        if [ "$___X_CMD_ENV_PLATFORM" = "linux" ] ; then
-             printf "https://github.com/skaji/relocatable-perl/releases/download/%s/perl-x86_64-linux.tar.gz" "${version}"
-        elif [ "$___X_CMD_ENV_PLATFORM" = "darwin" ] ; then
-             printf "https://github.com/skaji/relocatable-perl/releases/download/%s/perl-darwin-2level.tar.gz" "${version}s"
-        else [ "$___X_CMD_ENV_PLATFORM" = "windows" ] ;
-             printf "https://strawberryperl.com/download/%s/strawberry-perl-%s-%s.zip" "${version}" "${version}" "${_arch}"
-        fi
-    fi
+    local version="${version}"
+    case "$(x os name)" in
+        linux)  printf "https://github.com/skaji/relocatable-perl/releases/download/%s/perl-x86_64-linux.tar.gz" "${version}"   ;;
+        darwin) printf "https://github.com/skaji/relocatable-perl/releases/download/%s/perl-darwin-2level.tar.gz" "${version}s" ;;
+        win)
+            local download_base_url="https://strawberryperl.com/download"
+            case "$(x os arch)" in
+                x32)        printf "%s/%s/strawberry-perl-%s-%s.zip" "$download_base_url" "${version}" "${version}" "32bit" ;;
+                x64)        printf "%s/%s/strawberry-perl-%s-%s.zip" "$download_base_url" "${version}" "${version}" "64bit" ;;
+                *)          env:error "your arch:($(x os arch)) are not supported" return 1 ;;
+            esac ;;
+        *)      env:error "your system:($(x os name)) are not supported" return 1 ;;
+    esac
 }
 # EndSection
 
 # Section: unpack
 ___x_cmd_env_perl_get_compression(){
     case "$(x os name)" in
-        "darwin" | "linux")  printf "%s" "tar.gz" ;;
+        darwin|linux)  printf "tar.gz" ;;
     esac
-}
-
-___x_cmd_env_perl_copy_to_unpackdir(){
-    local version="${1:?Provide a version}"
-
-
-    if [ "$___X_CMD_ENV_PLATFORM" = "linux" ] ; then
-        archive_unpack_files="$(dirname "$archive_path")/perl-x86_64-linux"
-    fi
-    if [ "$___X_CMD_ENV_PLATFORM" = "darwin" ] ; then
-        archive_unpack_files="$(dirname "$archive_path")/perl-darwin-2level"
-    fi
-    if [ "$___X_CMD_ENV_PLATFORM" = "windows" ] ; then
-        archive_unpack_files="$(dirname "$archive_path")/perl-darwin-2level"
-    fi
-
-    mv -f "${archive_path%/*}/apache-maven-$version/"* "$unpack_dir"
-
 }
 # EndSection
