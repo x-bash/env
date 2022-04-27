@@ -39,7 +39,3 @@ ___x_cmd_env_kotlin_ui_catsel(){
 }
 
 # EndSection
-
-___x_cmd_env_kotlin_ws(){
-    :
-}

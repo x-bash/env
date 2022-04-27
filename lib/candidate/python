@@ -132,7 +132,3 @@ ___x_cmd_env_python_ui_catsel(){
 }
 
 # EndSection
-
-___x_cmd_env_python_ws(){
-    :
-}
