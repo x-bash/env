@@ -75,10 +75,6 @@ ___x_cmd_env_go_get_download_url(){
     printf "https://golang.google.cn/dl/go%s.%s-%s.%s" "${version}" "${system}" "${arch}" "${compression}"
 }
 
-___x_cmd_env_go_copy_to_unpackdir(){
-    local version=${1:?Provide a version}
-}
-
 # EndSection
 
 # Section: catsel

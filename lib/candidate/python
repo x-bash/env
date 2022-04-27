@@ -89,7 +89,6 @@ ___x_cmd_env_python_get_download_url(){
     if [ "${___X_CMD_IN_CHINA_NET:-0}" -eq 1 ]; then
           url="https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda"
     fi
-env:info "$url/$miniconda_filename"
      printf "%s/%s" "$url" "$miniconda_filename"
 }
 
@@ -99,7 +98,7 @@ ___x_cmd_env_python_unpack(){
     local compression
     compression=$(___x_cmd_env_python_get_compression)
 
-    env:info "Unpacking python-$version.$compression"
+    env:info "Unpacking python-$version"
 
     local versions_path="$___X_CMD_ENV_PATH/python/versions"
     mkdir -p "${versions_path}"

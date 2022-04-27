@@ -15,7 +15,7 @@ ___x_cmd_env_kotlin_get_version_info(){
 # Section: download
 
 ___x_cmd_env_kotlin_get_download_url(){
-	local version="${1:?Provide a version}"
+	local version=${1:?Provide a version}
 	printf "https://github.com/JetBrains/kotlin/releases/download/v%s/kotlin-compiler-%s.zip" "${version}" "${version}"
 }
 
