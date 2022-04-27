@@ -1,71 +1,70 @@
 # shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263    # xrc
+
+# Section(util): get_compression, get_system_platform
+
+___x_cmd_env_rust_get_compression(){
+    case "$(x os name)" in
+        linux|darwin|win)      printf "tar.gz"    ;;
+        *)          env:error "your arch:($(x os name)) are not supported"
+                    return 1           ;;
+    esac
+}
+
 ___x_cmd_env_rust_get_system_platform(){
-    xrc os
     local _platform
     local _arch
     _platform="$(x os name)"
     _arch="$(x os arch)"
     case "$_platform" in
-        linux)      ___X_CMD_ENV_PLATFORM=unknown-linux-gnu                ;;
-        windows)    ___X_CMD_ENV_PLATFORM=pc-windows-msvc                  ;;
-        darwin)     ___X_CMD_ENV_PLATFORM=apple-darwin                     ;;
-        *)          env:error "your arch:(" "$_platform" ") are not supported"
-                    return 1
-                    ;;
+        linux)      system="unknown-linux-gnu"                ;;
+        windows)    system="pc-windows-msvc"                  ;;
+        darwin)     system="apple-darwin"                     ;;
+        *)          env:error "your arch:($_platform) are not supported"
+                    return 1                                  ;;
     esac
     case "$_arch" in
-        arm64)      ___X_CMD_ENV_ARCH="arm"           ;;
-        x64)        ___X_CMD_ENV_ARCH="x86_64"        ;;
-        armv7)      ___X_CMD_ENV_ARCH="armv7"         ;;
-        aarch)      ___X_CMD_ENV_ARCH="aarch"         ;;
-        powerpc64)  ___X_CMD_ENV_ARCH="powerpc64"     ;;
-        x86)         ___X_CMD_ENV_ARCH="x86_64"       ;;
-        *)          env:error "your arch:(" "$_arch" ") are not supported"
-                    return 1
-                    ;;
+        arm64)      arch="aarch64"                            ;;
+        x64)        arch="x86_64"                         ;;
+        x86)        arch="x86_64"                         ;;
+        aarch|powerpc64|armv7)      arch="$_arch"         ;;
+        *)          env:error "your arch:($_arch) are not supported"
+                    return 1                              ;;
     esac
-    case "$_platform" in
-        linux)      ___X_CMD_ENV_COMPRESSION=tar.gz                   ;;
-        windows)    ___X_CMD_ENV_COMPRESSION=msi                      ;;
-        darwin)     ___X_CMD_ENV_COMPRESSION=pkg                      ;;
-        *)          env:error "your arch:(" "$_platform" ") are not supported"
-                    return 1
-                    ;;
-    esac
-    if [ "$_platform" != "linux" ] && [ "$_platform" != "darwin" ] && [  "$_platform" != "win" ] ; then
-        env:error "your OS:(" "$_platform" ") are not supported"
-    fi
 }
 
-___x_cmd_env_rust_ls_remote(){
-    local cache_path="$___X_CMD_ENV_PATH/rust/cache/version_list"
-    local cache_expiration="${2:-86400}"
-    ___x_cmd_httpget "https://api.github.com/repos/rust-lang/rust/releases" "$cache_path" "$cache_expiration" && \
-        x ja ' k()=="tag_name"{print v()} ' < "$cache_path" | ___x_cmd_env_common_sort_version | ___x_cmd_env_common_simplify_version
+# EndSection
+
+# Section(ls_remote):
+
+___x_cmd_env_rust_get_list_url(){
+    printf "https://api.github.com/repos/rust-lang/rust/releases"
 }
+
+___x_cmd_env_rust_get_version_info(){
+    x ja 'k()=="tag_name" && ( v() ~ "'"$pattern"'" ) { print v() } '
+}
+
+# EndSection
+
+# Section(download):
 
 ___x_cmd_env_rust_get_download_url(){
-    local version=${1:?Provide a version}
+    local version="${1:?Provide a version}"
+    local system
+    local arch
     ___x_cmd_env_rust_get_system_platform
-    printf "https://static.rust-lang.org/dist/rust-%s-%s-%s.%s" "${version}" "${___X_CMD_ENV_ARCH}" "${___X_CMD_ENV_PLATFORM}" "${___X_CMD_ENV_COMPRESSION}"
-}
-___x_cmd_env_rust_get_compression(){
-    printf "%s" "tar.gz"
+    printf "https://static.rust-lang.org/dist/rust-%s-%s-%s.%s" "${version}" "${arch}" "${system}" "$(___x_cmd_env_rust_get_compression)"
 }
 
-___x_cmd_env_rust_unpack(){
-    ___x_cmd_env_rust_get_system_platform
+# EndSection
+
+# Section(unpack):
+
+___x_cmd_env_rust_copy_to_unpackdir()(
     local version="${1:?Provide a version}"
-    env:info "Unpacking: rust ${version}"
-    ___x_cmd_env_rust_get_system_platform
-    local archive_path="$___X_CMD_ENV_PATH/rust/archive/rust-${version}.${___X_CMD_ENV_COMPRESSION}"
-    x uz  "$archive_path" "$(dirname "${archive_path}")" 1>/dev/null || return
-	local archive_unpack_files
-	local versions_path="$___X_CMD_ENV_PATH/rust/versions"
-	archive_unpack_files="$(dirname "${archive_path}")/rust-${version}-${___X_CMD_ENV_ARCH}-${___X_CMD_ENV_PLATFORM}"
-	mkdir -p "$versions_path/${version}"
-    cd ~/.x-cmd/.env/rust/versions/archive/rust-${version}-${___X_CMD_ENV_ARCH}-${___X_CMD_ENV_PLATFORM}
-    ./install.sh --destdir=~/.x-cmd/.env/rust/versions/${version} --prefix=/
-	rm -rf "$archive_unpack_files"
-    env:info "unpack Successfully"
-}
+    cd "$unpack_dir"/* || return 1
+    ./install.sh --destdir="../tmp" --prefix=/
+    x rmrf "$PWD"
+)
+
+# EndSection
