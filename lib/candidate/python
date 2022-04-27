@@ -10,17 +10,17 @@ ___x_cmd_env_python_get_platform_arch(){
     _arch="$(x os arch)"
 
     case "$_platform" in
-        linux)      ___X_CMD_ENV_PLATFORM=Linux                     ;;
-        windows)    ___X_CMD_ENV_PLATFORM=Windows                   ;;
-        darwin)     ___X_CMD_ENV_PLATFORM=MacOSX                    ;;
+        linux)      system=Linux                     ;;
+        windows)    system=Windows                   ;;
+        darwin)     system=MacOSX                    ;;
         *)          env:error "your arch:(" "$_platform" ") are not supported"
                     return 1
                     ;;
     esac
 
     case "$_arch" in
-        aarch64|arm64|armv7l|armv6l)    ___X_CMD_ENV_ARCH="$_arch"   ;;
-        x64)                            ___X_CMD_ENV_ARCH=x86_64     ;;
+        aarch64|arm64|armv7l|armv6l)    arch="$_arch"   ;;
+        x64)                            arch=x86_64     ;;
         *)          env:error "your arch:(" "$_arch" ") are not supported"
                     return 1
                     ;;
@@ -28,22 +28,33 @@ ___x_cmd_env_python_get_platform_arch(){
 }
 
 ___x_cmd_env_python_get_compression(){
-    local version="${1:?Provide python version}"
-    local ___X_CMD_ENV_PLATFORM
-    local ___X_CMD_ENV_ARCH
+    local system
+    local arch
+    local compression
     if ___x_cmd_env_python_get_platform_arch ; then
-        if [ $___X_CMD_ENV_PLATFORM = "Windows" ] ; then
-            ___X_CMD_ENV_COMPRESSION="exe"
+        if [ $system = "Windows" ] ; then
+            compression="exe"
         else
-            ___X_CMD_ENV_COMPRESSION="sh"
+            compression="sh"
         fi
     fi
-    # printf "%s" "$___X_CMD_ENV_COMPRESSION"
-    miniconda_filename="Miniconda3-${version}-${___X_CMD_ENV_PLATFORM}-${___X_CMD_ENV_ARCH}.${___X_CMD_ENV_COMPRESSION}"
+    printf "%s" "$compression"
+}
+___x_cmd_env_python_get_miniconda_filename(){
+    local version=${1:?Provide a Version}
+    local system
+    local arch
+    local compression
+    env:info "1"
+    ___x_cmd_env_python_get_platform_arch || return 1
+    env:info "2"
+    compression="$(___x_cmd_env_python_get_compression)" || return 1
+    env:info "3"
+    printf "Miniconda3-%s-%s-%s.%s" "${version}" "${system}" "${arch}" "${compression}"
 }
 
 # EndSection
-
+https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-4.1.11-Linux-x86_64.sh
 # Section: ls, la
 
 ___x_cmd_env_python_get_list_url(){
@@ -51,10 +62,10 @@ ___x_cmd_env_python_get_list_url(){
 }
 
 ___x_cmd_env_python_get_version_info(){
-    local ___X_CMD_ENV_PLATFORM
+    local system
     local ___X_CMD_ENV_ARCH
     ___x_cmd_env_python_get_platform_arch || return 1
-    awk -v pattern="$pattern" -v platform="${___X_CMD_ENV_PLATFORM}" -v arch="$___X_CMD_ENV_ARCH" '
+    awk -v pattern="$pattern" -v platform="${system}" -v arch="$arch" '
     BEGIN{RS="<a href=";FS="\""} (match($2, "^.*-" platform "-" arch ".sh$")) {
         split($2, a, /-/)
         version = a[2]
@@ -68,28 +79,31 @@ ___x_cmd_env_python_get_version_info(){
 
 ___x_cmd_env_python_get_download_url(){
     local version="${1:?Provide python version}"
-    ___x_cmd_env_python_get_compression "$version"
+    local miniconda_filename
+    local compression
+    compression=$(___x_cmd_env_python_get_compression)
+    miniconda_filename="$(___x_cmd_env_python_get_miniconda_filename "$version")"
     mkdir -p "$(dirname "$archive_path")"
     # TODO: use function to switch mirror
     local url="https://repo.anaconda.com/miniconda"
     if [ "${___X_CMD_IN_CHINA_NET:-0}" -eq 1 ]; then
           url="https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda"
     fi
-
-     printf "$url/$miniconda_filename"
+env:info "$url/$miniconda_filename"
+     printf "%s/%s" "$url" "$miniconda_filename"
 }
 
 ___x_cmd_env_python_unpack(){
     local version="${1:?Provide python version}"
     local miniconda_filename
-    local ___X_CMD_ENV_COMPRESSION
-    ___x_cmd_env_python_get_compression "$version"
+    local compression
+    compression=$(___x_cmd_env_python_get_compression)
 
-    env:info "Unpacking python-$version.$___X_CMD_ENV_COMPRESSION"
+    env:info "Unpacking python-$version.$compression"
 
     local versions_path="$___X_CMD_ENV_PATH/python/versions"
     mkdir -p "${versions_path}"
-    local archive_path="$___X_CMD_ENV_PATH/python/archive/python-$version.$___X_CMD_ENV_COMPRESSION"
+    local archive_path="$___X_CMD_ENV_PATH/python/archive/python-$version.$compression"
     chmod +x "${archive_path}" && \
         "${archive_path}" -b -u -p "${versions_path}/${version}" 1>&2
 }
