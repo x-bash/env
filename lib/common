@@ -196,10 +196,10 @@ ___x_cmd_env_common_download_archive(){
         return 0
     fi
 
-    # if ! compression="$(___x_cmd_env_run_if_exist get_compression "$candidate" "$version")"; then
-	# 	env:error "Failed to get compression of $candidate $version."
-	# 	return 1
-	# fi
+    if ! compression="$(___x_cmd_env_run_if_exist get_compression "$candidate" "$version")"; then
+		env:error "Failed to get compression of $candidate $version."
+		return 1
+	fi
 
     local archive_path="$___X_CMD_ENV_PATH/$candidate/archive/$candidate-$version.${compression:-zip}"
     mkdir -p "${archive_path%/*}"
@@ -208,7 +208,7 @@ ___x_cmd_env_common_download_archive(){
         env:error "Failed to get download url for $candidate $version"
         return 1
     fi
-echo "$download_url" "  5555"
+
     env:info "Downloading $download_url"
     if ! curl --progress-bar --location --retry-max-time 10 --retry 0 "$download_url" --output "$archive_path" ; then
         env:error "Download failure from $download_url"
