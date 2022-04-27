@@ -49,6 +49,9 @@ ___x_cmd_env_rust_get_download_url(){
     ___x_cmd_env_rust_get_system_platform
     printf "https://static.rust-lang.org/dist/rust-%s-%s-%s.%s" "${version}" "${___X_CMD_ENV_ARCH}" "${___X_CMD_ENV_PLATFORM}" "${___X_CMD_ENV_COMPRESSION}"
 }
+___x_cmd_env_rust_get_compression(){
+    printf "%s" "tar.gz"
+}
 
 ___x_cmd_env_rust_unpack(){
     ___x_cmd_env_rust_get_system_platform
@@ -56,16 +59,13 @@ ___x_cmd_env_rust_unpack(){
     env:info "Unpacking: rust ${version}"
     ___x_cmd_env_rust_get_system_platform
     local archive_path="$___X_CMD_ENV_PATH/rust/archive/rust-${version}.${___X_CMD_ENV_COMPRESSION}"
-    x uz  "$archive_path" "$(dirname "${archive_path}")" 2>/dev/null || return
+    x uz  "$archive_path" "$(dirname "${archive_path}")" 1>/dev/null || return
 	local archive_unpack_files
 	local versions_path="$___X_CMD_ENV_PATH/rust/versions"
 	archive_unpack_files="$(dirname "${archive_path}")/rust-${version}-${___X_CMD_ENV_ARCH}-${___X_CMD_ENV_PLATFORM}"
 	mkdir -p "$versions_path/${version}"
-    
-
-    # mv -f "${archive_unpack_files}/rustc/"* "${archive_unpack_files}"
-    # rm -rf "${archive_unpack_files}/rustc"
-    # mv -f "$archive_unpack_files"/* "$___X_CMD_ENV_PATH/rust/versions/${version}"
-	# rm -rf "$archive_unpack_files"
+    cd ~/.x-cmd/.env/rust/versions/archive/rust-${version}-${___X_CMD_ENV_ARCH}-${___X_CMD_ENV_PLATFORM}
+    ./install.sh --destdir=~/.x-cmd/.env/rust/versions/${version} --prefix=/
+	rm -rf "$archive_unpack_files"
     env:info "unpack Successfully"
 }

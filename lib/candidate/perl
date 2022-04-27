@@ -41,7 +41,7 @@ ___x_cmd_env_perl_get_download_url(){
 # EndSection
 
 # Section: unpack
-___x_cmd_env_go_get_compression(){
+___x_cmd_env_perl_get_compression(){
     case "$(x os name)" in
         darwin|linux)  printf "tar.gz" ;;
     esac
