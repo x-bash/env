@@ -205,7 +205,6 @@ ___x_cmd_env_common_download_archive(){
     mkdir -p "${archive_path%/*}"
     local download_url
     if ! download_url="$("___x_cmd_env_${candidate}_get_download_url" "$version")"; then
-        echo "$url"
         env:error "Failed to get download url for $candidate $version"
         return 1
     fi
