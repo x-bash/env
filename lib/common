@@ -232,13 +232,13 @@ ___x_cmd_env_common_unpack(){
 
     # TODO: x shall 'compression="" ; printf "${compression:-ooo}"'
     local archive_path="$___X_CMD_ENV_PATH/$candidate/archive/$candidate-$version.${compression:-zip}"
-	if ! x uz "$archive_path" "${archive_path%/*}" ; then
+    local unpack_dir="${archive_path%/*}/$candidate-$version"
+
+    env:debug "Unpacking $archive_path to $unpack_dir"
+	if ! x uz "$archive_path" "$unpack_dir" ; then
         env:error "Failed to unzip $candidate $version"
         return 1
     fi
-
-    local unpack_dir="${archive_path%/*}/$candidate-$version"
-    mkdir -p "$unpack_dir"
 
     if ! ___x_cmd_env_run_if_exist copy_to_unpackdir "$candidate" "$version"; then
 		env:error "Failed to copy $candidate $version to unpack dir."
@@ -247,7 +247,8 @@ ___x_cmd_env_common_unpack(){
 
     local versions_path="$___X_CMD_ENV_PATH/$candidate/versions"
 	mkdir -p "$versions_path/$version"
-	mv -f "$unpack_dir/"* "$versions_path/$version"
+    env:debug "Moving $unpack_dir to $versions_path/$version"
+	mv -f "$unpack_dir"/*/* "$versions_path/$version"
 	x rmrf "$unpack_dir"
 }
 

@@ -61,8 +61,9 @@ ___x_cmd_env_deno_download_archive(){
 }
 
 ___x_cmd_env_deno_copy_to_unpackdir(){
-    mkdir -p "$unpack_dir/bin"
-    mv "${archive_path%/*}/deno" "$unpack_dir/bin/deno"
+    mkdir -p "$unpack_dir/tmp/bin"
+    mv "$unpack_dir/deno" "$unpack_dir/tmp/bin/deno"
+    env:info "Copy to $unpack_dir/tmp/bin/deno"
 }
 
 # EndSection

@@ -41,7 +41,4 @@ ___x_cmd_env_sbt_get_compression(){
     printf 'tgz'
 }
 
-___x_cmd_env_sbt_copy_to_unpackdir(){
-    mv -f "${archive_path%/*}/sbt/"* "$unpack_dir"
-}
 # EndSection
