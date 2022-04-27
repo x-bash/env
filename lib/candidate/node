@@ -4,23 +4,22 @@ ___X_CMD_ENV_NODE_MIRROR="https://nodejs.org/dist"
 
 # Section: ls_remote
 
-___x_cmd_env_node_ls_remote(){
-    local pattern="${1:-""}"
-    local cache_expiration="${2:-86400}"
-    local cache_path="$___X_CMD_ENV_PATH/node/cache/version_list"
+___x_cmd_env_node_get_list_url(){
+    printf "%s" "$___X_CMD_ENV_NODE_MIRROR/index.tab"
+}
 
-	___x_cmd_httpget "$___X_CMD_ENV_NODE_MIRROR/index.tab" "$cache_path" "$cache_expiration" && \
+___x_cmd_env_node_get_version_info(){
     awk -v pattern="$pattern" -v prev_codename="x-cmd" '
         ((NR>1)&&($1)){
             codename=$10
             version=$1
-            if ( (pattern == "") || ( index( version, pattern ) > 0 ) ) {
+            if ( version ~ pattern ) {
                 if (codename ~ /^\-?$/)                                 print version
                 else if (codename!="" && codename != prev_codename)     print version, codename, "*"        # The latest version of this code name
                 else                                                    print version, codename
             }
             prev_codename=codename
-        }' <"$cache_path" | ___x_cmd_env_common_sort_version | ___x_cmd_env_common_simplify_version
+        }'
 }
 
 # EndSection
