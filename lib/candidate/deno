@@ -40,7 +40,7 @@ ___x_cmd_env_deno_get_download_url(){
     local platform
     platform="$(___x_cmd_env_deno_get_platform)"
     if [ $# -eq 0 ] ; then
-         printf "https://github.com/denoland/deno/releases/latest/download/deno-%s.zip" "${patform}"
+         printf "https://github.com/denoland/deno/releases/latest/download/deno-%s.zip" "${platform}"
     else printf "https://github.com/denoland/deno/releases/download/v%s/deno-%s.zip" "${version}" "${platform}"
     fi
 }
