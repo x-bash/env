@@ -2,18 +2,15 @@
 
 # Section: gradle ls_remote and la
 
-___x_cmd_env_gradle_ls_remote(){
-    local pattern="${1:-""}"
-    local cache_expiration="${2:-86400}"
-    local cache_path="$___X_CMD_ENV_PATH/gradle/cache/version_list"
+___x_cmd_env_gradle_get_list_url(){
+    printf "https://services.gradle.org/distributions/"
+}
 
-    ___x_cmd_httpget "https://services.gradle.org/distributions/" "$cache_path" "$cache_expiration" && \
+___x_cmd_env_gradle_get_version_info(){
     awk -v pattern="$pattern" 'match($0, /gradle-([0-9.]+)-all.zip"/){
         version = substr($0, RSTART+7, RLENGTH-16)
-        if (pattern == "" || index(version, pattern) > 0) {
-            print version
-        }
-    }' <"$cache_path" | ___x_cmd_env_common_sort_version | ___x_cmd_env_common_simplify_version
+        if (version ~ pattern) { print version }
+    }'
 }
 
 # EndSection

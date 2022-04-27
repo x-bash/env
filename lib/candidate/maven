@@ -2,17 +2,15 @@
 
 # Section: Maven ls_remote
 
-___x_cmd_env_maven_ls_remote(){
-    local pattern="${1:-""}"
-    local cache_expiration="${2:-86400}"
-    local cache_path="$___X_CMD_ENV_PATH/maven/cache/version_list"
-    ___x_cmd_httpget "https://archive.apache.org/dist/maven/maven-3/" "$cache_path" "$cache_expiration"  && \
-        awk -v pattern="$pattern" 'match($0, /href="([0-9.]+)\/"/){
-            version = substr($0,52,5)
-            if (pattern == "" || index(version, pattern) > 0) {
-                print version
-            }
-        } ' <"$cache_path" | ___x_cmd_env_common_sort_version | ___x_cmd_env_common_simplify_version
+___x_cmd_env_maven_get_list_url(){
+    printf "https://archive.apache.org/dist/maven/maven-3/"
+}
+
+___x_cmd_env_maven_get_version_info(){
+    awk -v pattern="$pattern" 'match($0, /href="([0-9.]+)\/"/){
+        version = substr($0, RSTART+6, RLENGTH-8)
+        if (version ~ pattern) { print version }
+    } '
 }
 
 # EndSection
