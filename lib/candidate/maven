@@ -26,15 +26,6 @@ ___x_cmd_env_maven_get_download_url(){
 
 # EndSection
 
-# Section: unpack
-
-___x_cmd_env_maven_copy_to_unpackdir(){
-    local version="${1:?Provide a version}"
-    mv -f "${archive_path%/*}/apache-maven-$version/"* "$unpack_dir"
-}
-
-# EndSection
-
 # Section: current
 
 ___x_cmd_env_maven_current(){

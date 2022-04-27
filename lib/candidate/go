@@ -66,10 +66,6 @@ ___x_cmd_env_go_get_compression(){
     esac
 }
 
-___x_cmd_env_go_copy_to_unpackdir(){
-    mv -f "${archive_path%/*}/go/"* "$unpack_dir"
-}
-
 # TODO: Support windows
 # ___x_cmd_env_go_unpack_win(){
 #     x uz "$archive_path" "$(dirname "$archive_path")" || return 1

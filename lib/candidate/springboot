@@ -27,18 +27,6 @@ ___x_cmd_env_springboot_get_download_url(){
 
 # EndSection
 
-# Section: unpack
-___x_cmd_env_sbt_get_compression(){
-    printf 'zip'
-}
-
-___x_cmd_env_springboot_copy_to_unpackdir(){
-    local version="${1:?Provide a version}"
-    mv -f "${archive_path%/*}/spring-$version/"* "$unpack_dir"
-}
-
-# EndSection
-
 # Section: current
 
 ___x_cmd_env_springboot_current(){
