@@ -67,7 +67,7 @@ ___x_cmd_env_node_get_download_url(){
         arch="x64"
     fi
     # TODO: node <= 0.1.13 does not have a directory
-    local slug="node-${version}-${ ___x_cmd_env_platform}-${___x_cmd_env_arch}"
+    local slug="node-${version}-${___x_cmd_env_platform}-${___x_cmd_env_arch}"
     printf "%s/%s/%s.%s" "${___X_CMD_ENV_NODE_MIRROR}" "${version}" "${slug}" "${compression}"
 }
 # EndSection
