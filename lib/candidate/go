@@ -7,7 +7,7 @@ ___x_cmd_env_go_get_system_arch(){
         linux)      system=linux    ;;
         win)        system=windows  ;;
         darwin)     system=darwin   ;;
-        *)          env:error "your arch:(" "$(x os name)" ") are not supported"
+        *)          env:error "your arch:($(x os name)) are not supported"
                     return 1 ;;
     esac
     case "$(x os arch)" in
@@ -15,7 +15,7 @@ ___x_cmd_env_go_get_system_arch(){
         x64)           arch=amd64      ;;
         arm64)         arch=arm64      ;;
         armv7l|ARMv6)  arch=armv6l     ;;
-        *)  env:error "your arch:(" "$(x os arch)" ") are not supported"
+        *)  env:error "your arch:($(x os arch)) are not supported"
             return 1 ;;
     esac
 }
@@ -31,7 +31,7 @@ ___x_cmd_env_go_get_version_info(){
     local system
     local arch
     ___x_cmd_env_go_get_system_arch
-    env:debug "system:(" "$system" ") arch:(" "$arch" ")"
+    env:debug "system:($system) arch:($arch)"
 
     awk -v sys="${system}" -v arch="${arch}" -v pattern="${pattern}" \
     'match($0, "/dl/go[0-9.]+" sys "-" arch ) {
@@ -64,18 +64,25 @@ ___x_cmd_env_go_get_compression(){
         *)          printf 'tar.gz';;
     esac
 }
+
 ___x_cmd_env_go_get_download_url(){
     local version="${1:?Provide a version}"
-    if ___x_cmd_env_go_get_system_platform ; then
-        local compression='tar.gz'; [ "${___x_cmd_env_platform}" = 'windows' ] && compression='zip'
-        printf "https://golang.google.cn/dl/go%s.%s-%s.%s" "${version}" "${___x_cmd_env_platform}" "${___x_cmd_env_arch}" "${compression}"
-        env:info "Downloading go ${version}"
-    fi
+    local system
+    local arch
+    ___x_cmd_env_go_get_system_arch || return 1
+    local compression
+    compression="$(___x_cmd_env_go_get_compression)"
+    printf "https://golang.google.cn/dl/go%s.%s-%s.%s" "${version}" "${system}" "${arch}" "${compression}"
 }
 
 ___x_cmd_env_go_copy_to_unpackdir(){
     local version=${1:?Provide a version}
 }
+
+# EndSection
+
+# Section: catsel
+
 ___x_cmd_env_go_ui_catsel(){
     case "$#" in
         0)  ___x_cmd_env_go_ls_remote | awk '{ split($0,arr,"."); vmap[arr[1]]=1 } END{ for(key in vmap){print key} }' ;;

@@ -10,13 +10,13 @@ ___x_cmd_env_deno_get_platform(){
     case "$system" in
         darwin)
             case "$arch" in
-                arm64)      paltform="aarch64-apple-darwin"   ;;
-                x64)        paltform="x86_64-apple-darwin"    ;;
-                *)          env:error "your arch:(" "$arch" ") are not supported" ; return 1 ;;
+                arm64)      printf "aarch64-apple-darwin"   ;;
+                x64)        printf "x86_64-apple-darwin"    ;;
+                *)          env:error "your arch:($arch) are not supported" ; return 1 ;;
             esac ;;
-        linux)  paltform="x86_64-unknown-linux-gnu"       ;;
-        win)    paltform="x86_64-pc-windows-msvc"         ;;
-        *)  env:error "your OS:(" "$system" ") are not supported" ; return 1 ;;
+        linux)  printf "x86_64-unknown-linux-gnu"       ;;
+        win)    printf "x86_64-pc-windows-msvc"         ;;
+        *)  env:error "your system:($system) are not supported" ; return 1 ;;
     esac
 }
 # EndSection；
@@ -37,7 +37,8 @@ ___x_cmd_env_deno_get_version_info(){
 
 ___x_cmd_env_deno_get_download_url(){
     local version="${1:?Provide a version}"
-    ___x_cmd_env_deno_get_platform
+    local platform
+    platform="$(___x_cmd_env_deno_get_platform)"
     if [ $# -eq 0 ] ; then
          printf "download_url=https://github.com/denoland/deno/releases/latest/download/deno-%s.zip" "${paltform}"
     else printf "https://github.com/denoland/deno/releases/download/v%s/deno-%s.zip" "${version}" "${paltform}"

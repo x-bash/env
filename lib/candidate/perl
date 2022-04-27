@@ -17,7 +17,7 @@ ___x_cmd_env_perl_get_version_info(){
                             version = substr($0,RSTART+7,RLENGTH-16)
                             (version ~ pattern) { print version }
                         }' ;;
-        *)              env:error "your system:(" "$(x os name)" ") are not supported" ; return 1 ;;
+        *)              env:error "your system:($(x os name)) are not supported" ; return 1 ;;
     esac
 }
 # EndSection
