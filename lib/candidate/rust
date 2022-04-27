@@ -1,6 +1,6 @@
 # shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263    # xrc
 
-# Section(util): get_compression, get_system_platform
+# Section(util): get_compression, get_system_arch
 
 ___x_cmd_env_rust_get_compression(){
     case "$(x os name)" in
@@ -10,7 +10,7 @@ ___x_cmd_env_rust_get_compression(){
     esac
 }
 
-___x_cmd_env_rust_get_system_platform(){
+___x_cmd_env_rust_get_system_arch(){
     local _platform
     local _arch
     _platform="$(x os name)"
@@ -52,7 +52,7 @@ ___x_cmd_env_rust_get_download_url(){
     local version="${1:?Provide a version}"
     local system
     local arch
-    ___x_cmd_env_rust_get_system_platform
+    ___x_cmd_env_rust_get_system_arch
     printf "https://static.rust-lang.org/dist/rust-%s-%s-%s.%s" "${version}" "${arch}" "${system}" "$(___x_cmd_env_rust_get_compression)"
 }
 
