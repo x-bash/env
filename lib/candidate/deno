@@ -1,7 +1,8 @@
 # shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263    # xrc
 
-# Section: utils
-___x_cmd_env_deno_get_platform(){
+# Section(util): get_platform
+
+___x_cmd_env_deno_platform(){
     local system
     local arch
     system="$(x os name)"
@@ -19,31 +20,36 @@ ___x_cmd_env_deno_get_platform(){
         *)  env:error "your system:($system) are not supported" ; return 1 ;;
     esac
 }
+
 # EndSection；
 
-# Section: ls, la
+# Section(ls_remote): list_url, version_info
 
-___x_cmd_env_deno_get_list_url(){
+___x_cmd_env_deno_list_url(){
     printf "https://api.github.com/repos/denoland/deno/releases"
 }
 
-___x_cmd_env_deno_get_version_info(){
+___x_cmd_env_deno_version_info(){
     x ja 'k()=="tag_name" && ( v() ~ "'"$pattern"'" ) { print substr(v(),2); }'
 }
 
 # EndSection
 
-# Section: download, unpack
+# Section(download): download_url
 
-___x_cmd_env_deno_get_download_url(){
+___x_cmd_env_deno_download_url(){
     local version="${1:?Provide a version}"
     local platform
-    platform="$(___x_cmd_env_deno_get_platform)"
+    platform="$(___x_cmd_env_deno_platform)"
     if [ $# -eq 0 ] ; then
          printf "https://github.com/denoland/deno/releases/latest/download/deno-%s.zip" "${platform}"
     else printf "https://github.com/denoland/deno/releases/download/v%s/deno-%s.zip" "${version}" "${platform}"
     fi
 }
+
+# EndSection
+
+# Section(unpack): copy_to_unpackdir
 
 ___x_cmd_env_deno_copy_to_unpackdir(){
     mkdir -p "$unpack_dir/tmp/bin"

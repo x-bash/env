@@ -1,26 +1,23 @@
 # shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263,SC2120    # xrc
 
-# Section: Scala ls_remote
+# Section(ls_remote): list_url, version_info
 
-___x_cmd_env_scala_ls_remote(){
-    local pattern="${1:-""}"
-	local cache_expiration="${2:-86400}"
-	local cache_path="$___X_CMD_ENV_PATH/scala/cache/cache_list"
-	___x_cmd_httpget "https://www.scala-lang.org/download/all.html" "$cache_path" "$cache_expiration" && \
+___x_cmd_env_scala_list_url(){
+    printf "https://www.scala-lang.org/download/all.html"
+}
+
+___x_cmd_env_scala_version_info(){
 	awk -v pattern="$pattern"  'match($0, /\/[0-9.]+.html/) {
         version = substr($0, RSTART+1, RLENGTH-6)
-        if (pattern == "" || index(version, pattern) > 0) {
-            print version
-        }
-    }' <"$cache_path" \
-        | ___x_cmd_env_common_sort_version | ___x_cmd_env_common_simplify_version
+        if (version ~ pattern) { print version }
+    }'
 }
 
 # EndSection
 
-# Section: download
+# Section(download): download_url
 
-___x_cmd_env_scala_get_download_url(){
+___x_cmd_env_scala_download_url(){
 	local version="${1:?Provide a version}"
     # TODO: optimizable
     case ${version} in

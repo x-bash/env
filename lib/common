@@ -53,8 +53,8 @@ ___x_cmd_env_common_ls_remote() {
   	local cache_expiration="${3:-86400}"
 	local cache_path="$___X_CMD_ENV_PATH/$candidate/cache/version_list"
 
-    ___x_cmd_httpget "$("___x_cmd_env_${candidate}_get_list_url")" "$cache_path" "-" &&
-    < "$cache_path" "___x_cmd_env_${candidate}_get_version_info"
+    ___x_cmd_httpget "$("___x_cmd_env_${candidate}_list_url")" "$cache_path" "$cache_expiration" &&
+    < "$cache_path" "___x_cmd_env_${candidate}_version_info" | ___x_cmd_env_common_sort_version | ___x_cmd_env_common_simplify_version
 }
 
 ___x_cmd_env_common_la(){
@@ -196,7 +196,7 @@ ___x_cmd_env_common_download_archive(){
         return 0
     fi
 
-    if ! compression="$(___x_cmd_env_run_if_exist get_compression "$candidate" "$version")"; then
+    if ! compression="$(___x_cmd_env_run_if_exist compression "$candidate" "$version")"; then
 		env:error "Failed to get compression of $candidate $version."
 		return 1
 	fi
@@ -204,7 +204,7 @@ ___x_cmd_env_common_download_archive(){
     local archive_path="$___X_CMD_ENV_PATH/$candidate/archive/$candidate-$version.${compression:-zip}"
     mkdir -p "${archive_path%/*}"
     local download_url
-    if ! download_url="$("___x_cmd_env_${candidate}_get_download_url" "$version")"; then
+    if ! download_url="$("___x_cmd_env_${candidate}_download_url" "$version")"; then
         env:error "Failed to get download url for $candidate $version"
         return 1
     fi
@@ -224,7 +224,7 @@ ___x_cmd_env_common_unpack(){
     env:info "Unpacking: $candidate $version"
 
     local compression
-    if ! compression="$(___x_cmd_env_run_if_exist get_compression "$candidate" "$version")"; then
+    if ! compression="$(___x_cmd_env_run_if_exist compression "$candidate" "$version")"; then
 		env:error "Failed to get compression of $candidate $version."
 		return 1
 	fi

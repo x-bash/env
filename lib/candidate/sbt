@@ -1,30 +1,30 @@
 # shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263,SC2120    # xrc
 
-# Section: sbt ls_remote
-___x_cmd_env_sbt_get_version_info(){
+# Section(util): compression
+
+___x_cmd_env_sbt_compression(){
+    printf 'tgz'
+}
+
+# EndSection
+
+# Section(ls_remote): list_url, version_info
+___x_cmd_env_sbt_version_info(){
     awk -v pattern="$pattern" 'match($0,/sbt [0-9.]+/) {
         version = substr($0,RSTART+4,RLENGTH-1)
         if (version ~ pattern ) { print version }
     }'
 }
 
-___x_cmd_env_sbt_get_list_url(){
+___x_cmd_env_sbt_list_url(){
     printf "https://www.scala-sbt.org/download.html"
 }
 
 # EndSection
 
-# Section: sbt download_archive
-___x_cmd_env_sbt_get_download_url(){
+# Section(download): download_url
+___x_cmd_env_sbt_download_url(){
     local version="${1:?Provide a version}"
     printf "https://github.com/sbt/sbt/releases/download/v%s/sbt-%s.tgz" "${version}" "${version}"
 }
-# EndSection
-
-# Section: sbt unpack
-
-___x_cmd_env_sbt_get_compression(){
-    printf 'tgz'
-}
-
 # EndSection

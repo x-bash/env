@@ -1,26 +1,23 @@
 # shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263,SC2120    # xrc
 
-# Section: Springboot ls_remote
+# Section(ls_remote): list_url, version_info
 
-___x_cmd_env_springboot_ls_remote(){
-    local pattern="${1:-""}"
-    local cache_expiration="${2:-86400}"
-    local cache_path="$___X_CMD_ENV_PATH/springboot/cache/version_list"
-    ___x_cmd_httpget "https://repo.spring.io/ui/api/v1/ui/nativeBrowser/release/org/springframework/boot/spring-boot-cli" "$cache_path" "$cache_expiration" &&\
+___x_cmd_env_springboot_list_url(){
+    printf "https://repo.spring.io/ui/api/v1/ui/nativeBrowser/release/org/springframework/boot/spring-boot-cli"
+}
+
+___x_cmd_env_springboot_version_info(){
     awk -v pattern="$pattern" 'match($0,/"[.-9]+(RELEASE)?[0-9A-Z.]+?/){
         version = substr($0,RSTART+1, RLENGTH-1)
-        if (pattern == "" || index(version, pattern) > 0) {
-            print version
-        }
-    } ' < "$cache_path" \
-        | ___x_cmd_env_common_sort_version | ___x_cmd_env_common_simplify_version
+        if (version ~ pattern) { print version }
+    } '
 }
 
 # EndSection
 
 # Section: download
 
-___x_cmd_env_springboot_get_download_url(){
+___x_cmd_env_springboot_download_url(){
     local version="${1:?Provide a version}"
     printf "https://repo.spring.io/simple/release/org/springframework/boot/spring-boot-cli/%s/spring-boot-cli-%s-bin.zip" "${version}" "${version}"
 }

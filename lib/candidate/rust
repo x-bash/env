@@ -1,8 +1,8 @@
 # shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263    # xrc
 
-# Section(util): get_compression, get_system_arch
+# Section(util): compression, get_system_arch
 
-___x_cmd_env_rust_get_compression(){
+___x_cmd_env_rust_compression(){
     case "$(x os name)" in
         linux|darwin|win)      printf "tar.gz"    ;;
         *)          env:error "your arch:($(x os name)) are not supported"
@@ -34,31 +34,31 @@ ___x_cmd_env_rust_get_system_arch(){
 
 # EndSection
 
-# Section(ls_remote):
+# Section(ls_remote): list_url, version_info
 
-___x_cmd_env_rust_get_list_url(){
+___x_cmd_env_rust_list_url(){
     printf "https://api.github.com/repos/rust-lang/rust/releases"
 }
 
-___x_cmd_env_rust_get_version_info(){
+___x_cmd_env_rust_version_info(){
     x ja 'k()=="tag_name" && ( v() ~ "'"$pattern"'" ) { print v() } '
 }
 
 # EndSection
 
-# Section(download):
+# Section(download): download_url
 
-___x_cmd_env_rust_get_download_url(){
+___x_cmd_env_rust_download_url(){
     local version="${1:?Provide a version}"
     local system
     local arch
     ___x_cmd_env_rust_get_system_arch
-    printf "https://static.rust-lang.org/dist/rust-%s-%s-%s.%s" "${version}" "${arch}" "${system}" "$(___x_cmd_env_rust_get_compression)"
+    printf "https://static.rust-lang.org/dist/rust-%s-%s-%s.%s" "${version}" "${arch}" "${system}" "$(___x_cmd_env_rust_compression)"
 }
 
 # EndSection
 
-# Section(unpack):
+# Section(unpack): copy_to_unpackdir
 
 ___x_cmd_env_rust_copy_to_unpackdir()(
     local version="${1:?Provide a version}"

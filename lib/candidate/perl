@@ -1,8 +1,16 @@
 # shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263    # xrc
 
-# Section: ls remote
+# Section(util): compression
+___x_cmd_env_perl_compression(){
+    case "$(x os name)" in
+        darwin|linux)  printf "tar.gz" ;;
+    esac
+}
+# EndSection
 
-___x_cmd_env_perl_get_list_url(){
+# Section(ls_remote): list_url, version_info
+
+___x_cmd_env_perl_list_url(){
     case "$(x os name)" in
         linux|darwin)      printf "https://api.github.com/repos/skaji/relocatable-perl/releases"   ;;
         win)               printf "https://strawberryperl.com/releases.html"                       ;;
@@ -10,7 +18,7 @@ ___x_cmd_env_perl_get_list_url(){
     esac
 }
 
-___x_cmd_env_perl_get_version_info(){
+___x_cmd_env_perl_version_info(){
     case "$(x os name)" in
         linux|darwin)   x ja 'k()=="tag_name" && ( v() ~ "'"$pattern"'" ){ print v(); }' ;;
         win)            awk -v pattern="$pattern" ' match($0, /<td><b>[0-9.]+<\/b><\/td>/) {
@@ -22,8 +30,9 @@ ___x_cmd_env_perl_get_version_info(){
 }
 # EndSection
 
-# Section: download
-___x_cmd_env_perl_get_download_url(){
+# Section(download): download_url
+
+___x_cmd_env_perl_download_url(){
     local version="${version}"
     case "$(x os name)" in
         linux)  printf "https://github.com/skaji/relocatable-perl/releases/download/%s/perl-x86_64-linux.tar.gz" "${version}"   ;;
@@ -38,12 +47,5 @@ ___x_cmd_env_perl_get_download_url(){
         *)      env:error "your system:($(x os name)) are not supported" return 1 ;;
     esac
 }
-# EndSection
 
-# Section: unpack
-___x_cmd_env_perl_get_compression(){
-    case "$(x os name)" in
-        darwin|linux)  printf "tar.gz" ;;
-    esac
-}
 # EndSection

@@ -2,9 +2,9 @@
 
 ___X_CMD_ENV_NODE_MIRROR="https://nodejs.org/dist"
 
-# Section: util get_compression
+# Section(util):  compression
 
-___x_cmd_env_node_get_compression(){
+___x_cmd_env_node_compression(){
     case "$(x os name)" in
         win)        printf 'zip'   ;;
         *)          printf 'tar.gz';;
@@ -13,13 +13,13 @@ ___x_cmd_env_node_get_compression(){
 
 # EndSection
 
-# Section: ls_remote
+# Section(ls_remote): list_url, version_info
 
-___x_cmd_env_node_get_list_url(){
+___x_cmd_env_node_list_url(){
     printf "%s" "$___X_CMD_ENV_NODE_MIRROR/index.tab"
 }
 
-___x_cmd_env_node_get_version_info(){
+___x_cmd_env_node_version_info(){
     awk -v pattern="$pattern" -v prev_codename="x-cmd" '
         ((NR>1)&&($1)){
             codename=$10
@@ -35,9 +35,9 @@ ___x_cmd_env_node_get_version_info(){
 
 # EndSection
 
-# Section: download
+# Section(download): download_url
 
-___x_cmd_env_node_get_download_url(){
+___x_cmd_env_node_download_url(){
     local version="${1:?Provide node version}"
     local system
     local arch
@@ -57,7 +57,7 @@ A
     fi
     # TODO: node <= 0.1.13 does not have a directory
     local slug="node-${version}-${system}-${arch}"
-    printf "%s/%s/%s.%s" "${___X_CMD_ENV_NODE_MIRROR}" "${version}" "${slug}" "$(___x_cmd_env_node_get_compression)"
+    printf "%s/%s/%s.%s" "${___X_CMD_ENV_NODE_MIRROR}" "${version}" "${slug}" "$(___x_cmd_env_node_compression)"
 }
 # EndSection
 

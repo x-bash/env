@@ -7,33 +7,41 @@ ___X_CMD_ENV_SDK_PLATFORM="$(printf "%s%s" "$(x os name)" "$(x os arch)" | tr '[
 
 # EndSection
 
-# Section: Java ls_remote
+# Section(util): compression
 
-___x_cmd_env_java_get_list_url() {
+___x_cmd_env_java_compression(){
+	if ! [ "$(x os name)" = "win" ]; then
+		printf "tar.gz"
+	fi
+}
+
+# EndSection
+
+# Section(ls_remote): list_url, version_info
+
+___x_cmd_env_java_list_url() {
     printf "https://api.sdkman.io/2/candidates/%s/%s/versions/all" \
         "$candidate" "$___X_CMD_ENV_SDK_PLATFORM"
 }
 
-___x_cmd_env_java_get_version_info(){
+___x_cmd_env_java_version_info(){
 	#TODO: To add more support not only for openjdk
     awk -v pattern="$pattern" 'BEGIN{ RS=","} ($0 ~ pattern)&&($0 ~ "-open$") { print $0 }'
 }
 
 # EndSection
 
-# Section: download, unpack
+# Section(download): download_url
 
-___x_cmd_env_java_get_download_url(){
+___x_cmd_env_java_download_url(){
     local version="${1:?Provide a version}"
     printf "https://api.sdkman.io/2/broker/download/java/%s/%s" \
 		 "$version" "$___X_CMD_ENV_SDK_PLATFORM"
 }
 
-___x_cmd_env_java_get_compression(){
-	if ! [ "$(x os name)" = "win" ]; then
-		printf "tar.gz"
-	fi
-}
+# EndSection
+
+# Section(unpack): copy_to_unpackdir
 
 ___x_cmd_env_java_copy_to_unpackdir(){
 	if [ "$(x os name)" = "darwin" ]; then
