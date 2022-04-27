@@ -168,7 +168,7 @@ ___x_cmd_env_common_current(){
 # Section: download unpack
 
 ___x_cmd_env_common_download(){
-    local candidate="${1:?Provide canddidate}"
+    local candidate="${1:?Provide candidate}"
     local version="${2:?Provide version}"
 
     if ___x_cmd_env_util_is_downloaded "$candidate" "$version" 2>/dev/null ; then
@@ -188,27 +188,27 @@ ___x_cmd_env_common_download(){
 }
 
 ___x_cmd_env_common_download_archive(){
-    local candidate="${1:?Provide canddidate}"
+    local candidate="${1:?Provide candidate}"
     local version="${2:?Provide version}"
 
     if ___x_cmd_env_util_is_archive_cached "$candidate" "$version" 2>/dev/null; then
         env:info "Archive existed: $version"
         return 0
     fi
-    
-    if ! compression="$(___x_cmd_env_run_if_exist get_compression "$candidate" "$version")"; then
-		env:error "Failed to get compression of $candidate $version."
-		return 1
-	fi
+
+    # if ! compression="$(___x_cmd_env_run_if_exist get_compression "$candidate" "$version")"; then
+	# 	env:error "Failed to get compression of $candidate $version."
+	# 	return 1
+	# fi
 
     local archive_path="$___X_CMD_ENV_PATH/$candidate/archive/$candidate-$version.${compression:-zip}"
     mkdir -p "${archive_path%/*}"
     local download_url
-    if ! download_url="$("___x_cmd_env_${candidate}_get_download_url" "$candidate" "$version")"; then
+    if ! download_url="$(___x_cmd_env_${candidate}_get_download_url "$version")"; then
         env:error "Failed to get download url for $candidate $version"
         return 1
     fi
-
+echo "$download_url" "  5555"
     env:info "Downloading $download_url"
     if ! curl --progress-bar --location --retry-max-time 10 --retry 0 "$download_url" --output "$archive_path" ; then
         env:error "Download failure from $download_url"
@@ -219,7 +219,7 @@ ___x_cmd_env_common_download_archive(){
 }
 
 ___x_cmd_env_common_unpack(){
-    local candidate="${1:?Provide canddidate}"
+    local candidate="${1:?Provide candidate}"
 	local version="${2:?Provide a version}"
     env:info "Unpacking: $candidate $version"
 
@@ -254,7 +254,7 @@ ___x_cmd_env_common_unpack(){
 
 # Section: install, uninstall
 ___x_cmd_env_common_install(){
-    local candidate="${1:?Provide canddidate}"
+    local candidate="${1:?Provide candidate}"
     local version="${2:?Provide version}"
     local use_shims="${3:-""}"
 
