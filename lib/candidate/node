@@ -1,7 +1,35 @@
 # shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263,SC2120    # xrc
 
 ___X_CMD_ENV_NODE_MIRROR="https://nodejs.org/dist"
+# Section: util
+___x_cmd_env_go_get_system_platform(){
+    case "$(x os name)" in
+        linux)      ___x_cmd_env_platform=Linux    ;;
+        win)        ___x_cmd_env_platform=win  ;;
+        darwin)     ___x_cmd_env_platform=darwin   ;;
+        *)          _env:error "your arch:(" "$(___x_cmd_os name)" ") are not supported"
+                    return 1
+                    ;;
+    esac
+    case "$(x os arch)" in
+        x86)           ___x_cmd_env_arch=386        ;;
+        x64)           ___x_cmd_env_arch=amd64      ;;
+        arm64)         ___x_cmd_env_arch=arm64      ;;
+        armv7l|ARMv6)  ___x_cmd_env_arch=armv6l     ;;
+        *)  env:error "your arch:(" "$(___x_cmd_os arch)" ") are not supported"
+            return 1
+            ;;
+    esac
+}
 
+___x_cmd_env_go_get_compression(){
+    case "$(x os name)" in
+        win)        printf 'zip'   ;;
+        *)          printf 'tar.gz';;
+    esac
+}
+
+#EndSection
 # Section: ls_remote
 
 ___x_cmd_env_node_ls_remote(){
@@ -27,48 +55,21 @@ ___x_cmd_env_node_ls_remote(){
 
 # Section: download
 
-___x_cmd_env_node_download_archive(){
-
+___x_cmd_env_node_get_download_url(){
     local version="${1:?Provide node version}"
-
-    if ___x_cmd_env_util_is_archive_cached node "$version" 2>/dev/null; then
-        env:info "Archive existed: $version"
-        return 0
-    fi
-
-    local platform
-    local arch
-    {
-        read -r platform
-        read -r arch
-    } <<A
-$(x os name; x os arch)
-A
-
-    local compression='tar.gz'; [ "${platform}" = 'win' ] && compression='zip' # TODO: tar.xz support
-    local archive_path="$___X_CMD_ENV_PATH/node/archive/node-${version}.${compression}"
-    mkdir -p "$(dirname "$archive_path")"
+    ___x_cmd_env_node_get_system_platform
+    local compression='tar.gz'; [ "${___x_cmd_env_platform}" = 'win' ] && compression='zip' # TODO: tar.xz support
 
     # TODO: Consider use config instead of code in the future
     local version_without_v="${version#v}"
-    if [ "$platform-$arch" = "darwin-arm64" ] && [ "${version_without_v%%.*.*}" -lt 16 ]; then
+    if [ " $___x_cmd_env_platform-$___x_cmd_env_arch" = "darwin-arm64" ] && [ "${version_without_v%%.*.*}" -lt 16 ]; then
         env:warn "You are using darwin arm64, but node $version is not available for this platform. (node < 16.x)"
         env:warn "Use x86_64 instead."
         arch="x64"
     fi
-
     # TODO: node <= 0.1.13 does not have a directory
-    local slug="node-${version}-${platform}-${arch}"
-    local download_url="${___X_CMD_ENV_NODE_MIRROR}/${version}/${slug}.${compression}"
-    if ! curl -L -C - --progress-bar "${download_url}" -o "${archive_path}"; then
-        rm -rf "${archive_path}"
-        env:error "Download from ${download_url} failed."
-        return 1
-    fi
-
-    # TODO: checksum
-
-    env:info "Downloaded ${download_url} to ${archive_path}"
+    local slug="node-${version}-${ ___x_cmd_env_platform}-${___x_cmd_env_arch}"
+    printf "%s/%s/%s.%s" "${___X_CMD_ENV_NODE_MIRROR}" "${version}" "${slug}" "${compression}"
 }
 # EndSection
 
@@ -91,16 +92,8 @@ ___x_cmd_env_node_unpack_other(){
 }
 
 ___x_cmd_env_node_unpack(){
-    local version="${1:?Provide node version}"
-    local platform
-    local arch
-    {
-        read -r platform
-        read -r arch
-    } <<A
-$(x os name; x os arch)
-A
-    local compression='tar.gz'; [ "${platform}" = 'win' ] && compression='zip' # TODO: tar.xz support
+    ___x_cmd_env_go_get_system_platform
+    local compression='tar.gz'; [ "${___x_cmd_env_platform}" = 'win' ] && compression='zip' # TODO: tar.xz support
     local archive_path="$___X_CMD_ENV_PATH/node/archive/node-${version}.${compression}"
 
     local archive_unpack_files

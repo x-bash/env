@@ -73,13 +73,8 @@ ___x_cmd_env_python_ls_remote(){
 
 # Section: download, unpack
 
-___x_cmd_env_python_download_archive(){
+___x_cmd_env_python_get_download_url(){
     local version="${1:?Provide python version}"
-
-    if ___x_cmd_env_util_is_archive_cached python "$version" 2>/dev/null; then
-        env:info "Archive existed: $version"
-        return 0
-    fi
 
     local miniconda_filename
     local ___X_CMD_ENV_COMPRESSION
