@@ -28,20 +28,14 @@ ___x_cmd_env_python_get_platform_arch(){
 }
 
 ___x_cmd_env_python_get_compression(){
-    local system
-    local arch
-    local compression
-    if ___x_cmd_env_python_get_platform_arch ; then
-        if [ $system = "Windows" ] ; then
-            compression="exe"
-        else
-            compression="sh"
-        fi
+    if [ "$(x os name)" = "win" ] ; then
+        printf "exe"
+    else
+        printf "sh"
     fi
-    printf "%s" "$compression"
 }
 ___x_cmd_env_python_get_miniconda_filename(){
-    local version=${1:?Provide a Version}
+    local version="${1:?Provide a Version}"
     local system
     local arch
     local compression
@@ -54,7 +48,7 @@ ___x_cmd_env_python_get_miniconda_filename(){
 }
 
 # EndSection
-https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-4.1.11-Linux-x86_64.sh
+
 # Section: ls, la
 
 ___x_cmd_env_python_get_list_url(){
