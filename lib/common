@@ -101,7 +101,7 @@ ___x_cmd_env_common_use(){
         version_path="${___X_CMD_ENV_PATH}/$candidate/versions/$version/bin"
     else
         version_path="${___X_CMD_ENV_PATH}/$candidate/shims"
-        ___x_cmd_env_util_make_shim_dir "$candidate" "${version}" || return 1
+        ___x_cmd_env_util_make_shim_dir "$candidate" "$version" || return 1
     fi
 
     ___x_cmd_env_util_add_path "$version_path" || return 1
@@ -118,7 +118,7 @@ ___x_cmd_env_common_try(){
 
     ___x_cmd_env_util_is_downloaded "$candidate" "$version" 2>/dev/null || return 1
     ___x_cmd_env_util_add_path "$version_path" && \
-        env:info "Setting ${candidate} ${version} in current Shell."
+        env:info "Setting ${candidate} $version in current Shell."
 }
 
 # EndSection
@@ -274,11 +274,11 @@ ___x_cmd_env_common_uninstall(){
     local version="${2:?Provide the version}"
     env:info "Uninstalling $1 $2"
 
-    local candidate_path="$___X_CMD_ENV_PATH/${candidate}/versions/${version}"
+    local candidate_path="$___X_CMD_ENV_PATH/${candidate}/versions/$version"
     if [ -d "$candidate_path" ]; then
         rm -rf "${candidate_path}"
     else
-        env_log  warn "This ${candidate} ${version} is no exist."
+        env_log  warn "This ${candidate} $version is no exist."
         return 1
     fi
     ___x_cmd_env_common_init_file_rm "$candidate"
@@ -315,11 +315,11 @@ ___x_cmd_env_common_exec(){
     local cmd="${2:?Provide command}"
     local version="${3:?Provide version}"; shift 3
 
-    if ! ___x_cmd_env_util_is_downloaded "${candidate}" "${version}" 2>/dev/null ; then
+    if ! ___x_cmd_env_util_is_downloaded "${candidate}" "$version" 2>/dev/null ; then
         env:error "Candidate $candidate No such version: $version"
         return 1
     fi
     env:info "Executing $candidate $version $cmd"
-    PATH="${___X_CMD_ENV_PATH}/${candidate}/versions/${version}/bin:$PATH" "$cmd" "$@"
+    PATH="${___X_CMD_ENV_PATH}/${candidate}/versions/$version/bin:$PATH" "$cmd" "$@"
 }
 # EndSection
