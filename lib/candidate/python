@@ -5,7 +5,7 @@
 ___x_cmd_env_python_get_system_arch(){
     case "$(x os name)" in
         linux)      system=Linux                     ;;
-        windows)    system=Windows                   ;;
+        win)        system=Windows                   ;;
         darwin)     system=MacOSX                    ;;
         *)          env:error "your arch:($(x os name)) are not supported"
                     return 1 ;;
@@ -50,7 +50,7 @@ ___x_cmd_env_python_version_info(){
     local arch
     ___x_cmd_env_python_get_system_arch || return 1
     awk -v pattern="$pattern" -v sys="$system" -v arch="$arch" '
-    BEGIN{RS="<a href=";FS="\""} (match($2, "^.*-" sys "-" arch ".sh$")) {
+    BEGIN{RS="<a href=";FS="\""} (match($2, "^.*-" sys "-" arch "(.sh|.exe)$")) {
         split($2, a, /-/)
         version = a[2]
         if (version ~ pattern) { print version }
