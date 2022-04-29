@@ -14,14 +14,14 @@ IFS=" "
 printf "%s" "$LANG_PREFIX" | while read -r lang suffix; do
     suffix="${suffix:-$lang}"
     @assert stdout x env exec "$lang" "$P.$suffix" <<A
-Hello, world.
+Hello, x-cmd!
 A
 done
 
 printf "%s" "$LANG_PREFIX" | while read -r lang suffix; do
     suffix="${suffix:-$lang}"
     @assert stdout x env exec "$lang=latest" "$P.$suffix" <<A
-Hello, world.
+Hello, x-cmd!
 A
 done
 
