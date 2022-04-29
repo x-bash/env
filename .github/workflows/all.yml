@@ -23,3 +23,11 @@ jobs:
       - uses: x-cmd/action@main
         with:
           shellcode: docker run -it xcmd/${{image}} x test
+
+  run-on-docker-auto:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: x-cmd/action@main
+        with:
+          shellcode: xws test-container
+
