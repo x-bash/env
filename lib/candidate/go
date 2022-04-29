@@ -2,23 +2,29 @@
 
 # Section(util): get_system_arch compression
 
+# system="$(x incase "$(x os name)" linux linux win :windows darwin :darwin)" || x log panic "your system:($(x os name)) are not supported"
+# arch="$(x incase "$(x os arch)" x86:386 x64:amd64 arm64:arm64 armv7l:armv6l ARMv6:armv6l)" || x log panic "Your arch:($(x os arch)) are not supported"
+
 ___x_cmd_env_go_get_system_arch(){
     case "$(x os name)" in
-        linux)      system=linux    ;;
-        win)        system=windows  ;;
-        darwin)     system=darwin   ;;
-        *)          env:error "your system:($(x os name)) are not supported"
-                    return 1 ;;
+        linux)              system=linux    ;;
+        win)                system=windows  ;;
+        darwin)             system=darwin   ;;
+        *)                  env:error "your system:($(x os name)) are not supported"
+                            return 1 ;;
     esac
     case "$(x os arch)" in
-        x86)           arch=386        ;;
-        x64)           arch=amd64      ;;
-        arm64)         arch=arm64      ;;
-        armv7l|ARMv6)  arch=armv6l     ;;
-        *)  env:error "your arch:($(x os arch)) are not supported"
-            return 1 ;;
+        x86)                arch=386        ;;
+        x64)                arch=amd64      ;;
+        arm64)              arch=arm64      ;;
+        armv7l|ARMv6)       arch=armv6l     ;;
+        *)                  env:error "your arch:($(x os arch)) are not supported"
+                            return 1 ;;
     esac
 }
+
+# x ifelse '[ "$(x os name)" = win ]' zip tar.gz
+# x case "$(x os name)" win:zip linux:tar.gz linux:zbc
 
 ___x_cmd_env_go_compression(){
     case "$(x os name)" in
