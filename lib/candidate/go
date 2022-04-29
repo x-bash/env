@@ -65,6 +65,7 @@ ___x_cmd_env_go_download_url(){
     local arch
     ___x_cmd_env_go_get_system_arch || return 1
     local compression
+    # compression="$(x ifelse '[ "$(x os name)" = win ]' zip tar.gz)"
     compression="$(___x_cmd_env_go_compression)"
     printf "https://golang.google.cn/dl/go%s.%s-%s.%s" "$version" "$system" "$arch" "$compression"
 }
