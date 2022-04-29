@@ -22,8 +22,8 @@ ___x_cmd_env_java_compression(){
 # Section(ls_remote): list_url, version_info
 
 ___x_cmd_env_java_list_url() {
-    printf "https://api.sdkman.io/2/candidates/%s/%s/versions/all" \
-        "$candidate" "$___X_CMD_ENV_SDK_PLATFORM"
+    printf "https://api.sdkman.io/2/candidates/java/%s/versions/all" \
+        "$___X_CMD_ENV_SDK_PLATFORM"
 }
 
 ___x_cmd_env_java_version_info(){
@@ -36,8 +36,7 @@ ___x_cmd_env_java_version_info(){
 # Section(download): download_url
 
 ___x_cmd_env_java_download_url(){
-    local version="${1:?Provide a version}"
-    printf "https://api.sdkman.io/2/candidates/java/%s/%s/all" \
+    printf "https://api.sdkman.io/2/broker/download/java/%s/%s" \
 		 "$version" "$___X_CMD_ENV_SDK_PLATFORM"
 }
 
