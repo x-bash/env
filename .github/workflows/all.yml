@@ -15,7 +15,7 @@ jobs:
           shellcode: x test
 
   run-on-docker:
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         image: [ debian, centos ]
