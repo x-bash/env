@@ -39,7 +39,6 @@ ___x_cmd_env_java_download_url(){
     printf "https://api.sdkman.io/2/broker/download/java/%s/%s" \
 		 "$version" "$___X_CMD_ENV_SDK_PLATFORM"
 }
-
 # EndSection
 
 # Section(unpack): copy_to_unpackdir
