@@ -1,0 +1,33 @@
+name: Try to do some thing
+on:
+  # push:
+  workflow_dispatch:
+
+jobs:
+  run-on-os:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, windows, macos ]
+    steps:
+      - uses: x-cmd/action@main
+        with:
+          shellcode: x test
+
+  # run-on-docker:
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     matrix:
+  #       image: [ debian, centos ]
+  #   steps:
+  #     - uses: x-cmd/action@main
+  #       with:
+  #         shellcode: docker run -it xcmd/${{image}} x test
+
+  run-on-docker-auto:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: x-cmd/action@main
+        with:
+          shellcode: xws test-container
+
