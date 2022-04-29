@@ -4,7 +4,9 @@
 
 # TODO: TO handle armv7l and windows
 ___X_CMD_ENV_SDK_PLATFORM="$(printf "%s%s" "$(x os name)" "$(x os arch)" | tr '[:lower:]' '[:upper:]' )"
-
+if [ "$___X_CMD_ENV_SDK_PLATFORM" = "WINX64" ] ; then
+    ___X_CMD_ENV_SDK_PLATFORM="mingw64_nt_10.0"
+fi
 # EndSection
 
 # Section(util): compression
