@@ -5,6 +5,7 @@
 ___x_cmd_env_common_full_version_remote(){
     local candidate="${1:?Provide candidate}"
     local pattern="${2}"
+    local cache_expiration="${3}"
     ___x_cmd_env_run_common_if_notfound ls_remote "$candidate" "$pattern" "$3" \
         | awk 'END{ if (NR<=0) { exit(1) } else print $1;}'
 }
@@ -12,7 +13,7 @@ ___x_cmd_env_common_full_version_remote(){
 ___x_cmd_env_common_full_version_local(){
     local candidate="${1:?Provide candidate}"
     local pattern="${2}"
-    ___x_cmd_env_run_common_if_notfound ls_local "$candidate" "$pattern" "$3" \
+    ___x_cmd_env_run_common_if_notfound ls_local "$candidate" "$pattern" \
         | awk 'END{ if (NR<=0) { exit(1) } else print $1;}'
 }
 
