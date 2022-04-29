@@ -2,6 +2,6 @@
 class HelloController {
     @RequestMapping("/home")
     String home() {
-        "Hello World!"
+        "Hello, x-cmd!"
     }
 }
