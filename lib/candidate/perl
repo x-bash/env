@@ -23,7 +23,7 @@ ___x_cmd_env_perl_version_info(){
         linux|darwin)   x ja 'k()=="tag_name" && ( v() ~ "'"$pattern"'" ){ print v(); }' ;;
         win)            awk -v pattern="$pattern" ' match($0, /<td><b>[0-9.]+<\/b><\/td>/) {
                             version = substr($0,RSTART+7,RLENGTH-16)
-                            (version ~ pattern) { print version }
+                            if (version ~ pattern) { print version }
                         }' ;;
         *)              env:error "your system:($(x os name)) are not supported" ; return 1 ;;
     esac

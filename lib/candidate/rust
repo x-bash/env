@@ -13,7 +13,7 @@ ___x_cmd_env_rust_compression(){
 ___x_cmd_env_rust_get_system_arch(){
     case "$(x os name)" in
         linux)      system="unknown-linux-gnu"                ;;
-        win)    system="pc-windows-msvc"                  ;;
+        win)        system="pc-windows-msvc"                  ;;
         darwin)     system="apple-darwin"                     ;;
         *)          env:error "your system:($(x os name)) are not supported"
                     return 1                                  ;;
