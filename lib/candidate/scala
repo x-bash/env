@@ -27,6 +27,9 @@ ___x_cmd_env_scala_download_url(){
     esac
 }
 
+___x_cmd_env_scala_copy_to_unpackdir(){
+    chmod -R +x "$unpack_dir"/*/bin/*
+}
 # EndSection
 
 # Section: ui_catsel
