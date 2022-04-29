@@ -1,15 +1,15 @@
 # shellcheck shell=sh disable=SC2039,SC1090,SC3043,SC2263,SC2120    # xrc
 
-# Section: ___X_CMD_ENV_SDK_PLATFORM
+# Section(util): platform  compression
 
-# TODO: TO handle armv7l and windows
-___X_CMD_ENV_SDK_PLATFORM="$(printf "%s%s" "$(x os name)" "$(x os arch)" | tr '[:lower:]' '[:upper:]' )"
-if [ "$___X_CMD_ENV_SDK_PLATFORM" = "WINX64" ] ; then
-    ___X_CMD_ENV_SDK_PLATFORM="mingw64_nt_10.0"
-fi
-# EndSection
-
-# Section(util): compression
+___x_cmd_env_java_platform(){
+    local system
+    system="$(x os name)"
+    case "$system" in
+        win)    printf "mingw64_nt_10.0" ;;
+        *)      printf "%s%s" "$system" "$(x os arch)" | tr '[:lower:]' '[:upper:]' ;;
+    esac
+}
 
 ___x_cmd_env_java_compression(){
 	if ! [ "$(x os name)" = "win" ]; then
@@ -23,7 +23,7 @@ ___x_cmd_env_java_compression(){
 
 ___x_cmd_env_java_list_url() {
     printf "https://api.sdkman.io/2/candidates/java/%s/versions/all" \
-        "$___X_CMD_ENV_SDK_PLATFORM"
+        "$(___x_cmd_env_java_platform)"
 }
 
 ___x_cmd_env_java_version_info(){
@@ -36,8 +36,9 @@ ___x_cmd_env_java_version_info(){
 # Section(download): download_url
 
 ___x_cmd_env_java_download_url(){
+    local version="$1"
     printf "https://api.sdkman.io/2/broker/download/java/%s/%s" \
-		 "$version" "$___X_CMD_ENV_SDK_PLATFORM"
+		 "$version" "$(___x_cmd_env_java_platform)"
 }
 # EndSection
 
