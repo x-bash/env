@@ -1,12 +1,12 @@
 
-LANG_VERSION="
-go      1.17
+LANG_VERSION="go      1.17.9
 scala   3.0.2
 sbt     1.6.0
 "
 
-IFS=" "
+# IFS=" "
 printf "%s" "$LANG_VERSION" | while read -r lang version; do
-    assert true x env use "$lang" "$version"
-    @assert "$(x env current scala)" = "$version"
+    x env download "$lang" "$version"
+    @assert true x env use "$lang" "$version"
+    @assert "$(x env current "$lang")" = "$version"
 done
