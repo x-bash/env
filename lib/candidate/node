@@ -4,10 +4,7 @@ ___X_CMD_ENV_NODE_MIRROR="https://nodejs.org/dist"
 
 # Section(util):  compression
 ___x_cmd_env_node_compression(){
-    case "$(x os name)" in
-        win)        printf 'zip'   ;;
-        *)          printf 'tar.gz';;
-    esac
+    x ifelse '[ $(x os name) = win ]' zip tar.gz
 }
 ## EndSection
 

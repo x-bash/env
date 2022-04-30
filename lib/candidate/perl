@@ -36,7 +36,7 @@ ___x_cmd_env_perl_download_url(){
     local version="$version"
     local SKAI="https://github.com/skaji/relocatable-perl/releases/download"
     case "$(x os name)" in
-        linux)              printf "%s/%s/perl-x86_64-linux.tar.gz" "$SKAI" "$version"   ;;
+        linux)              printf "%s/%s/perl-x86_64-linux.tar.gz" "$SKAI" "$version"  ;;
         darwin)             printf "%s/%s/perl-darwin-2level.tar.gz" "$SKAI" "$version" ;;
         win)
                             local download_base_url="https://strawberryperl.com/download/${version}/strawberry-perl-${version}"
