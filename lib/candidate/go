@@ -11,6 +11,11 @@ ___x_cmd_env_go_get_system_arch(){
         { env:error "your arch:($(x os arch)) are not supported" && return 1; }
     arch="$___X_CMD_CASE_RESULT"
 }
+
+___x_cmd_env_go_compression(){
+    x ifelse '[ "$(x os name)" = win ]' zip tar.gz
+}
+
 ## EndSection
 
 # Section(ls_remote): list_url, version_info
@@ -39,7 +44,7 @@ ___x_cmd_env_go_download_url(){
     local version="${1:?Provide a version}"
     local system; local arch;
     ___x_cmd_env_go_get_system_arch || return 1
-    printf "https://golang.google.cn/dl/go%s.%s-%s.%s" "$version" "$system" "$arch" "$(x ifelse '[ "$(x os name)" = win ]' zip tar.gz)"
+    printf "https://golang.google.cn/dl/go%s.%s-%s.%s" "$version" "$system" "$arch" "$(___x_cmd_env_go_compression)"
 }
 
 ## EndSection
