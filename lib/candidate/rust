@@ -2,11 +2,12 @@
 
 # Section(util): compression, get_system_arch
 ___x_cmd_env_rust_compression(){
-    case "$(x os name)" in
-        linux|darwin|win)      printf "tar.gz"    ;;
-        *)          env:error "your system:($(x os name)) are not supported"
-                    return 1           ;;
-    esac
+    printf "tar.gz"
+    # case "$(x os name)" in
+    #     linux|darwin|win)      printf "tar.gz"    ;;
+    #     *)          env:error "your system:($(x os name)) are not supported"
+    #                 return 1           ;;
+    # esac
 }
 
 ___x_cmd_env_rust_get_system_arch(){
