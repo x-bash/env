@@ -9,6 +9,8 @@ ___x_cmd_pkg(){
 
 ___X_CMD_PKG_RAWPATH="$___X_CMD_ROOT_TMP/env/raw"
 
+x log init pkg
+
 ___x_cmd_pkg___which_p7zip(){
     ___x_cmd_ensuredir "$___X_CMD_PKG_RAWPATH"
 
@@ -21,9 +23,10 @@ ___x_cmd_pkg___which_p7zip(){
     fi
 
     [ "$___X_CMD_HTTPGET_AGE" != 0 ] || (
+        pkg:info "Deflate the env.7z"
         x rmrf "$___X_CMD_PKG_RAWPATH"
         ___x_cmd_ensuredir "$___X_CMD_PKG_RAWPATH"
-        cd ${p7zip%/*} && cp env.7z raw/env.7z && cd raw && ls && pwd && x uz env.7z 2>/dev/null && rm env.7z
+        cd ${p7zip%/*} && cp env.7z raw/env.7z && cd raw && x uz env.7z 2>/dev/null && rm env.7z
     )
 }
 
