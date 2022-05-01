@@ -11,6 +11,13 @@ ___X_CMD_PKG_RAWPATH="$___X_CMD_ROOT_TMP/env/raw"
 
 x log init pkg
 
+
+___x_cmd_pkg_post_script(){
+    :
+}
+
+
+# Section: get from env.7z
 ___x_cmd_pkg___which_p7zip(){
     ___x_cmd_ensuredir "$___X_CMD_PKG_RAWPATH"
 
@@ -30,16 +37,14 @@ ___x_cmd_pkg___which_p7zip(){
     )
 }
 
+
 ___x_cmd_pkg_ls()(
     ___x_cmd_pkg___which_p7zip || return
 
     cd "$___X_CMD_PKG_RAWPATH"
     find . -name meta.tt.json | awk  '{ gsub(/\.\//, "", $0); gsub(/\/meta.tt.json$/, "", $0); print $0;  }'
 )
-
-___x_cmd_pkg_post_script(){
-    :
-}
+# EndSection
 
 # Section: get raw text from env.7z
 ___x_cmd_pkg_locate(){
