@@ -37,7 +37,11 @@ ___x_cmd_pkg_ls()(
     find . -name meta.tt.json | awk  '{ gsub(/\.\//, "", $0); gsub(/\/meta.tt.json$/, "", $0); print $0;  }'
 )
 
+___x_cmd_pkg_post_script(){
+    :
+}
 
+# Section: get raw text from env.7z
 ___x_cmd_pkg_locate(){
     local tgt="${1:?Provide name}"
     ___x_cmd_pkg_ls | awk -v FS=/ -v tgt="$tgt" '$2==tgt{ print $0; exit 0; }'
@@ -61,8 +65,5 @@ ___x_cmd_pkg___all_info(){
     s="$___X_CMD_PKG_RAWPATH/$(___x_cmd_pkg_locate "${1:?Provide name}")" || return
     cat "$s/meta.tt.json" "$s/version.tt.json"
 }
-
-___x_cmd_pkg_post_script(){
-    :
-}
+# EndSection
 
