@@ -10,8 +10,12 @@ ___x_cmd_pkg_version_ls(){
     :
 }
 
+# Global, China
 ___x_cmd_pkg_bin_url(){
     :
 }
 
+___x_cmd_pkg_post_script(){
+    :
+}
 
