@@ -1,20 +1,16 @@
-___x_cmd_pkgman_download(){
+___x_cmd_pkg_download(){
     :
 }
 
-___x_cmd_pkgman_work(){
+___x_cmd_pkg_ls(){
     :
 }
 
-___x_cmd_pkgman_ls(){
+___x_cmd_pkg_version_ls(){
     :
 }
 
-___x_cmd_pkgman_ls_version(){
-    :
-}
-
-___x_cmd_pkgman_ls_version(){
+___x_cmd_pkg_bin_url(){
     :
 }
 
