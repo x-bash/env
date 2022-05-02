@@ -45,7 +45,7 @@ function pkg_const_arr_push( arrl, arr, e ) {
     return arrl
 }
 
-function pkg_const_init( arr, pkg_name, version, l ){
+function pkg_const_init( arr, pkg_name, version, osarch,            l ){
     if (pkg_name != "")     l = pkg_const_arr_push( arrl, arrm "%{pkg_name}", pkg_name )
     if (version != "")      l = pkg_const_arr_push( arrl, arrm "%{version}", version )
 
@@ -53,20 +53,24 @@ function pkg_const_init( arr, pkg_name, version, l ){
     l = pkg_const_arr_push( arrl, arrm "%{sb_gt}", "https://gitee.com/static-build/%{pkg_name}/raw/%{sb_branch}/bin" )
     l = pkg_const_arr_push( arrl, arrm "%{sb_gh}", "https://raw.githubusercontent.com/static-build/%{pkg_name}/%{sb_branch}/bin" )
 
-    # load const string from version/osarch.const
+    # load const string from meta.const
 
     # load const string from osarch.const
 
-    # load const string from meta.const
+    # load const string from version/osarch.const
 
     return l
 }
 
-function pkg_eval_str( str, obj, pkg_name, version, osarch,     _constl, _const, _newstr ){
-    _constl = pkg_const_init( _const, pkg_name, version )
-    while ( match( str, /\%\{[^\}]\}\%/ ) ) {
+function pkg_eval_str( str, pkg_name, version, osarch,              _const ){
+    pkg_const_init( _const, pkg_name, version, osarch )
+    pkg_eval_str_from_const( str, _const )
+}
+
+function pkg_eval_str_from_const( str, const,    _newstr ){
+    while ( match( str, "\%\{[^\}]\}\%" ) ) {
         p = substr( str, RSTART, RLENGTH )
-        t = _const[p]
+        t = const[p]
         if ( t == "" )  {
             printf("Unknown pattern[%s] from str: %s", t, str)
             exit(1)
