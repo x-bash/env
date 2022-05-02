@@ -27,7 +27,7 @@ function pkg_eval_str_from_const( str, const,    _newstr ){
 function pkg_const_init( const, pkg_name, version, osarch,            l, i ){
     if (pkg_name != "")     l = pkg_const_arr_push( const, "%{pkg_name}", pkg_name )
     if (version != "")      l = pkg_const_arr_push( const, "%{version}", version )
-    if (osarch != "")       l = pkg_const_arr_push( const, "%{osarch}", version )
+    if (osarch != "")       l = pkg_const_arr_push( const, "%{osarch}", osarch )
 
     l = pkg_const_arr_push( const, "%{sb_branch}",  "main" )
     l = pkg_const_arr_push( const, "%{sb_gt}",      "https://gitee.com/static-build/%{pkg_name}/raw/%{sb_branch}/bin" )
