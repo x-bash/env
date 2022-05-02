@@ -23,24 +23,41 @@ function pkg_eval_str_from_const( str, const,    _newstr ){
     return str
 }
 
-function pkg_const_init( arr, pkg_name, version, osarch,            l ){
-    if (pkg_name != "")     l = pkg_const_arr_push( arrl, arrm "%{pkg_name}", pkg_name )
-    if (version != "")      l = pkg_const_arr_push( arrl, arrm "%{version}", version )
+function pkg_const_init( arr, pkg_name, version, osarch,            l, i ){
+    if (pkg_name != "")     l = pkg_const_arr_push( arrl, arr, "%{pkg_name}", pkg_name )
+    if (version != "")      l = pkg_const_arr_push( arrl, arr, "%{version}", version )
+    if (osarch != "")      l = pkg_const_arr_push( arrl, arr, "%{osarch}", version )
 
-    l = pkg_const_arr_push( arrl, arrm "%{sb_branch}",  "main" )
-    l = pkg_const_arr_push( arrl, arrm "%{sb_gt}",      "https://gitee.com/static-build/%{pkg_name}/raw/%{sb_branch}/bin" )
-    l = pkg_const_arr_push( arrl, arrm "%{sb_gh}",      "https://raw.githubusercontent.com/static-build/%{pkg_name}/%{sb_branch}/bin" )
-
-    # load const string from meta.const
-
-    # load const string from meta.osarch.const
-
-    # load const string from version.osarch.const
+    l = pkg_const_arr_push( arrl, arr, "%{sb_branch}",  "main" )
+    l = pkg_const_arr_push( arrl, arr, "%{sb_gt}",      "https://gitee.com/static-build/%{pkg_name}/raw/%{sb_branch}/bin" )
+    l = pkg_const_arr_push( arrl, arr, "%{sb_gh}",      "https://raw.githubusercontent.com/static-build/%{pkg_name}/%{sb_branch}/bin" )
 
     return l
 }
 
-function pkg_const_arr_push( arrl, arr, e ) {
+function pkg_const_load( constl, const, obj, pkg_name, version, osarch,            i, l, p ){
+    # load const string from meta.const
+    pkg_const_load_( onst, obj,         qu(pkg_name) SUBSEP qu("meta") SUBSEP qu("const") )
+
+    # load const string from meta.osarch.const
+    pkg_const_load_( onst, obj,         qu(pkg_name) SUBSEP qu("meta") SUBSEP qu("os-arch") SUBSEP qu("const") )
+
+    # load const string from version.osarch.const
+    pkg_const_load_( onst, obj,         qu(pkg_name) SUBSEP qu("version") SUBSEP qu(version) SUBSEP qu("const") )
+
+    # load const string from version.osarch.const
+    pkg_const_load_( onst, obj,         qu(pkg_name) SUBSEP qu("version") SUBSEP qu(version) SUBSEP qu(osarch) SUBSEP qu("const") )
+}
+
+function pkg_const_load_( const, obj, kp,       l, k, i ){
+    l = obj[ kp L ]
+    for (i=1; i<=l; ++i) {
+        k = obj[ kp, i ]
+        const[ "%{" k "}" ] = obj[ kp, k ]
+    }
+}
+
+function pkg_const_arr_push( arrl, arr, k, v ) {
     arr[ ++arrl ] = k
     arr[ k ] = v
     return arrl
