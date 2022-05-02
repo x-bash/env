@@ -37,13 +37,12 @@ function pkg_const_init( const, pkg_name, version, osarch,            l, i ){
 }
 
 
-
 function pkg_const_load( const, jobj, pkg_name, version, osarch,            i, l, p ){
     # load const string from meta.const
     pkg_const_load_( const, jobj,         qu(pkg_name) SUBSEP qu("meta") SUBSEP qu("const") )
 
     # load const string from meta.osarch.const
-    pkg_const_load_( const, jobj,         qu(pkg_name) SUBSEP qu("meta") SUBSEP qu("os-arch") SUBSEP qu("const") )
+    pkg_const_load_( const, jobj,         qu(pkg_name) SUBSEP qu("meta") SUBSEP qu("os-arch") SUBSEP qu(osarch) SUBSEP qu("const") )
 
     # load const string from version.osarch.const
     pkg_const_load_( const, jobj,         qu(pkg_name) SUBSEP qu("version") SUBSEP qu(version) SUBSEP qu("const") )
