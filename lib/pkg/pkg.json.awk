@@ -44,6 +44,7 @@ function pkg_const_arr_push( arrl, arr, e ) {
     arr[ k ] = v
     return arrl
 }
+
 function pkg_const_init( arr, pkg_name, version, l ){
     if (pkg_name != "")     l = pkg_const_arr_push( arrl, arrm "%{pkg_name}", pkg_name )
     if (version != "")      l = pkg_const_arr_push( arrl, arrm "%{version}", version )
