@@ -53,11 +53,31 @@ function pkg_const_init( arr, pkg_name, version, l ){
     l = pkg_const_arr_push( arrl, arrm "%{sb_gt}", "https://gitee.com/static-build/%{pkg_name}/raw/%{sb_branch}/bin" )
     l = pkg_const_arr_push( arrl, arrm "%{sb_gh}", "https://raw.githubusercontent.com/static-build/%{pkg_name}/%{sb_branch}/bin" )
 
+    # load const string from version/osarch.const
+
+    # load const string from osarch.const
+
+    # load const string from meta.const
+
     return l
 }
 
-function pkg_eval_str( str, obj, pkg_name, version, osarch,     constl, const ){
-    constl = pkg_const_init( const, pkg_name, version )
-
+function pkg_eval_str( str, obj, pkg_name, version, osarch,     _constl, _const, _newstr ){
+    _constl = pkg_const_init( _const, pkg_name, version )
+    while ( match( str, /\%\{[^\}]\}\%/ ) ) {
+        p = substr( str, RSTART, RLENGTH )
+        t = _const[p]
+        if ( t == "" )  {
+            printf("Unknown pattern[%s] from str: %s", t, str)
+            exit(1)
+        }
+        _newstr = substr( str, 1, RSTART-1 ) t substr( str, RSTART + RLENGTH )
+        if (_newstr == str)  {
+            printf("Logic error. Target not changed.")
+            exit(1)
+        }
+        str = _newstr
+    }
+    return str
 }
 
