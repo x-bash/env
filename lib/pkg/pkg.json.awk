@@ -84,19 +84,19 @@ function pkg___attr( jobj, pkg_name, version, attr,  r){
 }
 
 function pkg_homepage( jobj, pkg_name, version ){
-    return pkg_attr( jobj, pkg_name, version, qu("homepage") )
+    return pkg___attr( jobj, pkg_name, version, qu("homepage") )
 }
 
 function pkg_license( jobj, pkg_name, version ){
-    return pkg_attr( jobj, pkg_name, version, qu("license") )
+    return pkg___attr( jobj, pkg_name, version, qu("license") )
 }
 
 function pkg_url_default( jobj, pkg_name, version ){
-    return pkg_attr( jobj, pkg_name, version, qu("url") SUBSEP qu("_") )
+    return pkg___attr( jobj, pkg_name, version, qu("url") SUBSEP qu("_") )
 }
 
 function pkg_url_cn( jobj, pkg_name, version ){
-    return pkg_attr( jobj, pkg_name, version, qu("url") SUBSEP qu("cn") )
+    return pkg___attr( jobj, pkg_name, version, qu("url") SUBSEP qu("cn") )
 }
 
 # EndSection
@@ -109,11 +109,11 @@ function parse_pkg_jqparse( str, jobj, kp,       arrl, arr ){
 }
 
 function parse_pkg_meta_json(jobj, pkg_name, meta_json) {
-    return parse_pkg_jqparse( meta_json,     jobj, pkg_name SUBSEP "meta" )
+    return parse_pkg_jqparse( meta_json,     jobj, qu(pkg_name) SUBSEP qu("meta") )
 }
 
 function parse_pkg_version_json(jobj, pkg_name, meta_json) {
-    return parse_pkg_jqparse( version_json,  jobj, pkg_name SUBSEP "version" )
+    return parse_pkg_jqparse( version_json,  jobj, qu(pkg_name) SUBSEP qu("version") )
 }
 
 # EndSection
