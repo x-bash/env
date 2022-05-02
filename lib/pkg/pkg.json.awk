@@ -104,7 +104,7 @@ function pkg_url_cn( jobj, pkg_name, version ){
 # Section: parsing
 
 function parse_pkg_jqparse( str, jobj, kp,       arrl, arr ){
-    arrl = split(str, arr, sep || "\t")
+    arrl = split(str, arr, "\t")
     return jqparse_dict( jobj, kp,   arrl, arr )
 }
 
