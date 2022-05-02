@@ -55,9 +55,9 @@ function pkg_const_init( arr, pkg_name, version, osarch,            l ){
 
     # load const string from meta.const
 
-    # load const string from osarch.const
+    # load const string from meta.osarch.const
 
-    # load const string from version/osarch.const
+    # load const string from version.osarch.const
 
     return l
 }
