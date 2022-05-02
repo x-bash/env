@@ -62,7 +62,7 @@ function pkg_const_load_( const, jobj, kp,       l, k, i ){
 
 function pkg_const_arr_push( const, k, v,       l ) {
     l = const[ L ]
-    const[ ++l ] = k
+    const[ , ++l ] = k
     const[ k ] = v
     return const[ L ] = l
 }
