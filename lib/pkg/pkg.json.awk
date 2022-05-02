@@ -64,8 +64,7 @@ function pkg_const_arr_push( const, k, v,       l ) {
     l = const[ L ]
     const[ ++l ] = k
     const[ k ] = v
-    const[ L ] = l
-    return l
+    return const[ L ] = l
 }
 
 # EndSection
