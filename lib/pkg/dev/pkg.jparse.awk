@@ -5,17 +5,17 @@ BEGIN{
 function pkg_jqparse_dict(jobj, kp,     token_arrl, token_arr,  idx,                 l, t, _kl ){
     jobj[ kp ] = "{"
     ++ idx
-    _kl = ""
+    _kl = SUBSEP
     while ( idx <= token_arrl ) {
         t = token_arr[ idx ]
         if (t == "}") {
             jobj[ kp L ] = l
-            jobj[ kp K ] = substr( _kl, 2 )
+            jobj[ kp K ] = _kl
             return idx + 1
         }
         t = uq( t )
         token_arr[ kp, ++ l ] = t
-        _kl = _kl SUBSEP t
+        _kl = _kl t SUBSEP
         idx = ___pkg_jqparse_value( jobj, kp SUBSEP t, token_arrl, token_arr, idx + 2 )
         if ( token_arr[ idx ] == "," )     idx ++
     }
