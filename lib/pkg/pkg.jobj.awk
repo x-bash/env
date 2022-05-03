@@ -29,7 +29,7 @@ function pkg_init_table( jobj, table, table_kp,
     pkg_add_table( "sb_gt", "https://gitcode.net/x-bash/%{sb_repo}/-/raw/%{sb_branch}/bin", table, table_kp )
     pkg_add_table( "sb_gc", "https://gitcode.net/x-bash/%{sb_repo}/-/raw/%{sb_branch}/bin", table, table_kp )
 
-    pkg_copy_table( jobj, jqu(pkg_name) SUBSEP jqu("meta"), table, jqu(pkg_name) )
+    pkg_copy_table( jobj, jqu(pkg_name) SUBSEP jqu("meta"), table, table_kp )
 
     version_osarch = version "/" osarch
     _rule_kp = pkg_kp( pkg_name, "meta", "rule" )
@@ -39,10 +39,10 @@ function pkg_init_table( jobj, table, table_kp,
         _kpat = juq( k )
         gsub("\\*", "[^/]+", _kpat)
         if (match(version_osarch, "^" _kpat)) {
-            pkg_copy_table( jobj, _rule_kp SUBSEP k, table, "" )
+            pkg_copy_table( jobj, _rule_kp SUBSEP k, table, table_kp )
         }
     }
-    pkg_copy_table( jobj, jqu(pkg_name) SUBSEP jqu("version") SUBSEP jqu(version) SUBSEP jqu(osarch), table, "" )
+    pkg_copy_table( jobj, pkg_kp( pkg_name, "version", version, osarch), table, table_kp )
 }
 
 function pkg_add_table( k, v, table, table_kp,  l ){
