@@ -1,13 +1,3 @@
-
-function exit_msg( code, msg ){
-    if (msg == "") {
-        msg = code
-        code = 1
-    }
-    printf("%s\n", msg)
-    exit( code )
-}
-
 function pkg_eval_str( str, table,  _attempt ){
 
     while ( match( str, "\%\{[^\}]\}\%" ) ) {
@@ -36,10 +26,10 @@ function pkg_init_table( jobj, table, table_kp,
     pkg_add_table( "%{sb_gt}", "https://gitcode.net/x-bash/%{sb_repo}/-/raw/%{sb_branch}/bin" )
     pkg_add_table( "%{sb_gc}", "https://gitcode.net/x-bash/%{sb_repo}/-/raw/%{sb_branch}/bin" )
 
-    pkg_copy_table( jobj, qu(pkg_name) SUBSEP qu("meta"), table, "" )
+    pkg_copy_table( jobj, jqu(pkg_name) SUBSEP jqu("meta"), table, "" )
 
     version_osarch = version "/" osarch
-    _rule_kp = qu(pkg_name) SUBSEP qu("meta") SUBSEP qu("rule")
+    _rule_kp = jqu(pkg_name) SUBSEP jqu("meta") SUBSEP jqu("rule")
     _rule_l = jobj[ _rule_kp L ]
     for (i=1; i<=_rule_l; ++i) {
         k = jobj[ _rule_kp, i ]
@@ -49,16 +39,16 @@ function pkg_init_table( jobj, table, table_kp,
             pkg_copy_table( jobj, _rule_kp SUBSEP k, table, "" )
         }
     }
-    pkg_copy_table( jobj, qu(pkg_name) SUBSEP qu("version") SUBSEP qu(version) SUBSEP qu(osarch), table, "" )
+    pkg_copy_table( jobj, jqu(pkg_name) SUBSEP jqu("version") SUBSEP jqu(version) SUBSEP jqu(osarch), table, "" )
 }
 
 function pkg_add_table( k, v, table, table_kp,  l ){
-    k = qu(k)
+    k = jqu(k)
     if ( table[ table_kp, k ] == "" ) {
         table[ table_kp L ] = ( l = table[ table_kp L ] + 1 )
         table[ table_kp, l ] = k
     }
-    table[ table_kp, k ] = qu(v)
+    table[ table_kp, k ] = jqu(v)
 }
 
 # Section: copy
@@ -103,31 +93,5 @@ function parse_pkg_version_json(jobj, pkg_name, meta_json) {
     return parse_pkg_jqparse( version_json,  jobj, pkg_name SUBSEP "version") )
 }
 
-function uq( str ){
-    if (str !~ /^".*"$/) return str
-
-    str = substr( str, 2, length(str)-2 )
-    gsub( "\\\\", "\001", str )
-    gsub( "\\\"", "\"", str )
-    gsub( "/\\n/", "\n", str )
-    gsub( "/\\t/", "\t", str )
-    gsub( "/\\v/", "\v", str )
-    gsub( "/\\b/", "\b", str )
-    gsub( "/\\r/", "\r", str )
-    gsub( "\001", "\\\\", str )
-    return str
-}
-
-function qu( str ){
-    if (str ~ /^".*"$/) return str
-
-    gsub( "\"", "\\\"", str )
-    gsub( "\n", "\\n", str )
-    gsub( "\t", "\\t", str )
-    gsub( "\v", "\\v", str )
-    gsub( "\b", "\\b", str )
-    gsub( "\r", "\\r", str )
-    return "\"" str "\""
-}
 
 # EndSection
