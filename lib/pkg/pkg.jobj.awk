@@ -1,17 +1,22 @@
 
-function pkg_eval_str( str, table ){
+function exit_msg( code, msg ){
+    if (msg == "") {
+        msg = code
+        code = 1
+    }
+    printf("%s\n", msg)
+    exit( code )
+}
+
+function pkg_eval_str( str, table,  _attempt ){
+
     while ( match( str, "\%\{[^\}]\}\%" ) ) {
+        if ( ++_attempt > 100 ) exit_msg( sprintf( "Exit because replacement attempts more than 100[%s]: %s", _attempt, str ) )
         p = substr( str, RSTART, RLENGTH )
         t = table[p]
-        if ( t == "" )  {
-            printf("Unknown pattern[%s] from str: %s", t, str)
-            exit(1)
-        }
+        if ( t == "" )  exit_msg( sprintf("Unknown pattern[%s] from str: %s", t, str) )
         _newstr = substr( str, 1, RSTART-1 ) t substr( str, RSTART + RLENGTH )
-        if (_newstr == str)  {
-            printf("Logic error. Target not changed.")
-            exit(1)
-        }
+        if (_newstr == str)  exit_msg( sprintf("Logic error. Target not changed: %s", str) )
         str = _newstr
     }
     return str
