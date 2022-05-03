@@ -90,6 +90,20 @@ function pkg_copy_table(src_obj, src_kp, table, table_kp){
 
 # Section: parsing
 
+
+function parse_pkg_jqparse( str, jobj, kp,       arrl, arr ){
+    arrl = split(str, arr, "\t")
+    return jqparse_dict( jobj, kp,   arrl, arr, 1 )
+}
+
+function parse_pkg_meta_json(jobj, pkg_name, meta_json) {
+    return parse_pkg_jqparse( meta_json,     jobj, jqu(pkg_name) SUBSEP jqu("meta") )
+}
+
+function parse_pkg_version_json(jobj, pkg_name, meta_json) {
+    return parse_pkg_jqparse( version_json,  jobj, jqu(pkg_name) SUBSEP jqu("version") )
+}
+
 function pkg_kp(a1, a2, a3, a4, a5, a6, a7, a8, a9,
     a10, a11, a12, a13, a14, a15, a16, a17, a18, a19,
     _ret){
@@ -118,19 +132,5 @@ function pkg_kp(a1, a2, a3, a4, a5, a6, a7, a8, a9,
 
     return ret
 }
-
-function parse_pkg_jqparse( str, jobj, kp,       arrl, arr ){
-    arrl = split(str, arr, "\t")
-    return jqparse_dict( jobj, kp,   arrl, arr, 1 )
-}
-
-function parse_pkg_meta_json(jobj, pkg_name, meta_json) {
-    return parse_pkg_jqparse( meta_json,     jobj, jqu(pkg_name) SUBSEP jqu("meta") )
-}
-
-function parse_pkg_version_json(jobj, pkg_name, meta_json) {
-    return parse_pkg_jqparse( version_json,  jobj, jqu(pkg_name) SUBSEP jqu("version") )
-}
-
 
 # EndSection
