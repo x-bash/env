@@ -1,6 +1,39 @@
 
+function pkg_eval_str( str, table ){
+    while ( match( str, "\%\{[^\}]\}\%" ) ) {
+        p = substr( str, RSTART, RLENGTH )
+        t = table[p]
+        if ( t == "" )  {
+            printf("Unknown pattern[%s] from str: %s", t, str)
+            exit(1)
+        }
+        _newstr = substr( str, 1, RSTART-1 ) t substr( str, RSTART + RLENGTH )
+        if (_newstr == str)  {
+            printf("Logic error. Target not changed.")
+            exit(1)
+        }
+        str = _newstr
+    }
+    return str
+}
 
 
+function pkg_init_table( jobj, table, table_kp,   pkg_name, version, osarch,      _rule_kp, _rule_l, i, k, _kpat ){
+    pkg_copy_table( jobj, qu(pkg_name) SUBSEP qu("meta"), table, "" )
+
+    version_osarch = version "/" osarch
+    _rule_kp = qu(pkg_name) SUBSEP qu("meta") SUBSEP qu("rule")
+    _rule_l = jobj[ _rule_kp L ]
+    for (i=1; i<=_rule_l; ++i) {
+        k = jobj[ _rule_kp, i ]
+        _kpat = k
+        gsub("*", "[^/]+", _kpat)
+        if (match(k, "^" _kpat)) {
+            pkg_copy_table( jobj, _rule_kp SUBSEP k, table, "" )
+        }
+    }
+    pkg_copy_table( jobj, qu(pkg_name) SUBSEP qu("version") SUBSEP qu(version) SUBSEP qu(osarch), table, "" )
+}
 
 # Section: copy
 
