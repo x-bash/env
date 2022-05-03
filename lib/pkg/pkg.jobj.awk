@@ -91,7 +91,7 @@ function pkg_copy_table(src_obj, src_kp, table, table_kp){
 
 function parse_pkg_jqparse( str, jobj, kp,       arrl, arr ){
     arrl = split(str, arr, "\t")
-    return jqparse_dict( jobj, kp,   arrl, arr )
+    return jqparse_dict( jobj, kp,   arrl, arr, 1 )
 }
 
 function parse_pkg_meta_json(jobj, pkg_name, meta_json) {
