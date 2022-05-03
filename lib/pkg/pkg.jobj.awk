@@ -26,7 +26,7 @@ function pkg_init_table( jobj, table, table_kp,
     pkg_add_table( "%{sb_gt}", "https://gitcode.net/x-bash/%{sb_repo}/-/raw/%{sb_branch}/bin" )
     pkg_add_table( "%{sb_gc}", "https://gitcode.net/x-bash/%{sb_repo}/-/raw/%{sb_branch}/bin" )
 
-    pkg_copy_table( jobj, jqu(pkg_name) SUBSEP jqu("meta"), table, "" )
+    pkg_copy_table( jobj, jqu(pkg_name) SUBSEP jqu("meta"), table, jqu(pkg_name) )
 
     version_osarch = version "/" osarch
     _rule_kp = jqu(pkg_name) SUBSEP jqu("meta") SUBSEP jqu("rule")
@@ -34,7 +34,7 @@ function pkg_init_table( jobj, table, table_kp,
     for (i=1; i<=_rule_l; ++i) {
         k = jobj[ _rule_kp, i ]
         _kpat = k
-        gsub("*", "[^/]+", _kpat)
+        gsub("\\*", "[^/]+", _kpat)
         if (match(k, "^" _kpat)) {
             pkg_copy_table( jobj, _rule_kp SUBSEP k, table, "" )
         }
@@ -68,6 +68,8 @@ function pkg_copy_table___dict( src_obj, src_kp, table, table_kp,       l, i, _l
 }
 
 function pkg_copy_table(src_obj, src_kp, table, table_kp){
+    print src_kp "\t---\t" src_obj[ src_kp ]
+
     if (src_obj[ src_kp ] == "{") return pkg_copy_table___dict(src_obj, src_kp, table, table_kp)
     if (src_obj[ src_kp ] == "[") {
         print "Not implemented"

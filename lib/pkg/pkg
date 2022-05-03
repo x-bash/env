@@ -21,10 +21,16 @@ ___x_cmd_pkg_bin_url(){
 }
 
 ___x_cmd_pkg___awk(){
-    ___x_cmd_pkg___all_info | awk \
+    # ___x_cmd_pkg___all_info "${FP:-nmap}" | awk \
+    #     -f "$___X_CMD_ROOT_MOD/awk/lib/default.awk" \
+    #     -f "$___X_CMD_ROOT_MOD/awk/lib/jqparse.awk" \
+    #     -f "$___X_CMD_ROOT_MOD/env/lib/pkg/pkg.jobj.awk"
+
+    ___x_cmd_pkg___all_info "${FP:-nmap}" | awk \
         -f "$___X_CMD_ROOT_MOD/awk/lib/default.awk" \
         -f "$___X_CMD_ROOT_MOD/awk/lib/jqparse.awk" \
-        -f "$___X_CMD_ROOT_MOD/env/lib/pkg/pkg.jobj.awk"
+        -f "pkg.jobj.awk" \
+        -f "pkg.url.awk"
 }
 
 # Section: get from env.7z
