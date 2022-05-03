@@ -1,19 +1,15 @@
 function pkg_eval_str( str, table, pkg_name, _attempt ){
-    print "hhh"
     pkg_name = jqu( pkg_name )
 
     str = juq(str)
     while ( match( str, "\%\{[^}]+\}" ) ) {
-        print "going: " str
         if ( ++_attempt > 100 ) exit_msg( sprintf( "Exit because replacement attempts more than 100[%s]: %s", _attempt, str ) )
         p = substr( str, RSTART+2, RLENGTH-3 )
-        print "pat:\t" p
         t = table[ pkg_name, jqu(p) ]
         if ( t == "" )  exit_msg( sprintf("Unknown pattern[%s] from str: %s", (pkg_name SUBSEP jqu(p)), str) )
         _newstr = substr( str, 1, RSTART-1 ) juq(t) substr( str, RSTART + RLENGTH )
         if (_newstr == str)  exit_msg( sprintf("Logic error. Target not changed: %s", str) )
         str = _newstr
-        print "next: " str
     }
 
     return str
