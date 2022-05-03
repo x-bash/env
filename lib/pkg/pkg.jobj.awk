@@ -97,4 +97,31 @@ function parse_pkg_version_json(jobj, pkg_name, meta_json) {
     return parse_pkg_jqparse( version_json,  jobj, pkg_name SUBSEP "version") )
 }
 
+function uq( str ){
+    if (str !~ /^".*"$/) return str
+
+    str = substr( str, 2, length(str)-2 )
+    gsub( "\\\\", "\001", str )
+    gsub( "\\\"", "\"", str )
+    gsub( "/\\n/", "\n", str )
+    gsub( "/\\t/", "\t", str )
+    gsub( "/\\v/", "\v", str )
+    gsub( "/\\b/", "\b", str )
+    gsub( "/\\r/", "\r", str )
+    gsub( "\001", "\\\\", str )
+    return str
+}
+
+function qu( str ){
+    if (str ~ /^".*"$/) return str
+
+    gsub( "\"", "\\\"", str )
+    gsub( "\n", "\\n", str )
+    gsub( "\t", "\\t", str )
+    gsub( "\v", "\\v", str )
+    gsub( "\b", "\\b", str )
+    gsub( "\r", "\\r", str )
+    return "\"" str "\""
+}
+
 # EndSection
