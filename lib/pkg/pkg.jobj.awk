@@ -108,7 +108,7 @@ function pkg_kp(a1, a2, a3, a4, a5, a6, a7, a8, a9,
     a10, a11, a12, a13, a14, a15, a16, a17, a18, a19,
     _ret){
     _ret = ""
-    if (a1 == "")   return _ret;  _ret = ret SUBSEP jqu(a1)
+    if (a1 == "")   return _ret;  _ret = jqu(a1)
     if (a2 == "")   return _ret;  _ret = _ret SUBSEP jqu(a2)
     if (a3 == "")   return _ret;  _ret = _ret SUBSEP jqu(a3)
     if (a4 == "")   return _ret;  _ret = _ret SUBSEP jqu(a4)
