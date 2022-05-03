@@ -59,6 +59,7 @@ function pkg_copy_table___dict( src_obj, src_kp, table, table_kp,       l, i, _l
     for (i=1; i<=l; ++i) {
         k = src_obj[ src_kp, i ]
         if (k == "\"rule\"") continue       # skip the rule
+        print "pkg_copy_table___dict\t" k "\t" i "\t"
         if ( table[ table_kp, k ] == "" ) {
             table[ table_kp L ] = ( _l = table[ table_kp L ] + 1 )
             table[ table_kp, _l ] = k
@@ -67,14 +68,20 @@ function pkg_copy_table___dict( src_obj, src_kp, table, table_kp,       l, i, _l
     }
 }
 
+function pkg_copy_table___list( src_obj, src_kp, table, table_kp,       l, i, _l ){
+    l = src_obj[ src_kp L ]
+    table[ table_kp L ] = l
+
+    for (i=1; i<=l; ++i) {
+        pkg_copy_table( src_obj, src_kp SUBSEP i, table, table_kp SUBSEP i )
+    }
+}
+
 function pkg_copy_table(src_obj, src_kp, table, table_kp){
     print src_kp "\t---\t" src_obj[ src_kp ]
 
     if (src_obj[ src_kp ] == "{") return pkg_copy_table___dict(src_obj, src_kp, table, table_kp)
-    if (src_obj[ src_kp ] == "[") {
-        print "Not implemented"
-        exit(1)
-    }
+    if (src_obj[ src_kp ] == "[") return pkg_copy_table___list(src_obj, src_kp, table, table_kp)
     table[ table_kp ] = src_obj[ src_kp ]
 }
 
