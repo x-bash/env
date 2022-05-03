@@ -86,11 +86,11 @@ function parse_pkg_jqparse( str, jobj, kp,       arrl, arr ){
 }
 
 function parse_pkg_meta_json(jobj, pkg_name, meta_json) {
-    return parse_pkg_jqparse( meta_json,     jobj, pkg_name SUBSEP "meta" )
+    return parse_pkg_jqparse( meta_json,     jobj, jqu(pkg_name) SUBSEP jqu("meta") )
 }
 
 function parse_pkg_version_json(jobj, pkg_name, meta_json) {
-    return parse_pkg_jqparse( version_json,  jobj, pkg_name SUBSEP "version") )
+    return parse_pkg_jqparse( version_json,  jobj, jqu(pkg_name) SUBSEP jqu("version") )
 }
 
 
