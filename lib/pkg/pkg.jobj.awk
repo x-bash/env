@@ -32,13 +32,12 @@ function pkg_init_table( jobj, table, table_kp,
     pkg_copy_table( jobj, jqu(pkg_name) SUBSEP jqu("meta"), table, jqu(pkg_name) )
 
     version_osarch = version "/" osarch
-    _rule_kp = jqu(pkg_name) SUBSEP jqu("meta") SUBSEP jqu("rule")
+    _rule_kp = pkg_kp( pkg_name, "meta", "rule" )
     _rule_l = jobj[ _rule_kp L ]
     for (i=1; i<=_rule_l; ++i) {
         k = jobj[ _rule_kp, i ]
-        _kpat = k
+        _kpat = juq( k )
         gsub("\\*", "[^/]+", _kpat)
-        # print "kpat:\t" _kpat
         if (match(version_osarch, "^" _kpat)) {
             pkg_copy_table( jobj, _rule_kp SUBSEP k, table, "" )
         }
@@ -90,6 +89,35 @@ function pkg_copy_table(src_obj, src_kp, table, table_kp){
 # EndSetion
 
 # Section: parsing
+
+function pkg_kp(a1, a2, a3, a4, a5, a6, a7, a8, a9,
+    a10, a11, a12, a13, a14, a15, a16, a17, a18, a19,
+    _ret){
+    _ret = ""
+    if (a1 == "")   return _ret;  _ret = ret SUBSEP jqu(a1)
+    if (a2 == "")   return _ret;  _ret = _ret SUBSEP jqu(a2)
+    if (a3 == "")   return _ret;  _ret = _ret SUBSEP jqu(a3)
+    if (a4 == "")   return _ret;  _ret = _ret SUBSEP jqu(a4)
+    if (a5 == "")   return _ret;  _ret = _ret SUBSEP jqu(a5)
+    if (a6 == "")   return _ret;  _ret = _ret SUBSEP jqu(a6)
+    if (a7 == "")   return _ret;  _ret = _ret SUBSEP jqu(a7)
+    if (a8 == "")   return _ret;  _ret = _ret SUBSEP jqu(a8)
+
+
+    if (a9 == "")   return _ret;  _ret = _ret SUBSEP jqu(a9)
+    if (a10 == "")  return _ret;  _ret = _ret SUBSEP jqu(a10)
+    if (a11 == "")  return _ret;  _ret = _ret SUBSEP jqu(a11)
+    if (a12 == "")  return _ret;  _ret = _ret SUBSEP jqu(a12)
+    if (a13 == "")  return _ret;  _ret = _ret SUBSEP jqu(a13)
+    if (a14 == "")  return _ret;  _ret = _ret SUBSEP jqu(a14)
+    if (a15 == "")  return _ret;  _ret = _ret SUBSEP jqu(a15)
+    if (a16 == "")  return _ret;  _ret = _ret SUBSEP jqu(a16)
+    if (a17 == "")  return _ret;  _ret = _ret SUBSEP jqu(a17)
+    if (a18 == "")  return _ret;  _ret = _ret SUBSEP jqu(a18)
+    if (a19 == "")  return _ret;  _ret = _ret SUBSEP jqu(a19)
+
+    return ret
+}
 
 function parse_pkg_jqparse( str, jobj, kp,       arrl, arr ){
     arrl = split(str, arr, "\t")
