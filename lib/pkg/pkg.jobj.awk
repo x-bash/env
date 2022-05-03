@@ -53,11 +53,12 @@ function pkg_init_table( jobj, table, table_kp,
 }
 
 function pkg_add_table( k, v, table, table_kp,  l ){
-    if ( table[ table_kp, qu(k) ] == "" ) {
+    k = qu(k)
+    if ( table[ table_kp, k ] == "" ) {
         table[ table_kp L ] = ( l = table[ table_kp L ] + 1 )
         table[ table_kp, l ] = k
     }
-    table[ table_kp, k ] = v
+    table[ table_kp, k ] = qu(v)
 }
 
 # Section: copy
