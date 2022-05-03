@@ -17,8 +17,13 @@ function pkg_eval_str( str, table ){
     return str
 }
 
-
 function pkg_init_table( jobj, table, table_kp,   pkg_name, version, osarch,      _rule_kp, _rule_l, i, k, _kpat ){
+
+    # Predefined env variables
+    pkg_add_table( "%{sb_branch}", "main" )
+    pkg_add_table( "%{sb_gh}", "https://raw.githubusercontent.com/static-build/%{sb_repo}/%{sb_branch}/bin" )
+    pkg_add_table( "%{sb_gt}", "https://gitcode.net/x-bash/%{sb_repo}/-/raw/%{sb_branch}/bin" )
+
     pkg_copy_table( jobj, qu(pkg_name) SUBSEP qu("meta"), table, "" )
 
     version_osarch = version "/" osarch
@@ -33,6 +38,14 @@ function pkg_init_table( jobj, table, table_kp,   pkg_name, version, osarch,    
         }
     }
     pkg_copy_table( jobj, qu(pkg_name) SUBSEP qu("version") SUBSEP qu(version) SUBSEP qu(osarch), table, "" )
+}
+
+function pkg_add_table( k, v, table, table_kp,  l ){
+    if ( table[ table_kp, qu(k) ] == "" ) {
+        table[ table_kp L ] = ( l = table[ table_kp L ] + 1 )
+        table[ table_kp, l ] = k
+    }
+    table[ table_kp, k ] = v
 }
 
 # Section: copy
