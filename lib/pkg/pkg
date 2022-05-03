@@ -84,6 +84,7 @@ ___x_cmd_pkg___version_fp(){
 ___x_cmd_pkg___all_info(){
     local s
     s="$___X_CMD_PKG_RAWPATH/$(___x_cmd_pkg_locate "${1:?Provide name}")" || return
+    printf "%s\n" "$1"
     cat "$s/meta.tt.json" "$s/version.tt.json"
 }
 # EndSection

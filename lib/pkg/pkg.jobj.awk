@@ -35,7 +35,8 @@ function pkg_init_table( jobj, table, table_kp,
         k = jobj[ _rule_kp, i ]
         _kpat = k
         gsub("\\*", "[^/]+", _kpat)
-        if (match(k, "^" _kpat)) {
+        # print "kpat:\t" _kpat
+        if (match(version_osarch, "^" _kpat)) {
             pkg_copy_table( jobj, _rule_kp SUBSEP k, table, "" )
         }
     }
@@ -59,7 +60,7 @@ function pkg_copy_table___dict( src_obj, src_kp, table, table_kp,       l, i, _l
     for (i=1; i<=l; ++i) {
         k = src_obj[ src_kp, i ]
         if (k == "\"rule\"") continue       # skip the rule
-        print "pkg_copy_table___dict\t" k "\t" i "\t"
+        # print "pkg_copy_table___dict\t" k "\t" i "\t"
         if ( table[ table_kp, k ] == "" ) {
             table[ table_kp L ] = ( _l = table[ table_kp L ] + 1 )
             table[ table_kp, _l ] = k
@@ -78,10 +79,10 @@ function pkg_copy_table___list( src_obj, src_kp, table, table_kp,       l, i, _l
 }
 
 function pkg_copy_table(src_obj, src_kp, table, table_kp){
-    print src_kp "\t---\t" src_obj[ src_kp ]
 
     if (src_obj[ src_kp ] == "{") return pkg_copy_table___dict(src_obj, src_kp, table, table_kp)
     if (src_obj[ src_kp ] == "[") return pkg_copy_table___list(src_obj, src_kp, table, table_kp)
+    print "pkg_copy_table\t" table_kp "\t---\t" src_obj[ src_kp ]
     table[ table_kp ] = src_obj[ src_kp ]
 }
 
