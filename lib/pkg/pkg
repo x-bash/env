@@ -13,7 +13,9 @@ x log init pkg
 
 
 ___x_cmd_pkg_post_script(){
-    :
+    local pkg_name="${1:?Provide pkg name}"
+    local osarch="${2:?osarch as filter}"
+    local version="${3:?rovide version}"
 }
 
 
