@@ -26,11 +26,10 @@ ___x_cmd_env_util_add_path(){
     fi
 
     local newpath=":$PATH:"
-    local p
-    while :; do
-        p="${newpath#*:"$dir":}"
-        [ "$newpath" = "$p" ] && break
+    local p="${newpath#*:"$dir":}"
+    while [ "$newpath" = "$p" ]; do
         newpath="${newpath%%:$dir:*}:$p"
+        p="${newpath#*:"$dir":}"
     done
     newpath="${dir}${newpath}"
     PATH="${newpath%:}"
