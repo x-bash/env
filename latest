@@ -19,22 +19,20 @@ ___x_cmd_env_main() {
 
 ___x_cmd_env_util_add_path(){
     local dir="${1:?Provide a directory}"
-    local tmp="$PATH:"
 
     if [ ! -d "$dir" ] ; then
         printf "%s\n" "Failed to add path: $dir, not a directory" >&2
         return 1
     fi
 
-    PATH="$dir"
-    local cur
-    while [ -n "$tmp" ]; do
-        cur=${tmp%%:*}
-        tmp=${tmp#*:}
-        if [ "$cur" != "$dir" ]; then
-            PATH="$PATH:$cur"
-        fi
+    local newpath="$dir"
+    local IFS=:
+    local p
+    for p in $PATH; do
+        [ "$p" = "$dir" ] && continue
+        newpath="$newpath:$p"
     done
+    PATH="$newpath"
 }
 
 ___x_cmd_env_util_cmd_to_candidate(){
