@@ -25,14 +25,15 @@ ___x_cmd_env_util_add_path(){
         return 1
     fi
 
-    local newpath="$dir"
-    local IFS=:
+    local newpath=":$PATH:"
     local p
-    for p in $PATH; do
-        [ "$p" = "$dir" ] && continue
-        newpath="$newpath:$p"
+    while :; do
+        p="${newpath#*:"$dir":}"
+        [ "$newpath" = "$p" ] && break
+        newpath="${newpath%%:$dir:*}:$p"
     done
-    PATH="$newpath"
+    newpath="${dir}${newpath}"
+    PATH="${newpath%:}"
 }
 
 ___x_cmd_env_util_cmd_to_candidate(){
