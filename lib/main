@@ -43,7 +43,7 @@ ___x_cmd_env_config_add(){
     local tmp
     local i
     for i in "$@"; do
-        bin="${line%=*}="
+        bin="${i%=*}="
         tmp="${___X_CMD_ENV_VERSION_CONFIG#*
 "$bin"*
 }"
