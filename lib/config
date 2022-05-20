@@ -23,6 +23,27 @@ A
 
 }
 
+___X_CMD_ENV_VERSION_CONFIG_PATH="$___X_CMD_ROOT/.boot/env"
+
+ç(){
+    ___x_cmd_env_config_add "$@"
+    ___x_cmd_env_config_apply_by_var
+}
+
+___x_cmd_env_config_use(){
+    ___x_cmd_env_config_try "$@"
+
+    local backup="$___X_CMD_ENV_VERSION_CONFIG"
+    if [ -f "$___X_CMD_ENV_VERSION_CONFIG_PATH" ]; then
+        ___X_CMD_ENV_VERSION_CONFIG="$(cat "$___X_CMD_ENV_VERSION_CONFIG_PATH")"
+    else
+        ___X_CMD_ENV_VERSION_CONFIG=""
+    fi
+    ___x_cmd_env_config_add "$@"
+
+    ___X_CMD_ENV_VERSION_CONFIG="$backup"
+}
+
 ___x_cmd_env_config_load(){
     if ! ___X_CMD_ENV_VERSION_CONFIG="$(cat)"; then
         pkg:error "Config file not found."
