@@ -5,7 +5,7 @@
 # "
 
 
-___x_cmd_env_config_add(){
+___x_cmd_env___var_add(){
     local bin
     local tmp
     local i

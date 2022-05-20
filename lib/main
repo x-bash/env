@@ -5,7 +5,7 @@
 # "
 
 ___x_cmd_env_config_apply(){
-    ___x_cmd_env_config_add "$@"
+    ___x_cmd_env___var_add "$@"
     ___x_cmd_env_config_apply___by_var
 }
 
@@ -14,7 +14,7 @@ ___X_CMD_ENV_VERSION_CONFIG_PATH="$___X_CMD_ROOT/.boot/env"
 ___x_cmd_env_config_try(){
     ___x_cmd_env_config_prepare "$@" || return
 
-    ___x_cmd_env_config_add "$@"
+    ___x_cmd_env___var_add "$@"
     ___x_cmd_env_config_apply___by_var
 }
 
@@ -27,7 +27,7 @@ ___x_cmd_env_config_use(){
     else
         ___X_CMD_ENV_VERSION_CONFIG=""
     fi
-    ___x_cmd_env_config_add "$@"
+    ___x_cmd_env___var_add "$@"
 
     ___X_CMD_ENV_VERSION_CONFIG="$backup"
 }
@@ -38,7 +38,7 @@ ___x_cmd_env_config_prepare(){
     done
 }
 
-___x_cmd_env_config_add(){
+ç(){
     local bin
     local tmp
     local i
