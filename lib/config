@@ -5,23 +5,29 @@
 # "
 
 
-___x_cmd_env_config_apply(){
+___x_cmd_env_config_add(){
     local bin
     local tmp
+    local i
     for i in "$@"; do
         bin="${line%/*}="
         tmp="${___X_CMD_ENV_VERSION_CONFIG#*
-$bin*
+"$bin"*
 }"
         while [ "$tmp" != "$___X_CMD_ENV_VERSION_CONFIG" ]; do
             ___X_CMD_ENV_VERSION_CONFIG="${___X_CMD_ENV_VERSION_CONFIG%%
-$bin*
+"$bin"*
 *}${tmp}"
             tmp="${___X_CMD_ENV_VERSION_CONFIG#*
-$bin*
+"$bin"*
 }"
         done
+        ___X_CMD_ENV_VERSION_CONFIG="$___X_CMD_ENV_VERSION_CONFIG
+$i"
     done
+
+    ___X_CMD_ENV_VERSION_CONFIG="${___X_CMD_ENV_VERSION_CONFIG#
+}"
 
 }
 
