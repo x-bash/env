@@ -37,3 +37,14 @@ ___x_cmd_env_use(){
     ___X_CMD_ENV_VERSION_CONFIG="$backup"
 }
 
+___x_cmd_env_exec()(
+    local arg
+    local s
+    for arg in "$@"; do
+        case "$arg" in
+            *=*)        s="$s $arg" ;;
+            *)          break
+        esac
+    done
+    ___x_cmd_env_use "$@" && "$@"
+)
