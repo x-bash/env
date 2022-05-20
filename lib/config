@@ -15,5 +15,5 @@ ___x_cmd_env_config_save(){
         pkg:error "Couldn't create folder: ${tgt%/*}"
         return 1
     fi
-    printf "%s" "$___X_CMD_ENV_VERSION_CONFIG" >"${1:?Provide config file}"
+    printf "%s" "$___X_CMD_ENV_VERSION_CONFIG" >"$tgt"
 }

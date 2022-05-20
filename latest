@@ -2,7 +2,7 @@
 # shellcheck    shell=sh            disable=SC3043,SC2164,SC3000-SC4000
 # License:      GPLv3
 
-xrc:mod:lib env     util config main    advise
+xrc:mod:lib env     util config main advise ls
 
 ___x_cmd_env_main() {
     param:scope     "env"
@@ -36,7 +36,7 @@ A
         return 1
     fi
 
-    "___x_cmd_env_main_$PARAM_SUBCMD" "$@"
+    "___x_cmd_env_$PARAM_SUBCMD" "$@"
 }
 
 xrc setmain ___x_cmd_env_main

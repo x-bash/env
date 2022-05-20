@@ -8,8 +8,8 @@
 ___x_cmd_env_prepare(){
     local i
     for i in "$@"; do
-        if x pkg install "${i%=*}" "${i#*=}"; then
-            env:error "Cannot install package: $i"
+        if ! x pkg install "${i%=*}" "${i#*=}"; then
+            pkg:error "Cannot install package: $i"
             return 1;
         fi
     done
@@ -17,7 +17,6 @@ ___x_cmd_env_prepare(){
 
 ___x_cmd_env_try(){
     ___x_cmd_env_prepare "$@" || return
-
     ___x_cmd_env___var_add "$@"
 }
 
