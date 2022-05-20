@@ -1,3 +1,10 @@
+
+# ___X_CMD_ENV_VERSION_CONFIG="
+# python=3.5
+# java=17
+# perl=7
+# "
+
 ___x_cmd_env___var_apply_by_var(){
     local line
     local pkg
