@@ -38,7 +38,7 @@ ___x_cmd_env_config_prepare(){
     done
 }
 
-ç(){
+___x_cmd_env___var_add(){
     local bin
     local tmp
     local i
