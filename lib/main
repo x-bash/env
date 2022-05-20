@@ -4,11 +4,6 @@
 # python=1.3
 # "
 
-___x_cmd_env_config_apply(){
-    ___x_cmd_env___var_add "$@"
-    ___x_cmd_env___var_apply_by_var
-}
-
 ___X_CMD_ENV_VERSION_CONFIG_PATH="$___X_CMD_ROOT/.boot/env"
 
 ___x_cmd_env_config_try(){
