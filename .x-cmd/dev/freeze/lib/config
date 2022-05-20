@@ -1,0 +1,57 @@
+# ___X_CMD_ENV_VERSION_CONFIG="
+# java=1.1
+# node=1.2
+# python=1.3
+# "
+
+
+___x_cmd_env_config_add(){
+    local bin
+    local tmp
+    local i
+    for i in "$@"; do
+        bin="${line%=*}="
+        tmp="${___X_CMD_ENV_VERSION_CONFIG#*
+"$bin"*
+}"
+        while [ "$tmp" != "$___X_CMD_ENV_VERSION_CONFIG" ]; do
+            ___X_CMD_ENV_VERSION_CONFIG="${___X_CMD_ENV_VERSION_CONFIG%%
+"$bin"*
+*}${tmp}"
+            tmp="${___X_CMD_ENV_VERSION_CONFIG#*
+"$bin"*
+}"
+        done
+        ___X_CMD_ENV_VERSION_CONFIG="$___X_CMD_ENV_VERSION_CONFIG
+$i"
+    done
+
+    ___X_CMD_ENV_VERSION_CONFIG="${___X_CMD_ENV_VERSION_CONFIG#
+}"
+
+}
+
+___x_cmd_env_config_apply_by_var(){
+    local line
+    local bin
+    local version
+    while read -r line; do
+        bin="${line%=*}"
+        version="${line#*=}"
+        x pkg setup "$bin" "$version"
+    done <<A
+$___X_CMD_ENV_VERSION_CONFIG
+A
+
+}
+
+___x_cmd_env_config_load(){
+    if ! ___X_CMD_ENV_VERSION_CONFIG="$(cat "${1:?Provide config file}")"; then
+        pkg:error "Config file not found."
+    fi
+    ___x_cmd_env_config_apply_by_var
+}
+
+___x_cmd_env_config_save(){
+    printf "%s" "$___X_CMD_ENV_VERSION_CONFIG" >"${1:?Provide config file}"
+}
