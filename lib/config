@@ -25,7 +25,9 @@ A
 
 ___X_CMD_ENV_VERSION_CONFIG_PATH="$___X_CMD_ROOT/.boot/env"
 
-ç(){
+___x_cmd_env_config_try(){
+    ___x_cmd_env_config_prepare "$@" || return
+
     ___x_cmd_env_config_add "$@"
     ___x_cmd_env_config_apply_by_var
 }
@@ -51,8 +53,15 @@ ___x_cmd_env_config_load(){
     ___x_cmd_env_config_apply "$@"
 }
 
+
 ___x_cmd_env_config_save(){
     printf "%s" "$___X_CMD_ENV_VERSION_CONFIG" >"${1:?Provide config file}"
+}
+
+___x_cmd_env_config_prepare(){
+    for i in "$@"; do
+        x pkg setup_test "${i%=*}" "${i#*=}" || return 1
+    done
 }
 
 ___x_cmd_env_config_add(){
