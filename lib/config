@@ -7,5 +7,9 @@ ___x_cmd_env_config_load(){
 }
 
 ___x_cmd_env_config_save(){
+    if ! x ensuredir "${1%/*}"; then
+        pkg:error "Couldn't create folder: ${1%/*}"
+        return 1
+    fi
     printf "%s" "$___X_CMD_ENV_VERSION_CONFIG" >"${1:?Provide config file}"
 }
