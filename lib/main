@@ -6,6 +6,16 @@
 
 ___X_CMD_ENV_VERSION_CONFIG_PATH="$___X_CMD_ROOT/.boot/env"
 
+___x_cmd_env_prepare(){
+    local i
+    for i in "$@"; do
+        if x pkg install "${i%=*}" "${i#*=}"; then
+            env:error "Cannot install package: $i"
+            return 1;
+        fi
+    done
+}
+
 ___x_cmd_env_try(){
     ___x_cmd_env_prepare "$@" || return
 
