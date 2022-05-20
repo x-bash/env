@@ -6,7 +6,6 @@ ___x_cmd_env_config_load(){
     ___x_cmd_env_config_apply "$@"
 }
 
-
 ___x_cmd_env_config_save(){
     printf "%s" "$___X_CMD_ENV_VERSION_CONFIG" >"${1:?Provide config file}"
 }

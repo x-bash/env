@@ -1,0 +1,13 @@
+___x_cmd_env_config_apply___by_var(){
+    local line
+    local bin
+    local version
+    while read -r line; do
+        bin="${line%=*}"
+        version="${line#*=}"
+        x pkg setup "$bin" "$version"
+    done <<A
+$___X_CMD_ENV_VERSION_CONFIG
+A
+
+}
