@@ -6,15 +6,15 @@
 
 ___X_CMD_ENV_VERSION_CONFIG_PATH="$___X_CMD_ROOT/.boot/env"
 
-___x_cmd_env_config_try(){
-    ___x_cmd_env_config_prepare "$@" || return
+___x_cmd_env_try(){
+    ___x_cmd_env_prepare "$@" || return
 
     ___x_cmd_env___var_add "$@"
     ___x_cmd_env___var_apply_by_var
 }
 
-___x_cmd_env_config_use(){
-    ___x_cmd_env_config_try "$@"
+___x_cmd_env_use(){
+    ___x_cmd_env_try "$@"
 
     local backup="$___X_CMD_ENV_VERSION_CONFIG"
     if [ -f "$___X_CMD_ENV_VERSION_CONFIG_PATH" ]; then
@@ -27,7 +27,7 @@ ___x_cmd_env_config_use(){
     ___X_CMD_ENV_VERSION_CONFIG="$backup"
 }
 
-___x_cmd_env_config_prepare(){
+___x_cmd_env_prepare(){
     for i in "$@"; do
         x pkg setup_test "${i%=*}" "${i#*=}" || return 1
     done
