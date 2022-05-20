@@ -46,5 +46,5 @@ ___x_cmd_env_exec()(
             *)          break
         esac
     done
-    ___x_cmd_env_use "$@" && "$@"
+    eval ___x_cmd_env_use "$s" && "$@"
 )
