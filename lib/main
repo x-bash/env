@@ -4,7 +4,6 @@
 # python=1.3
 # "
 
-___X_CMD_ENV_VERSION_CONFIG_PATH="$___X_CMD_ROOT/.boot/env"
 
 ___x_cmd_env_prepare(){
     local i
@@ -37,6 +36,4 @@ ___x_cmd_env_use(){
 
     ___X_CMD_ENV_VERSION_CONFIG="$backup"
 }
-
-
 
