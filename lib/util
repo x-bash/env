@@ -1,11 +1,11 @@
 ___x_cmd_env___var_apply_by_var(){
     local line
-    local bin
+    local pkg
     local version
     while read -r line; do
-        bin="${line%=*}"
+        pkg="${line%=*}"
         version="${line#*=}"
-        x pkg setup "$bin" "$version"
+        x pkg setup "$pkg" "$version"
     done <<A
 $___X_CMD_ENV_VERSION_CONFIG
 A
@@ -13,20 +13,20 @@ A
 }
 
 ___x_cmd_env___var_add(){
-    local bin
+    local pkg
     local tmp
     local i
     for i in "$@"; do
-        bin="${i%=*}="
+        pkg="${i%=*}="
         tmp="${___X_CMD_ENV_VERSION_CONFIG#*
-"$bin"*
+"$pkg"*
 }"
         while [ "$tmp" != "$___X_CMD_ENV_VERSION_CONFIG" ]; do
             ___X_CMD_ENV_VERSION_CONFIG="${___X_CMD_ENV_VERSION_CONFIG%%
-"$bin"*
+"$pkg"*
 *}${tmp}"
             tmp="${___X_CMD_ENV_VERSION_CONFIG#*
-"$bin"*
+"$pkg"*
 }"
         done
         ___X_CMD_ENV_VERSION_CONFIG="$___X_CMD_ENV_VERSION_CONFIG
