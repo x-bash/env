@@ -6,7 +6,7 @@
 
 ___x_cmd_env_config_apply(){
     ___x_cmd_env___var_add "$@"
-    ___x_cmd_env_config_apply___by_var
+    ___x_cmd_env___var_apply_by_var
 }
 
 ___X_CMD_ENV_VERSION_CONFIG_PATH="$___X_CMD_ROOT/.boot/env"
@@ -15,7 +15,7 @@ ___x_cmd_env_config_try(){
     ___x_cmd_env_config_prepare "$@" || return
 
     ___x_cmd_env___var_add "$@"
-    ___x_cmd_env_config_apply___by_var
+    ___x_cmd_env___var_apply_by_var
 }
 
 ___x_cmd_env_config_use(){
@@ -38,29 +38,4 @@ ___x_cmd_env_config_prepare(){
     done
 }
 
-___x_cmd_env___var_add(){
-    local bin
-    local tmp
-    local i
-    for i in "$@"; do
-        bin="${i%=*}="
-        tmp="${___X_CMD_ENV_VERSION_CONFIG#*
-"$bin"*
-}"
-        while [ "$tmp" != "$___X_CMD_ENV_VERSION_CONFIG" ]; do
-            ___X_CMD_ENV_VERSION_CONFIG="${___X_CMD_ENV_VERSION_CONFIG%%
-"$bin"*
-*}${tmp}"
-            tmp="${___X_CMD_ENV_VERSION_CONFIG#*
-"$bin"*
-}"
-        done
-        ___X_CMD_ENV_VERSION_CONFIG="$___X_CMD_ENV_VERSION_CONFIG
-$i"
-    done
-
-    ___X_CMD_ENV_VERSION_CONFIG="${___X_CMD_ENV_VERSION_CONFIG#
-}"
-
-}
 
