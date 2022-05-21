@@ -16,7 +16,22 @@ ___x_cmd_env_prepare(){
 }
 
 ___x_cmd_env_try(){
-    ___x_cmd_env_prepare "$@" || return
+    local pkg_name
+    local version
+    local tgt
+
+    for i in "$@"; do
+    pkg_name="${i%=*}"
+    version="${i#*=}"
+    tgt="$___X_CMD_PKG_INSTALL_PATH/$pkg_name/$version"
+    echo $tgt "eeee"
+
+    if [ ! -e $tgt ]; then
+        ___x_cmd_env_prepare >/dev/null "$@" || return
+        echo "111"
+    fi
+    done
+
     ___x_cmd_env___var_add "$@"
 }
 
