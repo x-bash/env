@@ -1,7 +1,7 @@
 # Author:       Li Junhao           l@x-cmd.com     # xrc
 # shellcheck    shell=sh            disable=SC3043,SC2164,SC3000-SC4000
 # License:      GPLv3
-xrc param 
+xrc param
 xrc:mod:lib env     util config main advise ls
 
 ___x_cmd_env() {
@@ -9,9 +9,6 @@ ___x_cmd_env() {
     param:dsl <<A
 subcommands:
     ls                      "list all installed environments"
-    download                "Download environment"
-    install                 "Install environment"
-    uninstall               "Remove environment"
     try                     "Set environment version in this shell session"
     use                     "Set global environment version"
 
@@ -20,6 +17,9 @@ subcommands:
 
     exec                    "Run an executable with the selected candidates version"
 A
+# uninstall               "Remove environment"
+# install                 "Install environment"
+# download                "Download environment"
     param:run
 
     # TODO: la---"list all available environments"
@@ -39,4 +39,4 @@ A
     "___x_cmd_env_$PARAM_SUBCMD" "$@"
 }
 
-xrc setmain ___x_cmd_env_main
+xrc setmain ___x_cmd_env
