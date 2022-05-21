@@ -6,6 +6,7 @@
 
 
 ___x_cmd_env_prepare(){
+    local candidate=$@
     local i
     for i in "$@"; do
         if ! x pkg install "${i%=*}" "${i#*=}"; then
@@ -16,24 +17,36 @@ ___x_cmd_env_prepare(){
 }
 
 ___x_cmd_env_try(){
-    local pkg_name
+    param:scope "env"
+    param:dsl <<A
+advise:
+    #2        xrc env/latest && ___x_cmd_env_advise_ls_local_version
+options:
+    #1        "Environment Candidates" <candidates>:candidates_list
+    #2        "Version"                <version>=""
+A
+    param:run
+
+    local candidate=${1}
     local version
-    local tgt
 
-    for i in "$@"; do
-    pkg_name="${i%=*}"
-    version="${i#*=}"
-    tgt="$___X_CMD_PKG_INSTALL_PATH/$pkg_name/$version"
-
-    if [ ! -e $tgt ]; then
-        ___x_cmd_env_prepare >/dev/null "$@" || return
-    fi
-    done
+    ___x_cmd_env_prepare >/dev/null "$@" || return
 
     ___x_cmd_env___var_add "$@"
 }
 
 ___x_cmd_env_use(){
+    param:scope "env"
+    param:dsl <<A
+advise:
+    #2        xrc env/latest && ___x_cmd_env_advise_ls_local_version
+options:
+    --use_shims   "Use shims"
+    #1            "Environment Candidates" <candidates>:candidates_list
+    #2            "Version"                <version>=""
+A
+    param:run
+
     ___x_cmd_env_try "$@"
 
     local backup="$___X_CMD_ENV_VERSION_CONFIG"
@@ -50,6 +63,15 @@ ___x_cmd_env_use(){
 }
 
 ___x_cmd_env_exec()(
+    param:scope "env"
+    param:dsl <<A
+advise:
+    #1        xrc env/latest && ___x_cmd_env_advise_ls_cmd
+options:
+    #1        "Environment Candidates command and version you want to find, e.g. 'node=v16.9.0'"
+A
+    param:run
+    
     local arg
     local s
     for arg in "$@"; do
