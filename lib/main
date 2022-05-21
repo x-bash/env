@@ -18,6 +18,7 @@ ___x_cmd_env_prepare(){
 }
 
 ___x_cmd_env_try(){
+    param:void
     local pkg_name
     local version
     local tgt
@@ -36,6 +37,7 @@ ___x_cmd_env_try(){
 }
 
 ___x_cmd_env_use(){
+    param:void
     ___x_cmd_env_try "$@"
 
     local backup="$___X_CMD_ENV_VERSION_CONFIG"
@@ -52,6 +54,7 @@ ___x_cmd_env_use(){
 }
 
 ___x_cmd_env_exec()(
+    param:void
     local arg
     local s
     for arg in "$@"; do
