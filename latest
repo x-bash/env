@@ -3,6 +3,7 @@
 # License:      GPLv3
 xrc param/latest
 xrc:mod:lib env     util config main advise ls
+x log init env
 
 ___x_cmd_env() {
     param:scope     "env"
@@ -12,12 +13,19 @@ subcommands:
     try                     "Set environment version in this shell session"
     use                     "Set global environment version"
 
+<<<<<<< HEAD
 
 
 
     exec                    "Run an executable with the selected candidates version"
 A
 # which                   "Display path of environment installed"
+=======
+    which                   "Display path of environment installed"
+
+    exec                    "Run an executable with the selected candidates version"
+A
+>>>>>>> 03157810f51aab4b868c248c5926151b91900207
 # current                 "Show current environment"
 # uninstall               "Remove environment"
 # install                 "Install environment"

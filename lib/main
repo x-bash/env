@@ -8,9 +8,11 @@
 ___x_cmd_env_prepare(){
     local candidate=$@
     local i
+    env:info "env prepare: $*"
+
     for i in "$@"; do
         if ! x pkg install "${i%=*}" "${i#*=}"; then
-            pkg:error "Cannot install package: $i"
+            env:error "Cannot install package: $i"
             return 1;
         fi
     done
