@@ -6,7 +6,6 @@
 
 
 ___x_cmd_env_prepare(){
-    local candidate=$@
     local i
     env:info "env prepare: $*"
 
@@ -19,35 +18,14 @@ ___x_cmd_env_prepare(){
 }
 
 ___x_cmd_env_try(){
-    param:scope "env"
-    param:dsl <<A
-advise:
-    #2        xrc env/latest && ___x_cmd_env_advise_ls_local_version
-options:
-    #1        "Environment Candidates" <candidates>:candidates_list
-    #2        "Version"                <version>=""
-A
-    param:run
+    param:void
 
-    local candidate=${1}
-    local version
-
-    ___x_cmd_env_prepare >/dev/null "$@" || return
-
+    ___x_cmd_env_prepare "$@" || return
     ___x_cmd_env___var_add "$@"
 }
 
 ___x_cmd_env_use(){
-    param:scope "env"
-    param:dsl <<A
-advise:
-    #2        xrc env/latest && ___x_cmd_env_advise_ls_local_version
-options:
-    --use_shims   "Use shims"
-    #1            "Environment Candidates" <candidates>:candidates_list
-    #2            "Version"                <version>=""
-A
-    param:run
+    param:void
 
     ___x_cmd_env_try "$@"
 
@@ -65,14 +43,7 @@ A
 }
 
 ___x_cmd_env_exec()(
-    param:scope "env"
-    param:dsl <<A
-advise:
-    #1        xrc env/latest && ___x_cmd_env_advise_ls_cmd
-options:
-    #1        "Environment Candidates command and version you want to find, e.g. 'node=v16.9.0'"
-A
-    param:run
+    param:void
 
     local arg
     local s
