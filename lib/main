@@ -51,6 +51,19 @@ ___x_cmd_env_use(){
     ___X_CMD_ENV_VERSION_CONFIG="$backup"
 }
 
+___x_cmd_env_unuse(){
+    local i
+    local pkg_name
+    local version
+    for i in "$@"; do
+        pkg_name="${i%=*}"
+        version="$(___x_cmd_env_get_version "$i")"
+        pkg:info "Remove $pkg_name $version path: $___X_CMD_PKG_INSTALL_PATH/$pkg_name/$version/bin"
+        x pkg uninstall "$pkg_name" "$version"
+        x path rm "$___X_CMD_PKG_INSTALL_PATH/$pkg_name/$version/bin"
+    done
+}
+
 ___x_cmd_env_exec()(
     # local arg
     # local s

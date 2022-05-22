@@ -10,11 +10,11 @@ subcommands:
     ls                      "list all installed environments"
     try                     "Set environment version in this shell session"
     use                     "Set global environment version"
+    unuse                   "Remove environment"
     exec                    "Run an executable with the selected candidates version"
     which                   "Display path of environment installed"
 A
 # current                 "Show current environment"
-# uninstall               "Remove environment"
 # install                 "Install environment"
 # download                "Download environment"
     param:run
