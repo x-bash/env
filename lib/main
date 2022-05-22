@@ -68,7 +68,7 @@ ___x_cmd_env_deactivate(){
     done
 }
 
-___x_cmd_env_activate(){
+___x_cmd_env_pkg_activate(){
     while [ $# -gt 0 ]; do
         local pkg_name="${1%=*}"
         ! ___x_cmd_pkg_activated_version_ || x list ":$___X_CMD_ENV_PKG_STACK_${pkg_name}" push "$___X_CMD_PKG_ACTIVATED_VERSION_"
@@ -77,7 +77,7 @@ ___x_cmd_env_activate(){
     done
 }
 
-___x_cmd_env_deactivate(){
+___x_cmd_env_pkg_deactivate(){
     while [ $# -gt 0 ]; do
         local pkg_name="${i%=*}"
         ___x_cmd_env_deactivate "$i"
