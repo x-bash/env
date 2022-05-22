@@ -35,17 +35,17 @@
 ___x_cmd_env_pkg_activate(){
     while [ $# -gt 0 ]; do
         local pkg_name="${1%=*}"
-        ! ___x_cmd_pkg_activated_version_ || x list ":$___X_CMD_ENV_PKG_STACK_${pkg_name}" push "$___X_CMD_PKG_ACTIVATED_VERSION_"
-        ___x_cmd_pkg_activate "$i"
+        ! ___x_cmd_pkg_activated_version_ || x llist push "$___X_CMD_PKG_ACTIVATED_VERSION_" "$___X_CMD_ENV_PKG_STACK_${pkg_name}"
+        ___x_cmd_pkg_activate "$pkg_name"
         shift
     done
 }
 
 ___x_cmd_env_pkg_deactivate(){
     while [ $# -gt 0 ]; do
-        local pkg_name="${i%=*}"
-        ___x_cmd_env_deactivate "$i"
-        x list ":$___X_CMD_ENV_PKG_STACK_${pkg_name}" pop_
+        local pkg_name="${1%=*}"
+        ___x_cmd_env_deactivate "$1"
+        x llist pop_ "$___X_CMD_ENV_PKG_STACK_${pkg_name}"
         ___x_cmd_pkg_dectivate "${pkg_name}=$___X_CMD_LIST_POP_"
         shift
     done
@@ -54,14 +54,14 @@ ___x_cmd_env_pkg_deactivate(){
 ___x_cmd_env_var_set(){
     local val
     eval val="\"\$$1\"" || return 1
-    x list ":$___X_CMD_ENV_VAR_$1" push "$val"
+    x llist push "$___X_CMD_ENV_VAR_$1" "$val"
     eval "$1=\"$2\""
 }
 
 ___x_cmd_env_var_recover(){
     while [ $# -gt 0 ]; do
-        x list ":$___X_CMD_ENV_VAR_$1" pop_
-        eval "$1=\"\$$___X_CMD_ENV_VAR_$1\""
+        x list pop_ "$___X_CMD_ENV_VAR_$1"
+        eval "$1=\"\$$___X_CMD_LIST_POP_\""
         shift
     done
 }
