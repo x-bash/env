@@ -9,7 +9,7 @@ ___x_cmd_env_ls(){
         i|installed)      shift;  ___x_cmd_env_ls_installed "$@" ;;
         a|activated)      shift;  ___x_cmd_env_ls_activated "$@" ;;
         A|all)            shift;  ___x_cmd_env_ls_all "$@" ;;
-        *)                __x_cmd_env_ls_cache "$@" ;;
+        *)                ___x_cmd_env_ls_all "$@" ;;
     esac
 }
 
