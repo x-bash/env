@@ -25,19 +25,18 @@ ___x_cmd_env___var_add(){
     local tmp
     local i
     ___X_CMD_ENV_VERSION_CONFIG="
-$___X_CMD_ENV_VERSION_CONFIG"
+$___X_CMD_ENV_VERSION_CONFIG
+"
     for i in "$@"; do
         pkg="${i%=*}="
         version="$(___x_cmd_env_get_version "${i%=*}" "${i#*=}")"
         tmp="${___X_CMD_ENV_VERSION_CONFIG#*"$pkg"*
 }"
-        pkg:info "tmp: $tmp ___X_CMD_ENV_VERSION_CONFIG: $___X_CMD_ENV_VERSION_CONFIG"
         while [ "$tmp" != "$___X_CMD_ENV_VERSION_CONFIG" ]; do
             ___X_CMD_ENV_VERSION_CONFIG="${___X_CMD_ENV_VERSION_CONFIG%%"$pkg"*
 *}${tmp}"
             tmp="${___X_CMD_ENV_VERSION_CONFIG#*"$pkg"*
 }"
-            pkg:info "___X_CMD_ENV_VERSION_CONFIG: $___X_CMD_ENV_VERSION_CONFIG tmp: $tmp"
         done
         ___X_CMD_ENV_VERSION_CONFIG="$___X_CMD_ENV_VERSION_CONFIG$pkg$version
 "
