@@ -60,7 +60,7 @@ ___x_cmd_env_var_set(){
 
 ___x_cmd_env_var_recover(){
     while [ $# -gt 0 ]; do
-        x list pop_ "$___X_CMD_ENV_VAR_$1"
+        x llist pop_ "$___X_CMD_ENV_VAR_$1"
         eval "$1=\"\$$___X_CMD_LIST_POP_\""
         shift
     done
