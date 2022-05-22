@@ -69,15 +69,20 @@ ___x_cmd_env_deactivate(){
 }
 
 # ___X_CMD_ENV_REPLACE_BACKUP=""
-# ___x_cmd_env_replace(){
+___x_cmd_env_enter(){
+    ___x_cmd_pkg_activated_version_ "$i"
+    ___X_CMD_ENV_EXIT_HOOK="$___X_CMD_ENV_EXIT_HOOK
+x pkg deactivate $i
+x pkg activate ${i%=*}=$___X_CMD_PKG_ACTIVATED_VERSION_
+"
 
-#     ___x_cmd_pkg_activated_sibling_ "$i"
-#     ___X_CMD_ENV_REPLACE_BACKUP="$___X_CMD_ENV_REPLACE_BACKUP
-# x pkg deactivate $i
-# x pkg activate $___X_CMD_PKG_ACTIVATED_SIBLING_
-# "
+}
 
-# }
+___x_cmd_env_exit(){
+    [ -n "$___X_CMD_ENV_EXIT_HOOK" ] || return 0
+    eval "$___X_CMD_ENV_EXIT_HOOK"
+    ___X_CMD_ENV_EXIT_HOOK=
+}
 
 # use = try + save-config
 ___x_cmd_env_use(){
