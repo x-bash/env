@@ -21,24 +21,27 @@ A
 
 ___x_cmd_env___var_add(){
     local pkg
+    local version
     local tmp
     local i
+    ___X_CMD_ENV_VERSION_CONFIG="
+$___X_CMD_ENV_VERSION_CONFIG"
     for i in "$@"; do
         pkg="${i%=*}="
-        tmp="${___X_CMD_ENV_VERSION_CONFIG#*
-"$pkg"*
+        version="$(___x_cmd_env_get_version "${i%=*}" "${i#*=}")"
+        tmp="${___X_CMD_ENV_VERSION_CONFIG#*"$pkg"*
 }"
+        pkg:info "tmp: $tmp ___X_CMD_ENV_VERSION_CONFIG: $___X_CMD_ENV_VERSION_CONFIG"
         while [ "$tmp" != "$___X_CMD_ENV_VERSION_CONFIG" ]; do
-            ___X_CMD_ENV_VERSION_CONFIG="${___X_CMD_ENV_VERSION_CONFIG%%
-"$pkg"*
+            ___X_CMD_ENV_VERSION_CONFIG="${___X_CMD_ENV_VERSION_CONFIG%%"$pkg"*
 *}${tmp}"
-            tmp="${___X_CMD_ENV_VERSION_CONFIG#*
-"$pkg"*
+            tmp="${___X_CMD_ENV_VERSION_CONFIG#*"$pkg"*
 }"
+            pkg:info "___X_CMD_ENV_VERSION_CONFIG: $___X_CMD_ENV_VERSION_CONFIG tmp: $tmp"
         done
-        ___X_CMD_ENV_VERSION_CONFIG="$___X_CMD_ENV_VERSION_CONFIG
-$i"
-        [ -z "$___X_CMD_ENV___VAR_ADD_NO_SETUP" ] || x pkg setup "${1%=*}" "${i#*=}"
+        ___X_CMD_ENV_VERSION_CONFIG="$___X_CMD_ENV_VERSION_CONFIG$pkg$version
+"
+        [ -z "$___X_CMD_ENV___VAR_ADD_NO_SETUP" ] || x pkg setup "${i%=*}" "$version"
     done
 
     ___X_CMD_ENV_VERSION_CONFIG="${___X_CMD_ENV_VERSION_CONFIG#
