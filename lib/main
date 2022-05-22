@@ -36,7 +36,7 @@ ___x_cmd_env_try(){
 ___x_cmd_env_use(){
     param:void
     x:trace env/use
-    ___x_cmd_env_prepare "$@" || return
+    ___x_cmd_env_try "$@" || return
 
     local backup="$___X_CMD_ENV_VERSION_CONFIG"
     if [ -f "$___X_CMD_ENV_VERSION_CONFIG_PATH" ]; then
