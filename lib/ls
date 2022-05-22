@@ -25,7 +25,7 @@ ___x_cmd_env_ls_installed()(
     # printf "%s\n" "$___X_CMD_ENV_VERSION_CONFIG" | awk '$0!=""{gsub("=", "\t", $0); print $0}'
 )
 
-# Invoked pkg ls activated
+# Invoked pkg ls activated: check environment variable...
 ___x_cmd_env_ls_activated()(
     if ! [ -d "$___X_CMD_PKG_RAWPATH" ]; then return 0; fi
     pkg_name="${1:?Provide package name}"
