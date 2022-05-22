@@ -11,8 +11,8 @@ subcommands:
     try                     "Set environment version in this shell session"
     use                     "Set global environment version"
     exec                    "Run an executable with the selected candidates version"
+    which                   "Display path of environment installed"
 A
-# which                   "Display path of environment installed"
 # current                 "Show current environment"
 # uninstall               "Remove environment"
 # install                 "Install environment"

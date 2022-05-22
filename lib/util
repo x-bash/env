@@ -31,7 +31,7 @@ $___X_CMD_ENV_VERSION_CONFIG
 "
     for i in "$@"; do
         pkg="${i%=*}="
-        version="$(___x_cmd_env_get_version "${i%=*}" "${i#*=}")"
+        version="$(___x_cmd_env_get_version "$i")"
         tmp="${___X_CMD_ENV_VERSION_CONFIG#*"$pkg"*
 }"
         while [ "$tmp" != "$___X_CMD_ENV_VERSION_CONFIG" ]; do

@@ -5,8 +5,8 @@
 # "
 
 ___x_cmd_env_get_version(){
-    local pkg_name="${1:?Provide pkg name}"
-    local version="${2:?Provide version}"
+    local pkg_name="${1%=*}"
+    local version="${1#*=}"
     if [ "$version" != "$pkg_name" ]; then
         printf "%s\n" "$version"
     else
@@ -17,10 +17,9 @@ ___x_cmd_env_get_version(){
 
 ___x_cmd_env_prepare(){
     local i
-    x:trace x/env
     for i in "$@"; do
-        pkg:info "env prepare: packname:${i%=*} version:$(___x_cmd_env_get_version "${i%=*}" "${i#*=}")"
-        if ! x pkg install "${i%=*}" "$(___x_cmd_env_get_version "${i%=*}" "${i#*=}")"; then
+        pkg:info "Prepare ${i%=*} $(___x_cmd_env_get_version "$i")"
+        if ! x pkg install "${i%=*}" "$(___x_cmd_env_get_version "$i")"; then
             pkg:error "Cannot install package: $i"
             return 1;
         fi
@@ -29,15 +28,14 @@ ___x_cmd_env_prepare(){
 
 ___x_cmd_env_try(){
     param:void
-    x:trace x/env
+    x:trace env/try
     ___x_cmd_env_prepare "$@" || return
     ___X_CMD_ENV___VAR_ADD_NO_SETUP="" ___x_cmd_env___var_add "$@"
 }
 
 ___x_cmd_env_use(){
     param:void
-    x:trace x/env
-    # ___x_cmd_env_try "$@"
+    x:trace env/use
     ___x_cmd_env_prepare "$@" || return
 
     local backup="$___X_CMD_ENV_VERSION_CONFIG"
@@ -54,8 +52,6 @@ ___x_cmd_env_use(){
 }
 
 ___x_cmd_env_exec()(
-    param:void
-
     # local arg
     # local s
     # for arg in "$@"; do
@@ -65,11 +61,22 @@ ___x_cmd_env_exec()(
     #     esac
     # done
     # eval ___x_cmd_env_use "$s" && "$@"
-    local arg="${1:?Provide package}"
-    local pkg_name="${arg%=*}"
-    local version="$(___x_cmd_env_get_version "${arg%=*}" "${arg#*=}")"
+    param:void
+    x:trace env/exec
+
+    local candidate="${1:?Provide package}"
+    local pkg_name="${candidate%=*}"
+    local version
+    version="$(___x_cmd_env_get_version "$candidate")"
     shift
-    pkg:info "pkg_name:$pkg_name version:$version *:$*"
+    pkg:info "Execute $pkg_name $version: $*"
     x pkg xbin init "$pkg_name" "$version"
     "___x_cmd_${pkg_name}" "$@"
 )
+
+___x_cmd_env_which(){
+    local i
+    for i in "$@"; do
+        x pkg xbin path "${i%=*}" "$(___x_cmd_env_get_version "$i")"
+    done
+}
