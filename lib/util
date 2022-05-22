@@ -10,9 +10,11 @@ ___x_cmd_env___var_apply_by_var(){
     local pkg
     local version
     while read -r line; do
-        pkg="${line%=*}"
-        version="${line#*=}"
-        x pkg setup "$pkg" "$version"
+        if [ -n "$line" ]; then
+            pkg="${line%=*}"
+            version="${line#*=}"
+            x pkg setup "$pkg" "$version"
+        fi
     done <<A
 $___X_CMD_ENV_VERSION_CONFIG
 A
