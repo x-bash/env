@@ -14,7 +14,7 @@ ___x_cmd_env_get_version(){
     fi
 }
 
-
+# try = install + activate
 ___x_cmd_env_try(){
     param:void
     x:trace env/try
@@ -35,6 +35,41 @@ ___x_cmd_env_try(){
     ___X_CMD_ENV___VAR_ADD_NO_SETUP="" ___x_cmd_env___var_add "$@"
 }
 
+___x_cmd_env_activate(){
+    local i
+    for i in "$@"; do
+        if x pkg activated "$i"; then
+            pkg:error "Not activated: $i"
+            return 1
+        fi
+
+        if x pkg installed "$i"; then
+            pkg:error "Not installed: $i"
+            return 1
+        fi
+    done
+
+    for i in "$@"; do
+        x pkg activate "$i"
+    done
+}
+
+___x_cmd_env_deactivate(){
+    local i
+    for i in "$@"; do
+        if ! x pkg activated "$i"; then
+            pkg:error "Not activated: $i"
+            return 1
+        fi
+    done
+
+    for i in "$@"; do
+        x pkg activate "$i"
+    done
+}
+
+
+# use = try + save-config
 ___x_cmd_env_use(){
     param:void
     x:trace env/use
