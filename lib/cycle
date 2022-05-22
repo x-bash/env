@@ -46,7 +46,7 @@ ___x_cmd_env_pkg_deactivate(){
         local pkg_name="${1%=*}"
         ___x_cmd_env_deactivate "$1"
         x llist pop_ "$___X_CMD_ENV_PKG_STACK_${pkg_name}"
-        ___x_cmd_pkg_activate "${pkg_name}=$___X_CMD_LIST_POP_"
+        [ -z "$___X_CMD_LIST_POP_" ] || ___x_cmd_pkg_activate "${pkg_name}=$___X_CMD_LIST_POP_"
         shift
     done
 }
