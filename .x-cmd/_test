@@ -1,0 +1,6 @@
+. ./latest
+. ./lib/config
+. ./lib/ls
+. ./lib/main
+. ./lib/util
+x env use java=18-open node=v18.2.0

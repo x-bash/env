@@ -2,24 +2,21 @@
 # shellcheck    shell=sh            disable=SC3043,SC2164,SC3000-SC4000
 # License:      GPLv3
 
-xrc:mod:lib env     util config main    advise
-
-___x_cmd_env_main() {
+xrc param/latest
+___x_cmd_env() {
     param:scope     "env"
     param:dsl <<A
 subcommands:
     ls                      "list all installed environments"
-    download                "Download environment"
-    install                 "Install environment"
-    uninstall               "Remove environment"
     try                     "Set environment version in this shell session"
     use                     "Set global environment version"
-
-    current                 "Show current environment"
-    which                   "Display path of environment installed"
-
+    unuse                   "Remove environment"
     exec                    "Run an executable with the selected candidates version"
+    which                   "Display path of environment installed"
 A
+# current                 "Show current environment"
+# install                 "Install environment"
+# download                "Download environment"
     param:run
 
     # TODO: la---"list all available environments"
@@ -32,11 +29,18 @@ A
     fi
 
     if [ -z "$PARAM_SUBCMD" ]; then
-        ___x_cmd_env_main help
+        ___x_cmd_env help
         return 1
     fi
 
-    "___x_cmd_env_main_$PARAM_SUBCMD" "$@"
+    "___x_cmd_env_$PARAM_SUBCMD" "$@"
 }
 
-xrc setmain ___x_cmd_env_main
+
+x log init  pkg
+xrc:mod:lib env     util config main advise ls
+
+
+
+
+xrc setmain ___x_cmd_env
