@@ -12,11 +12,11 @@ ___x_cmd_env_var(){
 }
 
 ___x_cmd_env_var_isset(){
-    eval "[ \${${1:?Provide variable name}+1} = 1 ]"
+    eval "[ \"\${${1:?Provide variable name}+1}\" = 1 ]"
 }
 
 ___x_cmd_env_var_isunset(){
-    eval "[ \${${1:?Provide variable name}+1} != 1 ]"
+    eval "[ \"\${${1:?Provide variable name}+1}\" != 1 ]"
 }
 
 ___x_cmd_env_var_set(){
@@ -58,7 +58,9 @@ ___x_cmd_env_var_recover(){
         eval "unset $1"
     else
         env:error "Variable Not trackcing"
+        return 1
     fi
+    eval unset "$varname_bak"
 }
 
 ___x_cmd_env_var_recoverall(){
@@ -66,8 +68,8 @@ ___x_cmd_env_var_recoverall(){
     while read -r var; do
         case "$var" in
             "")     ;;
-            *=)     unset "${var}" ;;
-            *)      unset "${var}=\"\$___X_CMD_ENV_VAR___BACKUP_${var}\"" ;;
+            *=)     eval unset "${var}" ;;
+            *)      eval "${var}=\"\$___X_CMD_ENV_VAR___BACKUP_${var}\"" ;;
         esac
     done
     ___X_CMD_ENV_VAR_LIST=
