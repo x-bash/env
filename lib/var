@@ -13,7 +13,7 @@ ___x_cmd_env_var(){
     esac
 }
 
-# Section: backup and get
+# Section: ls and backup and get
 
 ___x_cmd_env_var_ls(){
     printf "%s" "${___X_CMD_ENV_VAR_LIST#.}"
