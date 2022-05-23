@@ -4,10 +4,9 @@
 
 ___x_cmd_env_var(){
     case "$1" in
-        set|\
-        get_|get_backup_|\
+        backup|get_backup_|\
         clear|\
-        recover)   eval "\$___x_cmd_env_var_${1} \"\$@\"" ;;
+        recover|recoverall)   eval "\$___x_cmd_env_var_${1} \"\$@\"" ;;
     esac
 }
 
