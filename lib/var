@@ -33,7 +33,6 @@ $1
         fi
         eval "$varname_bak=\"\${1}\""
     fi
-    eval "$1=\"\${2}\""
 }
 
 ___x_cmd_env_var_recover___rm(){
@@ -79,12 +78,14 @@ ___x_cmd_env_var_ls(){
     printf "%s" "${___X_CMD_ENV_VAR_LIST#.}"
 }
 
-___x_cmd_env_var_get_(){
-    eval "___X_CMD_ENV_VAR_GET_=\"\$$1\""
-}
-
 ___x_cmd_env_var_get_backup_(){
     eval "___X_CMD_ENV_VAR_GET_BACKUP_=\"\$___X_CMD_ENV_VAR___BACKUP_$1\""
+}
+
+___x_cmd_env_var_get_backup(){
+    local ___X_CMD_ENV_VAR_GET_BACKUP_
+    ___x_cmd_env_var_get_backup_ "$1"
+    printf "%s\n" "$___X_CMD_ENV_VAR_GET_BACKUP_"
 }
 
 
