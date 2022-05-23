@@ -4,7 +4,10 @@
 
 ___x_cmd_env_var(){
     case "$1" in
-        set|isset|isunset|get_|get_backup_|recover)   eval "\$___x_cmd_env_var_${1} \"\$@\"" ;;
+        set|isset|isunset|\
+        get_|get_backup_|\
+        clear|\
+        recover)   eval "\$___x_cmd_env_var_${1} \"\$@\"" ;;
     esac
 }
 
@@ -19,15 +22,21 @@ ___x_cmd_env_var_isunset(){
 ___x_cmd_env_var_set(){
     local varname_bak="___X_CMD_ENV_VAR___BACKUP_${1:?Provide varname}"
     if ___x_cmd_env_var_isunset "$varname_bak"; then
-        eval "$varname_bak=\"\${varname}\""
-        ___X_CMD_ENV_VAR_LIST="${___X_CMD_ENV_VAR_LIST}
+        if eval ___x_cmd_env_var_isunset "$1"; then
+            ___X_CMD_ENV_VAR_LIST="${___X_CMD_ENV_VAR_LIST}
+$1=
+"
+        else
+            ___X_CMD_ENV_VAR_LIST="${___X_CMD_ENV_VAR_LIST}
 $1
 "
+        fi
+        eval "$varname_bak=\"\${1}\""
     fi
     eval "$1=\"\${2}\""
 }
 
-___x_cmd_env_var_recover(){
+___x_cmd_env_var_recover___rm(){
     local tmp="${___X_CMD_ENV_VAR_LIST#*
 "${1:?Provide varname}"
 }"
@@ -36,7 +45,32 @@ ___x_cmd_env_var_recover(){
 "$1"
 *}
 ${tmp}"
+        return 0
     fi
+    return 1
+}
+
+___x_cmd_env_var_recover(){
+    local varname_bak="___X_CMD_ENV_VAR___BACKUP_${1:?Provide varname}"
+    if ___x_cmd_env_var_recover___rm "${1}"; then
+        eval "$1=\"\${varname_bak}\""
+    elif ___x_cmd_env_var_recover___rm "$1="; then
+        eval "unset $1"
+    else
+        env:error "Variable Not trackcing"
+    fi
+}
+
+___x_cmd_env_var_recoverall(){
+    local var
+    while read -r var; do
+        case "$var" in
+            "")     ;;
+            *=)     unset "${var}" ;;
+            *)      unset "${var}=\"\$___X_CMD_ENV_VAR___BACKUP_${var}\"" ;;
+        esac
+    done
+    ___X_CMD_ENV_VAR_LIST=
 }
 
 ___x_cmd_env_var_ls(){
