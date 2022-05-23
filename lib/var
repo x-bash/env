@@ -2,6 +2,9 @@
 # shellcheck    shell=sh            disable=SC3043,SC2164,SC3000-SC4000
 # License:      GPLv3
 
+# activate: x env var backup   PATH JAVA_HOME AAA
+# deactivate: x env var recoverall
+
 ___x_cmd_env_var(){
     case "$1" in
         backup|get_backup_|\
@@ -56,6 +59,21 @@ ${tmp}"
 }
 
 ___x_cmd_env_var_recover(){
+    if [ "$#" -eq 0 ]; then
+        ___x_cmd_env_var_recover___all
+    else
+        ___x_cmd_env_var_recover___multiple "$@"
+    fi
+}
+
+___x_cmd_env_var_recover___multiple(){
+    while [ $# -gt 0 ]; do
+        ___x_cmd_env_var_recover___one "$1"
+        shift
+    done
+}
+
+___x_cmd_env_var_recover___one(){
     local varname_bak="___X_CMD_ENV_VAR___BACKUP_${1:?Provide varname}"
     if ___x_cmd_env_var_recover___rm "${1}"; then
         eval "$1=\"\${varname_bak}\""
@@ -68,7 +86,7 @@ ___x_cmd_env_var_recover(){
     eval unset "$varname_bak"
 }
 
-___x_cmd_env_var_recoverall(){
+___x_cmd_env_var_recover___all(){
     local var
     while read -r var; do
         case "$var" in
