@@ -13,12 +13,17 @@ ___x_cmd_env_var(){
     esac
 }
 
-___x_cmd_env_var_isset(){
-    eval "[ \"\${${1:?Provide variable name}+1}\" = 1 ]"
+# Section: backup and get
+
+___x_cmd_env_var_ls(){
+    printf "%s" "${___X_CMD_ENV_VAR_LIST#.}"
 }
 
-___x_cmd_env_var_isunset(){
-    eval "[ \"\${${1:?Provide variable name}+1}\" != 1 ]"
+___x_cmd_env_var_backup(){
+    while [ $# -gt 0 ]; do
+        ___x_cmd_env_var_backup___one "$1"
+        shift
+    done
 }
 
 ___x_cmd_env_var_backup___one(){
@@ -37,26 +42,19 @@ $1
     fi
 }
 
-___x_cmd_env_var_backup(){
-    while [ $# -gt 0 ]; do
-        ___x_cmd_env_var_backup___one "$1"
-        shift
-    done
+___x_cmd_env_var_get_backup_(){
+    eval "___X_CMD_ENV_VAR_GET_BACKUP_=\"\$___X_CMD_ENV_VAR___BACKUP_$1\""
 }
 
-___x_cmd_env_var_recover___rm(){
-    local tmp="${___X_CMD_ENV_VAR_LIST#*
-"${1:?Provide varname}"
-}"
-    if [ "$tmp" = "$___X_CMD_ENV_VAR_LIST" ]; then
-        ___X_CMD_ENV_VAR_LIST="${___X_CMD_ENV_VAR_LIST%%
-"$1"
-*}
-${tmp}"
-        return 0
-    fi
-    return 1
+___x_cmd_env_var_get_backup(){
+    local ___X_CMD_ENV_VAR_GET_BACKUP_
+    ___x_cmd_env_var_get_backup_ "$1"
+    printf "%s\n" "$___X_CMD_ENV_VAR_GET_BACKUP_"
 }
+
+# EndSection
+
+# Section: recover
 
 ___x_cmd_env_var_recover(){
     if [ "$#" -eq 0 ]; then
@@ -64,6 +62,18 @@ ___x_cmd_env_var_recover(){
     else
         ___x_cmd_env_var_recover___multiple "$@"
     fi
+}
+
+___x_cmd_env_var_recover___all(){
+    local var
+    while read -r var; do
+        case "$var" in
+            "")     ;;
+            *=)     eval unset "${var}" ;;
+            *)      eval "${var}=\"\$___X_CMD_ENV_VAR___BACKUP_${var}\"" ;;
+        esac
+    done
+    ___X_CMD_ENV_VAR_LIST=
 }
 
 ___x_cmd_env_var_recover___multiple(){
@@ -86,30 +96,29 @@ ___x_cmd_env_var_recover___one(){
     eval unset "$varname_bak"
 }
 
-___x_cmd_env_var_recover___all(){
-    local var
-    while read -r var; do
-        case "$var" in
-            "")     ;;
-            *=)     eval unset "${var}" ;;
-            *)      eval "${var}=\"\$___X_CMD_ENV_VAR___BACKUP_${var}\"" ;;
-        esac
-    done
-    ___X_CMD_ENV_VAR_LIST=
+___x_cmd_env_var_recover___rm(){
+    local tmp="${___X_CMD_ENV_VAR_LIST#*
+"${1:?Provide varname}"
+}"
+    if [ "$tmp" = "$___X_CMD_ENV_VAR_LIST" ]; then
+        ___X_CMD_ENV_VAR_LIST="${___X_CMD_ENV_VAR_LIST%%
+"$1"
+*}
+${tmp}"
+        return 0
+    fi
+    return 1
+}
+# EndSection
+
+# Section: utils
+
+___x_cmd_env_var_isset(){
+    eval "[ \"\${${1:?Provide variable name}+1}\" = 1 ]"
 }
 
-___x_cmd_env_var_ls(){
-    printf "%s" "${___X_CMD_ENV_VAR_LIST#.}"
+___x_cmd_env_var_isunset(){
+    eval "[ \"\${${1:?Provide variable name}+1}\" != 1 ]"
 }
 
-___x_cmd_env_var_get_backup_(){
-    eval "___X_CMD_ENV_VAR_GET_BACKUP_=\"\$___X_CMD_ENV_VAR___BACKUP_$1\""
-}
-
-___x_cmd_env_var_get_backup(){
-    local ___X_CMD_ENV_VAR_GET_BACKUP_
-    ___x_cmd_env_var_get_backup_ "$1"
-    printf "%s\n" "$___X_CMD_ENV_VAR_GET_BACKUP_"
-}
-
-
+# EndSection
