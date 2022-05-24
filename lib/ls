@@ -4,7 +4,6 @@ ___X_CMD_PKG_INSTALL_PATH="$___X_CMD_ROOT_TMP/pkg/installed"
 ___X_CMD_PKG_RAWPATH="$___X_CMD_ROOT_TMP/pkg/raw"
 
 ___x_cmd_env_ls(){
-    param:void
     case "$1" in
         i|installed)      shift;  ___x_cmd_env_ls_installed "$@" ;;
         a|activated)      shift;  ___x_cmd_env_ls_activated "$@" ;;
