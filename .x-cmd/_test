@@ -7,13 +7,13 @@
 # x env use java=18-open node=v18.2.0
 fff()(
     aaa=234
-    ___x_cmd_env_var backup PATH aaa bbb AAA
-    ___x_cmd_env_var_get_backup PATH
+    x env var backup PATH aaa bbb AAA
+    x env var get_backup PATH
     aaa=123
     bbb=456
     echo "aaa:$aaa bbb:$bbb"
-    ___x_cmd_env_var_ls
-    ___x_cmd_env_var_recover
+    x env var ls
+    x env var recover
     echo "aaa:$aaa bbb:$bbb"
     echo "varname_bak: $varname_bak"
 )
