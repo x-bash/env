@@ -42,7 +42,7 @@ $___X_CMD_ENV_VERSION_CONFIG
         done
         ___X_CMD_ENV_VERSION_CONFIG="$___X_CMD_ENV_VERSION_CONFIG$pkg$version
 "
-        [ -z "$___X_CMD_ENV___VAR_ADD_NO_SETUP" ] || x pkg setup "${i%=*}" "$version"
+        # [ -z "$___X_CMD_ENV___VAR_ADD_NO_SETUP" ] || x pkg setup "${i%=*}" "$version"
     done
 
     ___X_CMD_ENV_VERSION_CONFIG="${___X_CMD_ENV_VERSION_CONFIG#

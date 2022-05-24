@@ -21,7 +21,7 @@ ___x_cmd_env_try(){
 
     local i
     for i in "$@"; do
-        pkg:info "Prepare ${i%=*} $(___x_cmd_env_get_version "$i")"
+        pkg:info "Prepare $i"
         if ! x pkg install "${i%=*}" "$(___x_cmd_env_get_version "$i")"; then
             pkg:error "Cannot install package: $i"
             return 1
@@ -29,10 +29,11 @@ ___x_cmd_env_try(){
     done
 
     for i in "$@"; do
-        x pkg activate "$i"
+        x pkg activate "${i%=*}" "$(___x_cmd_env_get_version "$i")"
     done
 
-    ___X_CMD_ENV___VAR_ADD_NO_SETUP="" ___x_cmd_env___var_add "$@"
+    # ___X_CMD_ENV___VAR_ADD_NO_SETUP="" ___x_cmd_env___var_add "$@"
+    ___x_cmd_env___var_add "$@"
 }
 
 # use = try + save-config
@@ -48,7 +49,8 @@ ___x_cmd_env_use(){
         ___X_CMD_ENV_VERSION_CONFIG=""
     fi
 
-    ___X_CMD_ENV___VAR_ADD_NO_SETUP=1 ___x_cmd_env___var_add "$@"
+    # ___X_CMD_ENV___VAR_ADD_NO_SETUP=1 ___x_cmd_env___var_add "$@"
+    ___x_cmd_env___var_add "$@"
     ___x_cmd_env_config_save
 
     ___X_CMD_ENV_VERSION_CONFIG="$backup"
@@ -59,8 +61,8 @@ ___x_cmd_env_unuse(){
     local pkg_name
     local version
     for i in "$@"; do
-        pkg_name="${i%=*}"
-        x pkg deactivate "$pkg_name"
+        # pkg_name="${i%=*}"
+        x pkg deactivate "${i%=*}" "$(___x_cmd_env_get_version "$i")"
         # 1. remove config
         # 2. remove env
     done
