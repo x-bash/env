@@ -77,7 +77,7 @@ ___x_cmd_env_unuse(){
         x pkg deactivate "$pkg_name"
         ___x_cmd___env_store_prev "$pkg_name"
         ___x_cmd___env_store_current "$pkg_name"
-        code="$code ${i%=}="
+        code="$code $pkg_name="
     done
 
     eval "$code"        # Remove config in file
