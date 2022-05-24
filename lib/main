@@ -52,7 +52,9 @@ ___x_cmd_env_try(){
         ___x_cmd___env_store_current "$___X_CMD___ENV_PARSE_PKG" "$___X_CMD___ENV_PARSE_VERSION"
     done
 
-    ___X_CMD_ENV___VAR_ADD_NO_SETUP="" ___x_cmd_env___var_add "$@"
+    local ___X_CMD_ENV___CONFIGSTR_SET_
+    ___x_cmd_env___configstr_set_ "$@"
+    ___X_CMD_ENV_VERSION_CONFIG="$___X_CMD_ENV___CONFIGSTR_SET_"
 }
 
 # use = try + save-config
@@ -60,19 +62,7 @@ ___x_cmd_env_use(){
     x:trace env/use
     ___x_cmd_env_try "$@" || return
 
-    # ___x_cmd_env___configfile_set "$pkg" "$ver"
-
-    local backup="$___X_CMD_ENV_VERSION_CONFIG"
-    if [ -f "$___X_CMD_ENV_VERSION_CONFIG_PATH" ]; then
-        ___X_CMD_ENV_VERSION_CONFIG="$(cat "$___X_CMD_ENV_VERSION_CONFIG_PATH")"
-    else
-        ___X_CMD_ENV_VERSION_CONFIG=""
-    fi
-
-    ___X_CMD_ENV___VAR_ADD_NO_SETUP=1 ___x_cmd_env___var_add "$@"
-    ___x_cmd_env_config_save
-
-    ___X_CMD_ENV_VERSION_CONFIG="$backup"
+    ___x_cmd_env_configfile_set "$@"
 }
 
 # TODO
