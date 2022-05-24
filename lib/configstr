@@ -1,0 +1,59 @@
+
+___x_cmd_env___configstr_add_(){
+    ___X_CMD_ENV___CONFIGSTR_ADD_="${1:?Provide str}"
+    local pkg="${2:?Provide pkg}"
+    local ver="${2:?Provide ver}"
+
+    local bin
+    local tmp
+    local i
+    for i in "$@"; do
+        bin="${pkg%=*}="
+        tmp="${___X_CMD_ENV___CONFIGSTR_ADD_#*
+"$bin"*
+}"
+        while [ "$tmp" != "$___X_CMD_ENV___CONFIGSTR_ADD_" ]; do
+            ___X_CMD_ENV___CONFIGSTR_ADD_="${___X_CMD_ENV___CONFIGSTR_ADD_%%
+"$bin"*
+*}${tmp}"
+            tmp="${___X_CMD_ENV___CONFIGSTR_ADD_#*
+"$bin"*
+}"
+        done
+        ___X_CMD_ENV___CONFIGSTR_ADD_="$___X_CMD_ENV___CONFIGSTR_ADD_
+$i"
+    done
+
+    ___X_CMD_ENV___CONFIGSTR_ADD_="${___X_CMD_ENV___CONFIGSTR_ADD_#
+}"
+
+}
+
+___x_cmd_env___configstr_rm_(){
+    ___X_CMD_ENV___CONFIGSTR_RM_="${1:?Provide str}"
+    local pkg="${2:?Provide pkg}"
+
+    local bin
+    local tmp
+    local i
+    for i in "$@"; do
+        bin="${pkg%=*}="
+        tmp="${___X_CMD_ENV___CONFIGSTR_RM_#*
+"$bin"*
+}"
+        while [ "$tmp" != "$___X_CMD_ENV___CONFIGSTR_RM_" ]; do
+            ___X_CMD_ENV___CONFIGSTR_RM_="${___X_CMD_ENV___CONFIGSTR_RM_%%
+"$bin"*
+*}${tmp}"
+            tmp="${___X_CMD_ENV___CONFIGSTR_RM_#*
+"$bin"*
+}"
+        done
+        ___X_CMD_ENV___CONFIGSTR_RM_="$___X_CMD_ENV___CONFIGSTR_RM_
+$i"
+    done
+
+    ___X_CMD_ENV___CONFIGSTR_RM_="${___X_CMD_ENV___CONFIGSTR_RM_#
+}"
+
+}
