@@ -14,9 +14,25 @@ ___x_cmd_env_get_version(){
     fi
 }
 
+___x_cmd___env_pasre__pkg__version(){
+    case "$1" in
+        *=-)
+            ___X_CMD___ENV_PARSE_PKG="${1%=-}"
+            ___x_cmd_env_prev_ "${1%=-}"
+            ___X_CMD___ENV_PARSE_VERSION="$___X_CMD_ENV_PREV_"
+            ;;
+        *=*)
+            ___X_CMD___ENV_PARSE_PKG="${1%=*}"
+            ___X_CMD___ENV_PARSE_VERSION="${1#*=}"
+            ;;
+        *)
+            ___X_CMD___ENV_PARSE_PKG="${1}"
+            ___X_CMD___ENV_PARSE_VERSION="$(x pkg default_version "$1")"
+    esac
+}
+
 # try = install + activate
 ___x_cmd_env_try(){
-    param:void
     x:trace env/try
 
     local i
@@ -28,8 +44,12 @@ ___x_cmd_env_try(){
         fi
     done
 
+    local ___X_CMD___ENV_PARSE_PKG
+    local ___X_CMD___ENV_PARSE_VERSION
     for i in "$@"; do
-        x pkg activate "$i"
+        ___x_cmd___env_store_prev "$i"
+        x pkg activate "$___X_CMD___ENV_PARSE_PKG" "$___X_CMD___ENV_PARSE_VERSION"
+        ___x_cmd___env_store_cur "$___X_CMD___ENV_PARSE_VERSION"
     done
 
     ___X_CMD_ENV___VAR_ADD_NO_SETUP="" ___x_cmd_env___var_add "$@"
