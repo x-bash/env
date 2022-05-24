@@ -2,6 +2,9 @@
 # shellcheck    shell=sh            disable=SC3043,SC2164,SC3000-SC4000
 # License:      GPLv3
 
+xrc:mod:lib env     util exec config main advise ls var
+
+
 ___x_cmd_env(){
     case "$1" in
         ls)             ___x_cmd_env_ls "$@" ;;
@@ -56,6 +59,5 @@ ___x_cmd_env(){
 
 
 x log init  pkg
-xrc:mod:lib env     util config main advise ls var
 
 xrc setmain ___x_cmd_env
