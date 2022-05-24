@@ -11,7 +11,7 @@ ___x_cmd_env_current_(){
     ___X_CMD_ENV_CURRENT_="$___X_CMD_LDICT_GET_"
 }
 
-___x_cmd_env_store_current(){
+___x_cmd___env_store_current(){
     ___x_cmd_ldict_put ___X_CMD_ENV_VERSION_CONFIG "${1:?Provide pkg name}" "${2:?Provide version}"
 }
 

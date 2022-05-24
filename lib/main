@@ -70,13 +70,17 @@ ___x_cmd_env_unuse(){
     local i
     local pkg_name
     local version
+
+    local code=___x_cmd_env_config_set
     for i in "$@"; do
         pkg_name="${i%=*}"
         x pkg deactivate "$pkg_name"
         ___x_cmd___env_store_prev "$pkg_name"
-        ___x_cmd_env_unset_current "$pkg_name"
-        # 2. remove env
+        ___x_cmd___env_store_current "$pkg_name"
+        code="$code ${i%=}="
     done
+
+    eval "$code"        # Remove config in file
 }
 
 ___x_cmd_env_which(){
