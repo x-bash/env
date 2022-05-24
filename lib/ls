@@ -16,12 +16,17 @@ ___x_cmd_env_ls(){
 # Invoked pkg ls installed
 ___x_cmd_env_ls_installed()(
     if ! [ -d "$___X_CMD_PKG_INSTALL_PATH" ]; then return 0; fi
-    cd "$___X_CMD_PKG_INSTALL_PATH/$1"
+    if ! cd "$___X_CMD_PKG_INSTALL_PATH/$1"; then
+        pkg:debug "No pkg found."
+        return 0
+    fi
+
     pkg:debug "dir $___X_CMD_PKG_INSTALL_PATH/$1"
     for i in *; do
         printf "%s\n" "$i"
     done
-    cd - 1>/dev/null
+
+    cd "$OLD_PWD" || return 0
     # printf "%s\n" "$___X_CMD_ENV_VERSION_CONFIG" | awk '$0!=""{gsub("=", "\t", $0); print $0}'
 )
 
