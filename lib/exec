@@ -23,7 +23,10 @@ ___x_cmd___env_exec_set(){
             --)     break ;;
             -*)     ___x_cmd_env untry "${1#-}" ;;
             *=)     ___x_cmd_env untry "${1%=}" ;;
-            *=-)    ___x_cmd_env retore "${1%=-}" ;;
+            *=-)
+                    local ___X_CMD_ENV_PREV_
+                    ___x_cmd_env_prev_ "${1%=-}"
+                    ___x_cmd_env try "${1%=-}=${___X_CMD_ENV_PREV_}" ;;
             *=*)    ___x_cmd_env try "$1" ;;
         esac
     done
