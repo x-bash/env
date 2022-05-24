@@ -19,6 +19,10 @@ ${pkg}=*
     fi
 }
 
+___x_cmd_env_store_current_){
+    :
+}
+
 ___x_cmd_env_prev(){
     local ___X_CMD_ENV_CURRENT_
     printf "%s\n" "$___X_CMD_ENV_PREV"
