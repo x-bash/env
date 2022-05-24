@@ -31,6 +31,7 @@ ___x_cmd_env_config_set(){
         str="$(cat "$___X_CMD_ENV_VERSION_CONFIG_PATH")"
     fi
 
+    local ___X_CMD_ENV___CONFIGSTR_SET_
     ___x_cmd_env___configstr_set_ "$str" "$@"
     ___x_cmd_env_config_save - "$___X_CMD_ENV___CONFIGSTR_SET_"
 }
