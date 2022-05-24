@@ -31,6 +31,18 @@
 #         x pkg activate "$i"
 #     done
 # }
+___x_cmd_pkg_activated_version_(){
+    local _line
+    printf "%s\n" "$___X_CMD_PKG_ACTIVATE___LIST" | while read -r _line; do
+        [ -n "$_line" ] || continue
+        ___X_CMD_PKG_ACTIVATED_VERSION_="${_line#*${1}=}"
+        if [ $___X_CMD_PKG_ACTIVATED_VERSION_ != $_line ]; then
+            printf "%s\n" "$___X_CMD_PKG_ACTIVATED_VERSION_" && return 0
+        fi
+    done
+    ___X_CMD_PKG_ACTIVATED_VERSION_=
+    return 1
+}
 
 ___x_cmd_env_pkg_activate(){
     while [ $# -gt 0 ]; do
