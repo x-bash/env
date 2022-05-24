@@ -31,6 +31,7 @@ ___x_cmd_env_var_backup(){
 
 ___x_cmd_env_var_backup___one(){
     local varname_bak="___X_CMD_ENV_VAR___BACKUP_${1:?Provide varname}"
+
     if ___x_cmd_env_var_isunset "$varname_bak"; then
         if ___x_cmd_env_var_isunset "$1"; then
             ___X_CMD_ENV_VAR_LIST="${___X_CMD_ENV_VAR_LIST}
@@ -72,7 +73,7 @@ ___x_cmd_env_var_recover___all(){
     ___x_cmd_env_var_ls | while read -r var; do
         case "$var" in
             "")     ;;
-            *=)     unset "${var}" ;;
+            *=)     eval unset "${var%=*}" ;;
             *)      eval "${var}=\"\$___X_CMD_ENV_VAR___BACKUP_${var}\"" ;;
         esac
     done
@@ -89,7 +90,7 @@ ___x_cmd_env_var_recover___multiple(){
 ___x_cmd_env_var_recover___one(){
     local varname_bak="___X_CMD_ENV_VAR___BACKUP_${1:?Provide varname}"
     if ___x_cmd_env_var_recover___rm "${1}"; then
-        eval "$1=\"\${varname_bak}\""
+        eval "$1=\"\$${varname_bak}\""
     elif ___x_cmd_env_var_recover___rm "$1="; then
         eval "unset $1"
     else
@@ -103,7 +104,7 @@ ___x_cmd_env_var_recover___rm(){
     local tmp="${___X_CMD_ENV_VAR_LIST#*
 "${1:?Provide varname}"
 }"
-    if [ "$tmp" = "$___X_CMD_ENV_VAR_LIST" ]; then
+    if [ "$tmp" != "$___X_CMD_ENV_VAR_LIST" ]; then
         ___X_CMD_ENV_VAR_LIST="${___X_CMD_ENV_VAR_LIST%%
 "$1"
 *}
