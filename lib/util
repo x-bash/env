@@ -1,0 +1,20 @@
+
+___x_cmd_env_current_(){
+    local pkg="${1:?Provide pkg name}"
+    ___X_CMD_ENV_PREV_="${___X_CMD_ENV_VERSION_CONFIG%
+${pkg}=*
+*}"
+
+    if [ "$___X_CMD_ENV_PREV_" = "$___X_CMD_ENV_VERSION_CONFIG" ]; then
+        ___X_CMD_ENV_PREV_=
+        return 1
+    else
+        ___X_CMD_ENV_PREV_="${___X_CMD_ENV_VERSION_CONFIG#"$___X_CMD_ENV_PREV_"}"
+        ___X_CMD_ENV_PREV_="${___X_CMD_ENV_PREV_%%=*}"
+    fi
+}
+
+___x_cmd_env_prev_(){
+    local pkg="${1:?Provide pkg name}"
+    eval printf "\"%s\\n\"" "\"\$___X_CMD_ENV_PREV_$pkg\""
+}
