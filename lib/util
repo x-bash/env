@@ -1,28 +1,32 @@
 
 ___x_cmd_env_current(){
     local ___X_CMD_ENV_CURRENT_
+    ___x_cmd_env_current_ "$@"
     printf "%s\n" "$___X_CMD_ENV_CURRENT_"
 }
 
-___x_cmd_env_current_(){
-    local pkg="${1:?Provide pkg name}"
-    ___X_CMD_ENV_CURRENT_="${___X_CMD_ENV_VERSION_CONFIG%
-${pkg}=*
-*}"
+# ___x_cmd_env_current_(){
+#     local pkg="${1:?Provide pkg name}"
+#     ___X_CMD_ENV_CURRENT_="${___X_CMD_ENV_VERSION_CONFIG%
+# ${pkg}=*
+# *}"
 
-    if [ "$___X_CMD_ENV_CURRENT_" = "$___X_CMD_ENV_VERSION_CONFIG" ]; then
-        ___X_CMD_ENV_CURRENT_=
-        return 1
-    else
-        ___X_CMD_ENV_CURRENT_="${___X_CMD_ENV_VERSION_CONFIG#"$___X_CMD_ENV_CURRENT_"}"
-        ___X_CMD_ENV_CURRENT_="${___X_CMD_ENV_CURRENT_%%=*}"
-    fi
+#     if [ "$___X_CMD_ENV_CURRENT_" = "$___X_CMD_ENV_VERSION_CONFIG" ]; then
+#         ___X_CMD_ENV_CURRENT_=
+#         return 1
+#     else
+#         ___X_CMD_ENV_CURRENT_="${___X_CMD_ENV_VERSION_CONFIG#"$___X_CMD_ENV_CURRENT_"}"
+#         ___X_CMD_ENV_CURRENT_="${___X_CMD_ENV_CURRENT_%%=*}"
+#     fi
+# }
+
+___x_cmd_env_current_(){
+    ___x_cmd_ldict_get_ ___X_CMD_ENV_VERSION_CONFIG "${1:?Provide pkg name}"
+    ___X_CMD_ENV_CURRENT_="$___X_CMD_LDICT_GET_"
 }
 
 ___x_cmd_env_store_current(){
-    local pkg="${1:?Provide pkg name}"
-    local ver="${2:?Provide version}"
-    : TODO
+    ___x_cmd_ldict_put ___X_CMD_ENV_VERSION_CONFIG "${1:?Provide pkg name}" "${2:?Provide version}"
 }
 
 ___x_cmd_env_prev(){
