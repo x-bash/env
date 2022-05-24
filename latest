@@ -41,7 +41,4 @@ A
 x log init  pkg
 xrc:mod:lib env     util config main advise ls var
 
-
-
-
 xrc setmain ___x_cmd_env
