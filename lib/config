@@ -10,22 +10,15 @@ ___x_cmd_env_config_load(){
 }
 
 # set
-___x_cmd_env_config_set_(){
-    local tgt="${1:-"$___X_CMD_ENV_VERSION_CONFIG_PATH"}"
-    if [ "$tgt" = - ]; then
-        tgt="$___X_CMD_ENV_VERSION_CONFIG_PATH"
+___x_cmd_env_config_set(){
+    local str
+    if [ -f "$___X_CMD_ENV_VERSION_CONFIG_PATH" ]; then
+        str="$(cat "$___X_CMD_ENV_VERSION_CONFIG_PATH")"
     fi
 
-    if ! x ensuredir "${tgt%/*}"; then
-        env:error "Couldn't create folder: ${tgt%/*}"
-        return 1
-    fi
-
-    local str="${2:-"$___X_CMD_ENV_VERSION_CONFIG"}"
-    printf "%s" "$str" >"${1:?Provide config file}"
+    ___x_cmd_env___configstr_set_ "$str" "$@"
+    ___x_cmd_env_config_save - "$___X_CMD_ENV___CONFIGSTR_SET_"
 }
-
-
 
 ___x_cmd_env_config_save(){
     local tgt="${1:-"$___X_CMD_ENV_VERSION_CONFIG_PATH"}"
@@ -41,3 +34,35 @@ ___x_cmd_env_config_save(){
     local str="${2:-"$___X_CMD_ENV_VERSION_CONFIG"}"
     printf "%s" "$str" >"${1:?Provide config file}"
 }
+
+
+
+___x_cmd_env___configstr_set_(){
+    ___X_CMD_ENV___CONFIGSTR_ADD_="${1:?Provide str}"
+    shift
+
+    local bin
+    local tmp
+    local i
+    for i in "$@"; do
+        bin="${i%=*}="
+        tmp="${___X_CMD_ENV___CONFIGSTR_ADD_#*
+"$bin"*
+}"
+        while [ "$tmp" != "$___X_CMD_ENV___CONFIGSTR_ADD_" ]; do
+            ___X_CMD_ENV___CONFIGSTR_ADD_="${___X_CMD_ENV___CONFIGSTR_ADD_%%
+"$bin"*
+*}${tmp}"
+            tmp="${___X_CMD_ENV___CONFIGSTR_ADD_#*
+"$bin"*
+}"
+        done
+        ___X_CMD_ENV___CONFIGSTR_ADD_="$___X_CMD_ENV___CONFIGSTR_ADD_
+$i"
+    done
+
+    ___X_CMD_ENV___CONFIGSTR_ADD_="${___X_CMD_ENV___CONFIGSTR_ADD_#
+}"
+
+}
+
