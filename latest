@@ -57,7 +57,4 @@ ___x_cmd_env(){
 #     "___x_cmd_env_$PARAM_SUBCMD" "$@"
 # }
 
-
-x log init  pkg
-
 xrc setmain ___x_cmd_env
