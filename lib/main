@@ -53,7 +53,7 @@ ___x_cmd_env_try(){
     done
 
     local ___X_CMD_ENV___CONFIGSTR_SET_
-    ___x_cmd_env___configstr_set_ "$@"
+    ___x_cmd_env___configstr_set_ "$___X_CMD_ENV___CONFIGSTR_SET_" "$@"
     ___X_CMD_ENV_VERSION_CONFIG="$___X_CMD_ENV___CONFIGSTR_SET_"
 }
 
