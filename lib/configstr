@@ -1,39 +1,25 @@
 
-___x_cmd_env___configfile_add_(){
-    local pkg="${2:?Provide pkg}"
-    local ver="${2:?Provide ver}"
+___x_cmd_env___configfile_set(){
 
     local str
     if [ -f "$___X_CMD_ENV_VERSION_CONFIG_PATH" ]; then
         str="$(cat "$___X_CMD_ENV_VERSION_CONFIG_PATH")"
     fi
 
-    ___x_cmd_env___configstr_add_ "$str" "$pkg" "$ver"
+    ___x_cmd_env___configstr_set_ "$str" "$@"
     ___x_cmd_env_config_save
 }
 
-___x_cmd_env___configfile_rm_(){
-    local pkg="${2:?Provide pkg}"
 
-    local str
-    if [ -f "$___X_CMD_ENV_VERSION_CONFIG_PATH" ]; then
-        str="$(cat "$___X_CMD_ENV_VERSION_CONFIG_PATH")"
-    fi
-
-    ___x_cmd_env___configstr_rm_ "$str" "$pkg" "$ver"
-    ___x_cmd_env_config_save
-}
-
-___x_cmd_env___configstr_add_(){
+___x_cmd_env___configstr_set_(){
     ___X_CMD_ENV___CONFIGSTR_ADD_="${1:?Provide str}"
-    local pkg="${2:?Provide pkg}"
-    local ver="${2:?Provide ver}"
+    shift
 
     local bin
     local tmp
     local i
     for i in "$@"; do
-        bin="${pkg%=*}="
+        bin="${i%=*}="
         tmp="${___X_CMD_ENV___CONFIGSTR_ADD_#*
 "$bin"*
 }"
@@ -50,35 +36,6 @@ $i"
     done
 
     ___X_CMD_ENV___CONFIGSTR_ADD_="${___X_CMD_ENV___CONFIGSTR_ADD_#
-}"
-
-}
-
-___x_cmd_env___configstr_rm_(){
-    ___X_CMD_ENV___CONFIGSTR_RM_="${1:?Provide str}"
-    local pkg="${2:?Provide pkg}"
-
-    local bin
-    local tmp
-    local i
-    for i in "$@"; do
-        bin="${pkg%=*}="
-        tmp="${___X_CMD_ENV___CONFIGSTR_RM_#*
-"$bin"*
-}"
-        while [ "$tmp" != "$___X_CMD_ENV___CONFIGSTR_RM_" ]; do
-            ___X_CMD_ENV___CONFIGSTR_RM_="${___X_CMD_ENV___CONFIGSTR_RM_%%
-"$bin"*
-*}${tmp}"
-            tmp="${___X_CMD_ENV___CONFIGSTR_RM_#*
-"$bin"*
-}"
-        done
-        ___X_CMD_ENV___CONFIGSTR_RM_="$___X_CMD_ENV___CONFIGSTR_RM_
-$i"
-    done
-
-    ___X_CMD_ENV___CONFIGSTR_RM_="${___X_CMD_ENV___CONFIGSTR_RM_#
 }"
 
 }
