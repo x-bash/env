@@ -60,6 +60,8 @@ ___x_cmd_env_use(){
     x:trace env/use
     ___x_cmd_env_try "$@" || return
 
+    # ___x_cmd_env___configfile_set "$pkg" "$ver"
+
     local backup="$___X_CMD_ENV_VERSION_CONFIG"
     if [ -f "$___X_CMD_ENV_VERSION_CONFIG_PATH" ]; then
         ___X_CMD_ENV_VERSION_CONFIG="$(cat "$___X_CMD_ENV_VERSION_CONFIG_PATH")"

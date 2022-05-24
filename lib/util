@@ -19,7 +19,7 @@ ${pkg}=*
     fi
 }
 
-___x_cmd_env_store_current_){
+___x_cmd_env_store_current(){
     :
 }
 
