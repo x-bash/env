@@ -4,14 +4,18 @@
 
 ___x_cmd_env(){
     case "$1" in
-        ls)             ;;
-        try)            ;;
-        use)            ;;
-        unuse)          ;;
-        exec)           ;;
+        ls)             ___x_cmd_env_ls "$@" ;;
+        try)            ___x_cmd_env_try "$@" ;;
+        untry)          ___x_cmd_env_untry "$@" ;;
+        use)            ___x_cmd_env_use "$@" ;;
+        unuse)          ___x_cmd_env_unuse "$@" ;;
+        exec)           ___x_cmd_env_exec "$@" ;;
 
         which)          ;;
         var)            ;;
+
+        prev)           ___x_cmd_env_prev "$@" ;;
+        current)        ___x_cmd_env_current "$@" ;;
     esac
 }
 
