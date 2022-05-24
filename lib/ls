@@ -26,7 +26,10 @@ ___x_cmd_env_ls_installed()(
         printf "%s\n" "$i"
     done
 
-    cd "$OLD_PWD" || return 0
+    if ! cd "$OLD_PWD"; then
+        pkg:warn "Cannot go back $OLD_PWD"
+        return 0
+    fi
     # printf "%s\n" "$___X_CMD_ENV_VERSION_CONFIG" | awk '$0!=""{gsub("=", "\t", $0); print $0}'
 )
 
