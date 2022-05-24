@@ -20,7 +20,9 @@ ${pkg}=*
 }
 
 ___x_cmd_env_store_current(){
-    :
+    local pkg="${1:?Provide pkg name}"
+    local ver="${2:?Provide version}"
+    : TODO
 }
 
 ___x_cmd_env_prev(){
