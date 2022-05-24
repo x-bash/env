@@ -11,8 +11,8 @@ ___x_cmd_env(){
         unuse)          ___x_cmd_env_unuse "$@" ;;
         exec)           ___x_cmd_env_exec "$@" ;;
 
-        which)          ;;
-        var)            ;;
+        which)          ___x_cmd_env_which "$@" ;;
+        var)            ___x_cmd_env_var "$@" ;;
 
         prev)           ___x_cmd_env_prev "$@" ;;
         current)        ___x_cmd_env_current "$@" ;;
