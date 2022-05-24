@@ -85,19 +85,6 @@ ___x_cmd_env_unuse(){
     done
 }
 
-___x_cmd_env_exec()(
-    x:trace env/exec
-
-    local candidate="${1:?Provide package}"
-    local pkg_name="${candidate%=*}"
-    local version
-    version="$(___x_cmd_env_get_version "$candidate")"
-    shift
-    pkg:info "Execute $pkg_name $version: $*"
-    x pkg xbin init "$pkg_name" "$version"
-    "___x_cmd_${pkg_name}" "$@"
-)
-
 ___x_cmd_env_which(){
     local i
     for i in "$@"; do
