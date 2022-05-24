@@ -1,4 +1,9 @@
 
+___x_cmd_env_current(){
+    local ___X_CMD_ENV_CURRENT_
+    printf "%s\n" "$___X_CMD_ENV_CURRENT_"
+}
+
 ___x_cmd_env_current_(){
     local pkg="${1:?Provide pkg name}"
     ___X_CMD_ENV_CURRENT_="${___X_CMD_ENV_VERSION_CONFIG%
@@ -14,9 +19,14 @@ ${pkg}=*
     fi
 }
 
+___x_cmd_env_prev(){
+    local ___X_CMD_ENV_CURRENT_
+    printf "%s\n" "$___X_CMD_ENV_PREV"
+}
+
 ___x_cmd_env_prev_(){
     local pkg="${1:?Provide pkg name}"
-    eval printf "\"%s\\n\"" "\"\$___X_CMD_ENV_PREV_$pkg\""
+    eval ___X_CMD_ENV_PREV="\"\$___X_CMD_ENV_PREV_$pkg\""
 }
 
 ___x_cmd___env_store_prev(){
