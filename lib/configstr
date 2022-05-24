@@ -1,4 +1,29 @@
 
+___x_cmd_env___configfile_add_(){
+    local pkg="${2:?Provide pkg}"
+    local ver="${2:?Provide ver}"
+
+    local str
+    if [ -f "$___X_CMD_ENV_VERSION_CONFIG_PATH" ]; then
+        str="$(cat "$___X_CMD_ENV_VERSION_CONFIG_PATH")"
+    fi
+
+    ___x_cmd_env___configstr_add_ "$str" "$pkg" "$ver"
+    ___x_cmd_env_config_save
+}
+
+___x_cmd_env___configfile_rm_(){
+    local pkg="${2:?Provide pkg}"
+
+    local str
+    if [ -f "$___X_CMD_ENV_VERSION_CONFIG_PATH" ]; then
+        str="$(cat "$___X_CMD_ENV_VERSION_CONFIG_PATH")"
+    fi
+
+    ___x_cmd_env___configstr_rm_ "$str" "$pkg" "$ver"
+    ___x_cmd_env_config_save
+}
+
 ___x_cmd_env___configstr_add_(){
     ___X_CMD_ENV___CONFIGSTR_ADD_="${1:?Provide str}"
     local pkg="${2:?Provide pkg}"
