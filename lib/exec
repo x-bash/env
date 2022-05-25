@@ -50,7 +50,7 @@ ___x_cmd___env_exec_set_and_run_and_unset(){
                 ___x_cmd___env_exec_set_and_run_and_unset_recover "${1%=}"
                 local ___X_CMD_ENV_PREV_
                 ___x_cmd_env prev_ "$pkg"
-                ___x_cmd_pkg "${1%=-}=$___X_CMD_ENV_PREV_"
+                ___x_cmd_pkg activate "${1%=-}=$___X_CMD_ENV_PREV_"
                 ;;
             *=*)
                 ___x_cmd___env_exec_set_and_run_and_unset_recover "${1%=}"
