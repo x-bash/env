@@ -57,6 +57,7 @@ ___x_cmd___env_exec_set_and_run_and_unset(){
                 ___x_cmd_pkg activate "$1"
                 ;;
         esac
+        [ -z "$___X_CMD_ENV_RECOVER_CODE" ] || eval "$___X_CMD_ENV_RECOVER_CODE"
 
     done
 }
