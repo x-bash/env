@@ -7,7 +7,7 @@ ___x_cmd_advise rm ___x_cmd_env
 xrc env
 x log init env
 x log +env
-# x log -pkg
+x log -pkg
 
 t_var()(
     aaa=234
@@ -65,16 +65,29 @@ t_use()(
 )
 # t_use
 t_exec()(
+    x env try node=v16.15.0
     x env exec java=18-open node=v18.2.0 -- x pkg ls a
     x ui sep
-    x env exec java=18-open node=v17.9.0 -- x pkg ls a
-    x ui sep
-    x env exec java=18-open node=- -- x pkg ls a
 
+    x env exec go=1.17.10 node=v17.9.0 -- x pkg ls a
     x ui sep
+
+    x env exec java=18-open node=- -- x pkg ls a
+    x ui sep
+
     x env exec java=18-open node= -- x pkg ls a
 
     x env current node
+    x pkg ls a
+
+    x ui sep
+    x env exec java=18-open node=v18.2.0
+    x pkg ls a
+
+    x ui sep
+    x env exec java= -node
+    x pkg ls a
+
 
 
     # x pkg ls a

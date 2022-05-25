@@ -32,9 +32,10 @@ ___x_cmd_env_try(){
 
     local i
     for i in "$@"; do
-        env:info "Prepare ${i%=*} $(___x_cmd_env_get_version "$i")"
-        if ! ___x_cmd_pkg install "${i%=*}" "$(___x_cmd_pkg "$i")"; then
-            env:error "Cannot install package: $i"
+        ___x_cmd___env_pasre__pkg__version "$i"
+        env:info "Prepare $___X_CMD___ENV_PARSE_PKG $___X_CMD___ENV_PARSE_VERSION"
+        if ! ___x_cmd_pkg install "$___X_CMD___ENV_PARSE_PKG" "$___X_CMD___ENV_PARSE_VERSION"; then
+            env:error "Cannot install package: $___X_CMD___ENV_PARSE_PKG $___X_CMD___ENV_PARSE_VERSION"
             return 1
         fi
     done
