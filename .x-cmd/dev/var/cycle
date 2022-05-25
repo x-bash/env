@@ -3,12 +3,12 @@
 #     local i
 #     for i in "$@"; do
 #         if x pkg activated "$i"; then
-#             pkg:error "Not activated: $i"
+#             env:error "Not activated: $i"
 #             return 1
 #         fi
 
 #         if x pkg installed "$i"; then
-#             pkg:error "Not installed: $i"
+#             env:error "Not installed: $i"
 #             return 1
 #         fi
 #     done
@@ -22,7 +22,7 @@
 #     local i
 #     for i in "$@"; do
 #         if ! x pkg activated "$i"; then
-#             pkg:error "Not activated: $i"
+#             env:error "Not activated: $i"
 #             return 1
 #         fi
 #     done

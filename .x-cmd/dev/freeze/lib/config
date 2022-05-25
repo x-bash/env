@@ -47,7 +47,7 @@ A
 
 ___x_cmd_env_config_load(){
     if ! ___X_CMD_ENV_VERSION_CONFIG="$(cat "${1:?Provide config file}")"; then
-        pkg:error "Config file not found."
+        env:error "Config file not found."
     fi
     ___x_cmd_env___var_apply_by_var
 }
