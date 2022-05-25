@@ -40,11 +40,11 @@ ___x_cmd___env_exec_set_and_run_and_unset(){
                 shift; "$@"; break ;;
             -*)
                 ___x_cmd___env_exec_set_and_run_and_unset_recover "${1#-}"
-                ___x_cmd_env untry "${1#-}"
+                ___x_cmd_pkg deactivate "${1#-}"
                 ;;
             *=)
                 ___x_cmd___env_exec_set_and_run_and_unset_recover "${1%=}"
-                ___x_cmd_env untry "${1%=}"
+                ___x_cmd_pkg deactivate "${1%=}"
                 ;;
             *=-)
                 ___x_cmd___env_exec_set_and_run_and_unset_recover "${1%=}"
