@@ -3,22 +3,25 @@
 # License:      GPLv3
 
 xrc:mod:lib env     util exec config main advise ls var
-
+x log init env
+xrc pkg
 
 ___x_cmd_env(){
-    case "$1" in
-        ls)             ___x_cmd_env_ls "$@" ;;
-        try)            ___x_cmd_env_try "$@" ;;
-        untry)          ___x_cmd_env_untry "$@" ;;
-        use)            ___x_cmd_env_use "$@" ;;
-        unuse)          ___x_cmd_env_unuse "$@" ;;
-        exec)           ___x_cmd_env_exec "$@" ;;
+    local op="$1"
+    case "$op" in
+        ls)             shift; ___x_cmd_env_ls "$@" ;;
+        try)            shift; ___x_cmd_env_try "$@" ;;
+        untry)          shift; ___x_cmd_env_untry "$@" ;;
+        use)            shift; ___x_cmd_env_use "$@" ;;
+        unuse)          shift; ___x_cmd_env_unuse "$@" ;;
+        exec)           shift; ___x_cmd_env_exec "$@" ;;
 
-        which)          ___x_cmd_env_which "$@" ;;
-        var)            ___x_cmd_env_var "$@" ;;
+        which)          shift; ___x_cmd_env_which "$@" ;;
+        var)            shift; ___x_cmd_env_var "$@" ;;
 
-        prev)           ___x_cmd_env_prev "$@" ;;
-        current)        ___x_cmd_env_current "$@" ;;
+        prev)           shift; ___x_cmd_env_prev "$@" ;;
+        current)        shift; ___x_cmd_env_current "$@" ;;
+        current_)        shift; ___x_cmd_env_current_ "$@" ;;
     esac
 }
 

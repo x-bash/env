@@ -1,11 +1,15 @@
-. ./latest
-. ./lib/config
-. ./lib/ls
-. ./lib/main
-. ./lib/util
-. ./lib/var
-# x env use java=18-open node=v18.2.0
-fff()(
+# shellcheck shell=sh disable=SC1072 #source
+
+x log -x
+xws install
+___X_CMD_XRC_MODULE_IMPORTED=
+___x_cmd_advise rm ___x_cmd_env
+xrc env
+x log init env
+x log +env
+# x log -pkg
+
+t_var()(
     aaa=234
     x env var backup PATH aaa bbb AAA
     x env var get_backup PATH
@@ -17,4 +21,65 @@ fff()(
     echo "aaa:$aaa bbb:$bbb"
     echo "varname_bak: $varname_bak"
 )
-fff
+
+t_util()(
+    ___x_cmd___env_store_current  java v123
+    ___x_cmd___env_store_prev java
+    ___x_cmd___env_store_current java v234
+
+    ___x_cmd_env_current java
+    ___x_cmd_env_prev java
+)
+# t_util
+t_config()(
+    ___x_cmd_env_config_set python=v123 java=18-open rust=v234
+    ___x_cmd_env_config_set go=v345 java=
+)
+# t_config
+t_try()(
+    x env try java=18-open
+    x env try node=v18.2.0
+    # ___x_cmd_env_current node
+
+    x env try node=v17.9.0
+    # ___x_cmd_env_current node
+
+    x env untry node
+    ___x_cmd_env_current node
+
+    x pkg ls a
+)
+# t_try
+t_use()(
+    x env use java=18-open
+    x env use node=v18.2.0
+    x env current node
+
+    x env use node=v17.9.0
+    x env current node
+
+    x env use node=-
+    x env current node
+
+    x pkg ls a
+)
+# t_use
+t_exec()(
+    x env exec java=18-open node=v18.2.0 -- x pkg ls a
+    x ui sep
+    x env exec java=18-open node=v17.9.0 -- x pkg ls a
+    x ui sep
+    x env exec java=18-open node=- -- x pkg ls a
+
+    x ui sep
+    x env exec java=18-open node= -- x pkg ls a
+
+    x env current node
+
+
+    # x pkg ls a
+
+    # x env exec node=v17.9.0
+
+)
+t_exec
