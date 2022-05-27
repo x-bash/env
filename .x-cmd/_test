@@ -65,8 +65,11 @@ t_use()(
 )
 # t_use
 t_exec()(
-    x env try node=v16.15.0
+    # x env try node=v16.15.0 java go=-
+    # x env untry node
+
     x env exec java=18-open node=v18.2.0 -- x pkg ls a
+    
     x ui sep
 
     x env exec go=1.17.10 node=v17.9.0 -- x pkg ls a
