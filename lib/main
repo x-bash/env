@@ -27,6 +27,22 @@ ___x_cmd___env_pasre__pkg__version(){
     esac
 }
 
+# use = try + save-config
+___x_cmd_env_use(){
+    x:trace env/use
+    ___x_cmd_env_try "$@" || return
+
+    ___x_cmd_env_config_set "$@"
+}
+
+
+___x_cmd_env_unuse(){
+    x:trace env/unuse
+    ___x_cmd_env_untry "$@" || return
+    ___x_cmd_env_config_save "$___X_CMD_ENV_VERSION_CONFIG_PATH"
+}
+
+
 # try = install + activate
 ___x_cmd_env_try(){
     x:trace env/try
@@ -60,13 +76,6 @@ ___x_cmd_env_try(){
     ___X_CMD_ENV_VERSION_CONFIG="$(___x_cmd_ldict_print ___X_CMD_ENV___CONFIGSTR_SET_)"
 }
 
-# use = try + save-config
-___x_cmd_env_use(){
-    x:trace env/use
-    ___x_cmd_env_try "$@" || return
-
-    ___x_cmd_env_config_set "$@"
-}
 
 # TODO
 ___x_cmd_env_untry(){
@@ -90,11 +99,7 @@ ___x_cmd_env_untry(){
 
     eval "$code"
 }
-___x_cmd_env_unuse(){
-    x:trace env/unuse
-    ___x_cmd_env_untry "$@" || return
-    ___x_cmd_env_config_save "$___X_CMD_ENV_VERSION_CONFIG_PATH"
-}
+
 
 
 
