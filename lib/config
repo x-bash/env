@@ -11,9 +11,10 @@ ___x_cmd_env_config_load(){
 
     local line
     while read -r line; do
+        [ -n "$line" ] || continue
         ___x_cmd_env_try "$line"
     done <<A
-$(___x_cmd_ldict_print ___X_CMD_ENV_VERSION_CONFIG)
+$(printf "%s\n" "$___X_CMD_ENV_VERSION_CONFIG")
 A
 
 }
