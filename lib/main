@@ -103,7 +103,9 @@ ___x_cmd_env_untry(){
 # TODO: ~
 ___x_cmd_env_which(){
     local i
+    local bin_path
     for i in "$@"; do
-        ___x_cmd_pkg xbin path "${i%=*}" "$(___x_cmd_env_get_version "$i")"
+        bin_path="$(___x_cmd_pkg xbin path "${i%=*}" "$(___x_cmd_env_get_version "$i")")"
+        printf "%s\n" "${bin_path%/*}"
     done
 }
