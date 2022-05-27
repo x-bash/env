@@ -1,8 +1,11 @@
 
+___X_CMD_ENV_VERSION_CONFIG_PATH="$___X_CMD_ROOT/.boot/env"
 
 ___x_cmd_env_config_load(){
     if ! ___X_CMD_ENV_VERSION_CONFIG="$(cat "$___X_CMD_ENV_VERSION_CONFIG_PATH")"; then
-        env:error "Config file not found."
+        x mkdirp "${___X_CMD_ENV_VERSION_CONFIG_PATH%/*}"
+        touch "$___X_CMD_ENV_VERSION_CONFIG_PATH"
+        env:warn "Config file not found then create $___X_CMD_ENV_VERSION_CONFIG_PATH file"
     fi
     ___x_cmd_env_try "$@"
 }

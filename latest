@@ -27,8 +27,6 @@ ___x_cmd_env(){
     esac
 }
 
-___X_CMD_ENV_VERSION_CONFIG_PATH="$___X_CMD_ROOT/.boot/env"
-x mkdirp "$___X_CMD_ENV_VERSION_CONFIG_PATH"
 ___x_cmd_env_config_load
 
 xrc setmain ___x_cmd_env
