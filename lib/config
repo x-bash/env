@@ -41,6 +41,7 @@ ___x_cmd_env___configstr_set_(){
     local pkg_name_version
     local name
     local version
+    local IFS=" "
     for pkg_name_version in "$@"; do
         name="${pkg_name_version%=*}"
         version="${pkg_name_version#*=}"
