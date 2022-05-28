@@ -1,9 +1,9 @@
 # shellcheck    shell=sh            disable=SC3043      # xrc
 
-___x_cmd_env___ldict(){
+___x_cmd_env___sdict(){
     local ___X_CMD_LDICT_SEP="$___X_CMD_UNSEENCHAR_NEWLINE"
     local ___X_CMD_LDICT_KVSEP="="
-    ___x_cmd_ldict "$@"
+    ___x_cmd_sdict "$@"
 }
 
 
