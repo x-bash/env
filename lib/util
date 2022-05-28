@@ -15,12 +15,12 @@ ___x_cmd_env_current(){
 
 
 ___x_cmd_env_current_(){
-    ___x_cmd_env___sdict_get_ ___X_CMD_ENV_VERSION_CONFIG "${1:?Provide pkg name}"
-    ___X_CMD_ENV_CURRENT_="$___X_CMD_LDICT_GET_"
+    ___x_cmd_env___sdict get_ ___X_CMD_ENV_VERSION_CONFIG "${1:?Provide pkg name}"
+    ___X_CMD_ENV_CURRENT_="$___X_CMD_SDICT_GET_"
 }
 
 ___x_cmd___env_store_current(){
-    ___x_cmd_env___sdict_put_ ___X_CMD_ENV_VERSION_CONFIG "${1:?Provide pkg name}" "${2:?Provide version}"
+    ___x_cmd_env___sdict put ___X_CMD_ENV_VERSION_CONFIG "${1:?Provide pkg name}" "${2:?Provide version}"
 }
 
 ___x_cmd_env_prev(){

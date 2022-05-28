@@ -32,7 +32,7 @@ ___x_cmd_env_use(){
     # x:trace env/use
     ___x_cmd_env_try "$@" || return
 
-    local code="___x_cmd_env_config_set_ \"\$(cat \"\$___X_CMD_ENV_VERSION_CONFIG_PATH\")\""
+    local code="___x_cmd_env___configstr_set_ \"\$(cat \"\$___X_CMD_ENV_VERSION_CONFIG_PATH\")\""
     for i in "$@"; do
         ___x_cmd___env_pasre__pkg__version "$i"
         if [ -z "$___X_CMD___ENV_PARSE_VERSION" ]; then
@@ -41,7 +41,10 @@ ___x_cmd_env_use(){
         fi
         code="$code $___X_CMD___ENV_PARSE_PKG=$___X_CMD___ENV_PARSE_VERSION"
     done
+
+    local ___X_CMD_ENV___CONFIGSTR_SET_
     eval "$code"
+    ___x_cmd_env_config___write "$___X_CMD_ENV___CONFIGSTR_SET_"
 }
 
 
@@ -49,14 +52,13 @@ ___x_cmd_env_unuse(){
     x:trace env/unuse
     ___x_cmd_env_untry "$@" || return
 
-    local tmp
-    tmp="$(cat "$___X_CMD_ENV_VERSION_CONFIG_PATH")"
-
+    local unuse_tmp
+    unuse_tmp="$(cat "$___X_CMD_ENV_VERSION_CONFIG_PATH")$___X_CMD_UNSEENCHAR_NEWLINE"
     for i in "$@"; do
-        ___x_cmd_env___sdict rm tmp "${i%=*}"
+        ___x_cmd_env___sdict rm unuse_tmp "${i%=*}"
     done
 
-    ___x_cmd_env_config___write "$tmp" "$___X_CMD_ENV_VERSION_CONFIG_PATH"
+    ___x_cmd_env_config___write "$unuse_tmp" "$___X_CMD_ENV_VERSION_CONFIG_PATH"
 }
 
 # try = install + activate
@@ -73,7 +75,7 @@ ___x_cmd_env_try(){
             continue
         fi
 
-        env:info "Prepare $___X_CMD___ENV_PARSE_PKG $___X_CMD___ENV_PARSE_VERSION"
+        env:debug "Prepare $___X_CMD___ENV_PARSE_PKG $___X_CMD___ENV_PARSE_VERSION"
         if ! ___x_cmd_pkg install "$___X_CMD___ENV_PARSE_PKG" "$___X_CMD___ENV_PARSE_VERSION"; then
             env:error "Cannot install package: $___X_CMD___ENV_PARSE_PKG $___X_CMD___ENV_PARSE_VERSION"
             return 1
@@ -88,8 +90,9 @@ ___x_cmd_env_try(){
 
         code="$code $___X_CMD___ENV_PARSE_PKG=$___X_CMD___ENV_PARSE_VERSION"
     done
-    eval "$code"
 
+    local ___X_CMD_ENV___CONFIGSTR_SET_
+    eval "$code"
     ___X_CMD_ENV_VERSION_CONFIG="$___X_CMD_ENV___CONFIGSTR_SET_"
 }
 
@@ -101,20 +104,21 @@ ___x_cmd_env_untry(){
     local version
     local ___X_CMD_ENV_PREV
 
-    local code="___x_cmd_env___configstr_set_ \"\$___X_CMD_ENV_VERSION_CONFIG_PATH\""
+    local code="___x_cmd_env___configstr_set_ \"\$___X_CMD_ENV_VERSION_CONFIG\""
 
     local i; for i in "$@"; do
         pkg_name="${i%=*}"
         ___x_cmd_pkg deactivate "$pkg_name"
+        code="$code $pkg_name="
         ___x_cmd_env_prev_ "$pkg_name"
-        env:debug "untry $pkg_name recover $___X_CMD_ENV_PREV"
         if [ -n "$___X_CMD_ENV_PREV" ]; then
+            env:debug "untry $pkg_name recover $___X_CMD_ENV_PREV"
             ___x_cmd_pkg activate "$pkg_name" "$___X_CMD_ENV_PREV"
             ___x_cmd___env_store_current "$pkg_name" "$___X_CMD_ENV_PREV"
         fi
-        code="$code $pkg_name="
     done
 
+    local ___X_CMD_ENV___CONFIGSTR_SET_
     eval "$code"
     ___X_CMD_ENV_VERSION_CONFIG="$___X_CMD_ENV___CONFIGSTR_SET_"
 }
