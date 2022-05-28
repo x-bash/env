@@ -3,6 +3,7 @@
 ___X_CMD_ENV_VERSION_CONFIG_PATH="$___X_CMD_ROOT/.boot/env"
 
 ___x_cmd_env_config_load(){
+    x:trace env/load
     if ! ___X_CMD_ENV_VERSION_CONFIG="$(cat "$___X_CMD_ENV_VERSION_CONFIG_PATH" 2>/dev/null)"; then
         x mkdirp "${___X_CMD_ENV_VERSION_CONFIG_PATH%/*}"
         touch "$___X_CMD_ENV_VERSION_CONFIG_PATH"
