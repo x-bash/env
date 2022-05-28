@@ -40,3 +40,16 @@ ___x_cmd___env_store_prev(){
     ___x_cmd_env_current_ "$pkg"
     eval "___X_CMD_ENV_PREV_$pkg=\"\$___X_CMD_ENV_CURRENT_\""
 }
+
+# TODO: ~
+___x_cmd_env_which(){
+    local i
+    local bin_path
+    for i in "$@"; do
+        bin_path="$(___x_cmd_pkg xbin path "${i%=*}" "$(___x_cmd_env_get_version "$i")")"
+        bin_path="${bin_path%/*}"
+        [ -d "$bin_path" ] || continue
+        printf "%s\n" "${bin_path%/*}"
+    done
+}
+

@@ -48,9 +48,16 @@ ___x_cmd_env_use(){
 ___x_cmd_env_unuse(){
     x:trace env/unuse
     ___x_cmd_env_untry "$@" || return
-    ___x_cmd_env_config_save "$___X_CMD_ENV_VERSION_CONFIG_PATH"
-}
 
+    local tmp
+    tmp="$(cat "$___X_CMD_ENV_VERSION_CONFIG_PATH")"
+
+    for i in "$@"; do
+        ___x_cmd_env___sdict rm tmp "${i%=*}"
+    done
+
+    ___x_cmd_env_config___write "$tmp" "$___X_CMD_ENV_VERSION_CONFIG_PATH"
+}
 
 # try = install + activate
 ___x_cmd_env_try(){
@@ -110,16 +117,4 @@ ___x_cmd_env_untry(){
 
     eval "$code"
     ___X_CMD_ENV_VERSION_CONFIG="$___X_CMD_ENV___CONFIGSTR_SET_"
-}
-
-# TODO: ~
-___x_cmd_env_which(){
-    local i
-    local bin_path
-    for i in "$@"; do
-        bin_path="$(___x_cmd_pkg xbin path "${i%=*}" "$(___x_cmd_env_get_version "$i")")"
-        bin_path="${bin_path%/*}"
-        [ -d "$bin_path" ] || continue
-        printf "%s\n" "${bin_path%/*}"
-    done
 }
