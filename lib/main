@@ -29,7 +29,7 @@ ___x_cmd___env_pasre__pkg__version(){
 
 # use = try + save-config
 ___x_cmd_env_use(){
-    x:trace env/use
+    # x:trace env/use
     ___x_cmd_env_try "$@" || return
 
     local code="___x_cmd_env_config_set"
@@ -54,7 +54,7 @@ ___x_cmd_env_unuse(){
 
 # try = install + activate
 ___x_cmd_env_try(){
-    x:trace env/try
+    # x:trace env/try
 
     local i
     local ___X_CMD___ENV_PARSE_PKG
@@ -91,6 +91,7 @@ ___x_cmd_env_try(){
 
 # TODO
 ___x_cmd_env_untry(){
+    x:trace env/untry
     local i
     local pkg_name
     local version
