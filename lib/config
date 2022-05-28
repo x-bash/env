@@ -48,7 +48,7 @@ ___x_cmd_env___configstr_set_(){
         if [ -n "$version" ]; then
             ___x_cmd_env___sdict put    ___X_CMD_ENV___CONFIGSTR_SET_ "$name" "$version"
         else
-            ___x_cmd_env___sdict_rm     ___X_CMD_ENV___CONFIGSTR_SET_ "$name"
+            ___x_cmd_env___sdict rm     ___X_CMD_ENV___CONFIGSTR_SET_ "$name"
         fi
     done
 
