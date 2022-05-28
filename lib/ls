@@ -2,16 +2,19 @@
 
 ___x_cmd_env_ls(){
     case "$1" in
-        i|installed)      shift;  ___x_cmd_pkg ls i   "$@"    ;;
-        a|activated)      shift;  ___x_cmd_pkg ls a   "$@"    ;;
-        A|all)            shift;  ___x_cmd_pkg ls all "$@"    ;;
-        t|try)            shift;  ___x_cmd_env_ls_try "$@" ;;
-        u|use)            shift;  ___x_cmd_env_ls_use "$@" ;;
-
-        *)                ___x_cmd_env_ls_config "$@" ;;
+        a|activated)      shift;  ___x_cmd_pkg ls a      "$@" ;;
+        i|installed)      shift;  ___x_cmd_pkg ls i      "$@" ;;
+        A|all)            shift;  ___x_cmd_pkg ls all    "$@" ;;
+        u|use)            shift;  ___x_cmd_env_ls_use    "$@" ;;
+        config)           shift;  ___x_cmd_env_ls_config "$@" ;;
+        *)                ___x_cmd_env_ls_config "$@"
     esac
 }
 
 ___x_cmd_env_ls_config(){
     printf "%s\n" "$___X_CMD_ENV_VERSION_CONFIG"
+}
+
+___x_cmd_env_ls_use(){
+    cat "$___X_CMD_ENV_VERSION_CONFIG_PATH"
 }

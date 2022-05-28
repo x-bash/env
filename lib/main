@@ -80,8 +80,7 @@ ___x_cmd_env_try(){
 
         ___x_cmd_pkg activate "$___X_CMD___ENV_PARSE_PKG" "$___X_CMD___ENV_PARSE_VERSION"
         ___x_cmd___env_store_current "$___X_CMD___ENV_PARSE_PKG" "$___X_CMD___ENV_PARSE_VERSION"
-        ___X_CMD_ENV_VERSION_CONFIG_TRY="$___X_CMD_ENV_VERSION_CONFIG_TRY
-$___X_CMD___ENV_PARSE_PKG=$___X_CMD___ENV_PARSE_VERSION"
+
         code="$code $___X_CMD___ENV_PARSE_PKG=$___X_CMD___ENV_PARSE_VERSION"
     done
     eval "$code"
