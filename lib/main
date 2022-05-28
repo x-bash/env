@@ -32,7 +32,7 @@ ___x_cmd_env_use(){
     # x:trace env/use
     ___x_cmd_env_try "$@" || return
 
-    local code="___x_cmd_env___configstr_set_ \"\$(cat \"\$___X_CMD_ENV_VERSION_CONFIG_PATH\")\""
+    local code="___x_cmd_env___configstr_set_ \"\$(cat \"\$___X_CMD_ENV_VERSION_CONFIG_PATH\")\$___X_CMD_UNSEENCHAR_NEWLINE\""
     for i in "$@"; do
         ___x_cmd___env_pasre__pkg__version "$i"
         if [ -z "$___X_CMD___ENV_PARSE_VERSION" ]; then

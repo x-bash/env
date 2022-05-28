@@ -32,7 +32,7 @@ ___x_cmd_env_config___write(){
         return 1
     fi
 
-    printf "%s" "$1" > "$tgt"
+    printf "%s\n" "$1" > "$tgt"
 }
 
 ___x_cmd_env___configstr_set_(){
