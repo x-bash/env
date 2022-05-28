@@ -32,7 +32,7 @@ ___x_cmd_env_use(){
     # x:trace env/use
     ___x_cmd_env_try "$@" || return
 
-    local code="___x_cmd_env_config_set"
+    local code="___x_cmd_env_config_set_ \"\$(cat \"\$___X_CMD_ENV_VERSION_CONFIG_PATH\")\""
     for i in "$@"; do
         ___x_cmd___env_pasre__pkg__version "$i"
         if [ -z "$___X_CMD___ENV_PARSE_VERSION" ]; then
@@ -55,13 +55,11 @@ ___x_cmd_env_unuse(){
 # try = install + activate
 ___x_cmd_env_try(){
     # x:trace env/try
-
-    local i
     local ___X_CMD___ENV_PARSE_PKG
     local ___X_CMD___ENV_PARSE_VERSION
 
-    local code="___x_cmd_env___configstr_set_ \"\$___X_CMD_ENV_VERSION_CONFIG_PATH\""
-    for i in "$@"; do
+    local code="___x_cmd_env___configstr_set_ \"\$___X_CMD_ENV_VERSION_CONFIG\""
+    local i; for i in "$@"; do
         ___x_cmd___env_pasre__pkg__version "$i"
         if [ -z "$___X_CMD___ENV_PARSE_VERSION" ]; then
             env:warn "Not found $___X_CMD___ENV_PARSE_PKG version."
@@ -85,20 +83,20 @@ ___x_cmd_env_try(){
     done
     eval "$code"
 
-    ___X_CMD_ENV_VERSION_CONFIG="$(___x_cmd_ldict_print ___X_CMD_ENV___CONFIGSTR_SET_)"
+    ___X_CMD_ENV_VERSION_CONFIG="$___X_CMD_ENV___CONFIGSTR_SET_"
 }
 
 
 # TODO
 ___x_cmd_env_untry(){
     x:trace env/untry
-    local i
     local pkg_name
     local version
     local ___X_CMD_ENV_PREV
 
     local code="___x_cmd_env___configstr_set_ \"\$___X_CMD_ENV_VERSION_CONFIG_PATH\""
-    for i in "$@"; do
+
+    local i; for i in "$@"; do
         pkg_name="${i%=*}"
         ___x_cmd_pkg deactivate "$pkg_name"
         ___x_cmd_env_prev_ "$pkg_name"
@@ -111,7 +109,7 @@ ___x_cmd_env_untry(){
     done
 
     eval "$code"
-    ___X_CMD_ENV_VERSION_CONFIG="$(___x_cmd_ldict_print ___X_CMD_ENV___CONFIGSTR_SET_)"
+    ___X_CMD_ENV_VERSION_CONFIG="$___X_CMD_ENV___CONFIGSTR_SET_"
 }
 
 # TODO: ~
