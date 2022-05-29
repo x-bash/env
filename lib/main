@@ -11,7 +11,7 @@ ___x_cmd_env_get_version(){
 }
 
 ___x_cmd___env_pasre__pkg__version(){
-    case "$1" in
+    case "${1:?Please provide package and its version in form of <pkg>=<-|<version>>}" in
         *=-)
             ___X_CMD___ENV_PARSE_PKG="${1%=-}"
             ___x_cmd_env_prev_ "${1%=-}"
