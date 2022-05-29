@@ -89,8 +89,7 @@ ___x_cmd_env_try(){
         code="$code $___X_CMD___ENV_PARSE_PKG=$___X_CMD___ENV_PARSE_VERSION"
     done
 
-    local ___X_CMD_ENV___CONFIGSTR_SET_
-    eval "$code"
+    local ___X_CMD_ENV___CONFIGSTR_SET_;    eval "$code"
     ___X_CMD_ENV_VERSION_CONFIG="$___X_CMD_ENV___CONFIGSTR_SET_"
 }
 
