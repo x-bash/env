@@ -6,12 +6,11 @@
 # deactivate: x env var recoverall
 
 ___x_cmd_env_var(){
-    local option="$1"
     case "$1" in
         backup|get_backup|\
         clear|ls|\
-        recover|recoverall)  shift && "___x_cmd_env_var_$option" "$@" ;;
-        # recover|recoverall)  shift && eval "\$(___x_cmd_env_var_$option \"\$@\")" ;;
+        recover|recoverall)  shift && "___x_cmd_env_var_${1}" "$@" ;;
+        # recover|recoverall)  shift && eval "\$(___x_cmd_env_var_${1} \"\$@\")" ;;
     esac
 }
 

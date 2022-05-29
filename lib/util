@@ -43,9 +43,8 @@ ___x_cmd___env_store_prev(){
 
 # TODO: ~
 ___x_cmd_env_which(){
-    local i
     local bin_path
-    for i in "$@"; do
+    local i; for i in "$@"; do
         bin_path="$(___x_cmd_pkg xbin path "${i%=*}" "$(___x_cmd_env_get_version "$i")")"
         bin_path="${bin_path%/*}"
         [ -d "$bin_path" ] || continue
