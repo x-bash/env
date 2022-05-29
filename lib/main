@@ -33,7 +33,7 @@ ___x_cmd_env_use(){
     ___x_cmd_env_try "$@" || return
 
     local code="___x_cmd_env___configstr_set_ \"\$(cat \"\$___X_CMD_ENV_VERSION_CONFIG_PATH\")\$___X_CMD_UNSEENCHAR_NEWLINE\""
-    for i in "$@"; do
+    local i; for i in "$@"; do
         ___x_cmd___env_pasre__pkg__version "$i"
         if [ -z "$___X_CMD___ENV_PARSE_VERSION" ]; then
             env:warn "Not found $___X_CMD___ENV_PARSE_PKG version."
@@ -42,8 +42,7 @@ ___x_cmd_env_use(){
         code="$code $___X_CMD___ENV_PARSE_PKG=$___X_CMD___ENV_PARSE_VERSION"
     done
 
-    local ___X_CMD_ENV___CONFIGSTR_SET_
-    eval "$code"
+    local ___X_CMD_ENV___CONFIGSTR_SET_;    eval "$code"
     ___x_cmd_env_config___write "$___X_CMD_ENV___CONFIGSTR_SET_"
 }
 
@@ -52,9 +51,8 @@ ___x_cmd_env_unuse(){
     x:trace env/unuse
     ___x_cmd_env_untry "$@" || return
 
-    local unuse_tmp
-    unuse_tmp="$(cat "$___X_CMD_ENV_VERSION_CONFIG_PATH")$___X_CMD_UNSEENCHAR_NEWLINE"
-    for i in "$@"; do
+    local unuse_tmp; unuse_tmp="$(cat "$___X_CMD_ENV_VERSION_CONFIG_PATH")$___X_CMD_UNSEENCHAR_NEWLINE"
+    local i; for i in "$@"; do
         ___x_cmd_env___sdict rm unuse_tmp "${i%=*}"
     done
 
@@ -118,7 +116,6 @@ ___x_cmd_env_untry(){
         fi
     done
 
-    local ___X_CMD_ENV___CONFIGSTR_SET_
-    eval "$code"
+    local ___X_CMD_ENV___CONFIGSTR_SET_;    eval "$code"
     ___X_CMD_ENV_VERSION_CONFIG="$___X_CMD_ENV___CONFIGSTR_SET_"
 }
