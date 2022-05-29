@@ -17,7 +17,7 @@ ___x_cmd_env_ls_config(){
     [ -n "$___X_CMD_ENV_VERSION_CONFIG" ] || return 0
     osarch="$(___x_cmd_pkg_osarch)"
     locate_list="$(___x_cmd_pkg_ll)"
-    printf "%s\n" "$___X_CMD_ENV_VERSION_CONFIG" | awk -v FS="=" \
+    awk -v FS="=" \
         -v OSARCH="$osarch" \
         -v LOCAL_LIST="$locate_list" \
         -v PKG_RAWPATH="$___X_CMD_PKG_RAWPATH" \
@@ -26,7 +26,9 @@ ___x_cmd_env_ls_config(){
         -f "$___X_CMD_ROOT_MOD/awk/lib/jqparse.awk" \
         -f "$___X_CMD_ROOT_MOD/awk/lib/str.awk" \
         -f "$___X_CMD_ROOT_MOD/pkg/lib/awk/util.awk" \
-        -f "$___X_CMD_ROOT_MOD/pkg/lib/awk/pkg.ls.awk"
+        -f "$___X_CMD_ROOT_MOD/pkg/lib/awk/pkg.ls.awk" <<A
+${___X_CMD_ENV_VERSION_CONFIG}
+A
 }
 
 ___x_cmd_env_ls_use(){
