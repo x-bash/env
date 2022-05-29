@@ -9,6 +9,9 @@ xrc pkg
 ___x_cmd_env(){
     local op="$1"
     case "$op" in
+        current_)       shift; ___x_cmd_env_current_    "$@" ;;
+        prev_)          shift; ___x_cmd_env_prev_       "$@" ;;
+
         ls)             shift;  ___x_cmd_env_ls         "$@" ;;
         try)            shift;  ___x_cmd_env_try        "$@" ;;
         untry)          shift;  ___x_cmd_env_untry      "$@" ;;
@@ -21,7 +24,7 @@ ___x_cmd_env(){
 
         prev)           shift; ___x_cmd_env_prev        "$@" ;;
         current)        shift; ___x_cmd_env_current     "$@" ;;
-        current_)       shift; ___x_cmd_env_current_    "$@" ;;
+
         ""|help)             cat "$___X_CMD_ROOT_MOD/env/lib/help.txt" >&2; return 1 ;;
         _x_cmd_advise_json ) cat "$___X_CMD_ROOT_MOD/env/lib/env.advise.json"        ;;
     esac
