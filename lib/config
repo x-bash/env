@@ -36,8 +36,7 @@ ___x_cmd_env_config___write(){
 }
 
 ___x_cmd_env___configstr_set_(){
-    ___X_CMD_ENV___CONFIGSTR_SET_="${1:-""}"
-    shift
+    ___X_CMD_ENV___CONFIGSTR_SET_="${1:-""}";   shift
 
     local name
     local version

@@ -2,6 +2,12 @@ subcommands:
     ls                      "list all installed environments"
     x env ls <candidate>
 
+    current                 "Show the version of candidate you are using"
+    x env current <candidate>
+
+    prev
+    x env prev <candidate>  "Show the last version you used"
+
     try                     "Set environment version in this shell session"
     x env try <candidate>=<version> <candidate>=<version> <candidate>=<version>  ...
 
