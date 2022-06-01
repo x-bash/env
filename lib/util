@@ -44,11 +44,22 @@ ___x_cmd___env_store_prev(){
 # TODO: ~
 ___x_cmd_env_which(){
     local bin_path
-    local i; for i in "$@"; do
-        bin_path="$(___x_cmd_pkg xbin path "${i%=*}" "$(___x_cmd_env_get_version "$i")")"
-        bin_path="${bin_path%/*}"
-        [ -d "$bin_path" ] || continue
-        printf "%s\n" "${bin_path%/*}"
-    done
+    if [ -z "$@" ]; then
+        cat "$___X_CMD_ENV_VERSION_CONFIG_PATH" | while read -r  i; do
+            ! [ -z "$i" ] || continue
+            bin_path="$(___x_cmd_pkg xbin path "${i%=*}" "${i#*=}")"
+            bin_path="${bin_path%/*}"
+            [ -d "$bin_path" ] || continue
+            printf  "%-10s  %s\n" "${i%=*}" "${bin_path%/*}"
+        done
+    else
+        local i; for i in "$@"; do
+            bin_path="$(___x_cmd_pkg xbin path "${i%=*}" "$(___x_cmd_env_get_version "$i")")"
+            bin_path="${bin_path%/*}"
+            [ -d "$bin_path" ] || continue
+            printf "%s\n" "${bin_path%/*}"
+        done
+
+    fi
 }
 
