@@ -5,23 +5,18 @@ xrc path
 
 
 ___x_cmd_env_config_load(){
-    local configstr
-    if ! configstr="$(cat "$___X_CMD_ENV_VERSION_CONFIG_PATH" 2>/dev/null)"; then
+    if [ ! -f "$___X_CMD_ENV_VERSION_CONFIG_PATH" ]; then
         x touch "$___X_CMD_ENV_VERSION_CONFIG_PATH"
         env:debug "Config file not found then create $___X_CMD_ENV_VERSION_CONFIG_PATH file"
     fi
 
-    local line
-    while read -r line; do
+    local line; while read -r line; do
         [ -n "$line" ] || continue
         #___x_cmd_env_try "$line"
         local version=${line#*=}
         local name=${line%=*}
         ___x_cmd_pkg activate  "$name" "$version"
-    done <<A
-$configstr
-A
-
+    done <"$___X_CMD_ENV_VERSION_CONFIG_PATH"
 }
 
 # ___x_cmd_env_config_load(){
