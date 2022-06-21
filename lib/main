@@ -41,7 +41,8 @@ ___x_cmd_env_use(){
         fi
 
         local script_path
-        script_path="$(___x_cmd_pkg___get_script_path "$___X_CMD___ENV_PARSE_PKG" "$___X_CMD___ENV_PARSE_VERSION")"
+        script_path="$(___x_cmd_pkg___get_script_path "$___X_CMD___ENV_PARSE_PKG" "$___X_CMD___ENV_PARSE_VERSION" "" activate)"
+        env:debug "script_path: ""$script_path" "___X_CMD___ENV_PARSE_PKG: " "$___X_CMD___ENV_PARSE_PKG" "___X_CMD___ENV_PARSE_VERSION: " "$___X_CMD___ENV_PARSE_VERSION"
         code="$code $___X_CMD___ENV_PARSE_PKG=$___X_CMD___ENV_PARSE_VERSION=$script_path"
     done
 
