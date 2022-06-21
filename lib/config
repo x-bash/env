@@ -18,8 +18,8 @@ ___x_cmd_env_config_load(){
         local version="${versionandsrcipt%=*}"
         local script_path="${line##*=}"
 
-        # ___x_cmd_pkg activate  "$name" "$version" "$script_path"
-        . "${script_path}"
+         ___x_cmd_pkg activate  "$name" "$version" "$script_path"
+
 
     done <"$___X_CMD_ENV_VERSION_CONFIG_PATH"
 }
