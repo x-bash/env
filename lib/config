@@ -13,11 +13,14 @@ ___x_cmd_env_config_load(){
     local line; while read -r line; do
         [ -n "$line" ] || continue
         #___x_cmd_env_try "$line"
-        local name=${line%%=*}
-        local version=${line#"$name"=}
-        local script_path="${line#"$name"="$version"=}"
+        local name="${line%%=*}"
+        local versionandsrcipt="${line#"$name"=}"
+        local version="${versionandsrcipt%=*}"
+        local script_path="${line##*=}"
 
         ___x_cmd_pkg activate  "$name" "$version" "$script_path"
+
+
     done <"$___X_CMD_ENV_VERSION_CONFIG_PATH"
 }
 
