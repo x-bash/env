@@ -28,6 +28,15 @@ ___x_cmd_env___advise_ls_all_candidate(){
     ls "$___X_CMD_PKG_RAWPATH"/*/ | awk '{if(($0 != "") && (! match($0, /^\/[..]*/))){print $0}}'
 }
 
+___x_cmd_env___advise_ls_installed_name()(
+    if ! [ -d "$___X_CMD_PKG_INSTALL_PATH" ]; then return 0; fi
+    cd "$___X_CMD_PKG_INSTALL_PATH" || exit
+    local i
+    for i in *; do
+        printf "%s\n" "${i#*/}"
+    done
+)
+
 
 
 ## EndSection
