@@ -1,3 +1,4 @@
+x advise demo - <<A
 {
     "ls": {
         "installed|i": {
@@ -27,47 +28,32 @@
     },
     "untry": {
         "#desc": "Deactivate and record environment version",
-        "#1": {
-            "#exec": "___x_cmd_env___advive_local_use_candidate"
-        },
-        "#2": {
-            "#exec": "___x_cmd_env___advive_local_use_version"
+        "#n": {
+            "#exec": "___x_cmd_env___advise_ls_installed_name"
         }
     },
     "use": {
         "#desc": "Set global environment version",
-        "#1": {
-            "#exec": "___x_cmd_env___advise_ls_all_candidate"
-        },
-        "#2":{
-            "#exec": "___x_cmd_env___advise_ls_all_version"
+        "#n": {
+            "#exec": "___x_cmd_env___advise_ls_installed_name"
         }
     },
     "unuse": {
         "#desc": "Remove environment",
-        "#1": {
-            "#exec": "___x_cmd_env___advive_local_use_candidate"
-        },
-        "#2": {
-            "#ecex": "___x_cmd_env___advive_local_use_version"
+        "#n": {
+            "#exec": "___x_cmd_env___advise_ls_installed_name"
         }
     },
     "exec": {
         "#desc": "Run an executable with the selected candidates version",
         "#n": {
-            "#1": "___x_cmd_env___advise_ls_installed_name"
-        },
-        "#2": {
-            "#cand": []
+            "#exec": "___x_cmd_env___advise_ls_installed_name"
         }
     },
     "which": {
         "#desc": "Display path of environment installed",
         "#1": {
             "#exec": "___x_cmd_env___advise_ls_installed_name"
-        },
-        "#2":{
-            "#cand": [ ]
         }
     },
     "var": {
@@ -76,16 +62,10 @@
             "#cand": [ "backup", "get_backup", "ls", "recover" ]
         }
     },
-    "prev": {
-        "#desc": "Show the last version you used"
-    },
+    "prev": null,
     "current": {
-        "#desc": "input your local environment",
-        "#1": {
-            "#exec": "___x_cmd_env___advise_ls_installed_name"
-        },
-        "#2":{
-            "#cand": [ ]
-        }
-    }
+        "#desc": "show your local environment"
+    },
+    "current_": null
 }
+A

@@ -3,20 +3,12 @@
 # Section: advise ls_version
 
 # TODO:Here, the previous argument should be obtained through the interface provided by advise
-___x_cmd_env___advise_ls_all_version(){
-    local candidate_idx="${1:-2}"; [ -z "$ZSH_VERSION" ] || candidate_idx=$((candidate_idx+1))
-    x pkg ls all "${COMP_WORDS[candidate_idx]}"
-}
 
 ___x_cmd_env___adivse_ls_installed_version(){
     local candidate_idx="${1:-2}"; [ -z "$ZSH_VERSION" ] || candidate_idx=$((candidate_idx+1))
-    x pkg ls i "${COMP_WORDS[candidate_idx]}"
+    ___x_cmd_pkg___advise_local_version "${COMP_WORDS[candidate_idx]}"
 }
 
-___x_cmd_env_advise_cmd_ls_local_version(){
-    local cmd_idx="${1:-2}"; [ -z "$ZSH_VERSION" ] || cmd_idx=$((cmd_idx+1))
-    x env ls "$(___x_cmd_env_util_cmd_to_candidate "${COMP_WORDS[cmd_idx]}")"
-}
 
 ___x_cmd_env_advise_ls_cmd(){
     find "$___X_CMD_ENV_PATH"/*/versions/*/bin/* | while read -r cmd_path; do
@@ -37,6 +29,28 @@ ___x_cmd_env___advise_ls_installed_name()(
     done
 )
 
-
+___x_cmd_env___advise_ls_all_version(){
+    local candidate_idx="${1-2}"; [ -z "$ZSH_VERSION" ] || candidate_idx=$((candidate_idx+1))
+    ___x_cmd_pkg_ls_all "${COMP_WORDS[candidate_idx]}"
+}
 
 ## EndSection
+___x_cmd_env___advise_local_version(){
+    local "candidate=${1:-""}"
+    ls "$___X_CMD_PKG_INSTALL_PATH"/"$candidate"
+}
+
+___x_cmd_env___advive_local_use_candidate(){
+    local line; while read -r line; do
+        line=${line%%=*}
+        printf "%s" "$line"
+    done<"$___X_CMD_ENV_VERSION_CONFIG_PATH"
+}
+
+___x_cmd_env___advive_local_use_version(){
+    local line; while read -r line; do
+        line=${line#*=}
+        line=${line%=*}
+        printf "%s" "$line"
+    done<"$___X_CMD_ENV_VERSION_CONFIG_PATH"
+}
