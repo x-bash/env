@@ -9,7 +9,8 @@ ___x_cmd_env___advise_ls_candidate(){
     if [ "${cur%%=*}" = "$cur" ]; then
         candidate_exec_arr=( $(ls "$___X_CMD_PKG_RAWPATH"/*/ | awk '{if(($0 != "") && (! match($0, /^\/[..]*/))){print $0 "="}}'))
     else
-        candidate_exec_arr=( $(___x_cmd_pkg_ls_all "${cur%%=*}" "${cur%%=*}=" ))
+        ___x_cmd_advise_set_nospace
+        candidate_exec_arr=( $(___x_cmd_pkg_ls_all "${cur%%=*}" | awk -v name="${cur%%=*}=" '{ str = name $0; print str}'))
     fi
 }
 
