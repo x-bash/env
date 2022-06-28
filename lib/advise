@@ -5,12 +5,12 @@
 # TODO:Here, the previous argument should be obtained through the interface provided by advise
 ___x_cmd_env___advise_ls_candidate(){
     [ -z "$ZSH_VERSION" ] || local COMP_CWORD="$(( ${#words[@]} ))"
-    local cur="${COMP_WORDS[COMP_CWORD]}"
-    if [ "${cur%%=*}" = "$cur" ]; then
+    local candidate="${COMP_WORDS[COMP_CWORD]}"
+    if [ "${candidate%%=*}" = "$candidate" ]; then
         candidate_exec_arr=( $(ls "$___X_CMD_PKG_RAWPATH"/*/ | awk '{if(($0 != "") && (! match($0, /^\/[..]*/))){print $0 "="}}'))
     else
-        ___x_cmd_advise_set_nospace
-        candidate_exec_arr=( $(___x_cmd_pkg_ls_all "${cur%%=*}" | awk -v name="${cur%%=*}=" '{ str = name $0; print str}'))
+        # TODO: ___x_cmd_advise_set_nospace
+        candidate_exec_arr=( $(___x_cmd_pkg_ls_all "${candidate%%=*}" | awk -v name="${candidate%%=*}=" '{ str = name $0; print str}'))
     fi
 }
 
