@@ -68,7 +68,6 @@ ___x_cmd_env_try(){
     # x:trace env/try
     local ___X_CMD___ENV_PARSE_PKG
     local ___X_CMD___ENV_PARSE_VERSION
-    local ___X_CMD_ENV_CURRENT_
 
     local code="___x_cmd_env___configstr_set_ \"\$___X_CMD_ENV_VERSION_CONFIG\""
     local i; for i in "$@"; do
@@ -77,9 +76,6 @@ ___x_cmd_env_try(){
             env:warn "Not found $___X_CMD___ENV_PARSE_PKG version."
             continue
         fi
-
-        ___x_cmd_env_current_ "$___X_CMD___ENV_PARSE_PKG"
-        [ "$___X_CMD_ENV_CURRENT_" != "$___X_CMD___ENV_PARSE_VERSION" ] || continue
 
         env:debug "Prepare $___X_CMD___ENV_PARSE_PKG $___X_CMD___ENV_PARSE_VERSION"
         if ! ___x_cmd_pkg install "$___X_CMD___ENV_PARSE_PKG" "$___X_CMD___ENV_PARSE_VERSION"; then
