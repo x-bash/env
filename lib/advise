@@ -7,9 +7,9 @@ ___x_cmd_env___advise_ls_candidate(){
     [ -z "$ZSH_VERSION" ] || local COMP_CWORD="$(( ${#words[@]} ))"
     local candidate="${COMP_WORDS[COMP_CWORD]}"
     if [ "${candidate%%=*}" = "$candidate" ]; then
+        ___x_cmd_advise_set_nospace
         candidate_exec_arr=( $(ls "$___X_CMD_PKG_RAWPATH"/*/ | awk '{if(($0 != "") && (! match($0, /^\/[..]*/))){print $0 "="}}'))
     else
-        # TODO: ___x_cmd_advise_set_nospace
         candidate_exec_arr=( $(___x_cmd_pkg_ls_all "${candidate%%=*}" | awk -v name="${candidate%%=*}=" '{ str = name $0; print str}'))
     fi
 }
@@ -31,7 +31,7 @@ ___x_cmd_env___advise_ls_installed_name(){
 }
 
 ___x_cmd_env___advise_ls_all_version(){
-    local candidate_idx="${1-2}"; [ -z "$ZSH_VERSION" ] || candidate_idx=$((candidate_idx+1))
+    local candidate_idx="${1:-2}"; [ -z "$ZSH_VERSION" ] || candidate_idx=$((candidate_idx+1))
     candidate_exec_arr=( $(___x_cmd_pkg_ls_all "${COMP_WORDS[candidate_idx]}"))
 }
 
