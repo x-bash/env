@@ -28,7 +28,7 @@ ___x_cmd_env(){
 
         ""|--help|-help)            cat "$___X_CMD_ROOT_MOD/env/lib/help.txt" >&2; return 0 ;;
         _x_cmd_advise_json )        cat "$___X_CMD_ROOT_MOD/env/lib/env.advise.json"        ;;
-        *)                          pkg:error "Not found command: x env $1"; return 1
+        *)                          env:error "Not found command: x env $1"; return 1
     esac
 }
 
